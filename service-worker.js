@@ -3,10 +3,10 @@ self.addEventListener('install', function(event) {
     caches.open('v1').then(function(cache) {
       return cache.addAll([
         '/',
-        '/dashboard.php',
+        '/',
         '/icon-192x192.png',
         '/icon-512x512.png',
-        '/../my.css'
+        '/my.css'
       ]);
     })
   );

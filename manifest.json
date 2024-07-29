@@ -1,7 +1,7 @@
 {
-  "name": "Dashboard",
-  "short_name": "Dashboard",
-  "start_url": "/dashboard.php",
+  "name": "MyFDM91",
+  "short_name": "MyFDM91",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#007bff",
