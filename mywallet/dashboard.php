@@ -52,8 +52,6 @@ $next_selected = $next_date->format('d/m/Y');
 <body>
     <?php include 'navbar.php'; ?>
     <div class="container mt-5">
-        <h1 class="mb-4">Bentornato, <?php echo htmlspecialchars($_SESSION['name']); ?></h1>
-
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
                 <h4 class="mb-0">Panoramica</h4>
