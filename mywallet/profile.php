@@ -6,7 +6,7 @@ if (!isset($_SESSION['username'])) {
     exit;
 }
 
-require_once 'config.php';
+require_once '../config.php';
 
 $current_password_err = $new_password_err = $confirm_password_err = "";
 $current_password = $new_password = $confirm_password = "";

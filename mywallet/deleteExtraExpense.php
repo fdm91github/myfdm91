@@ -6,7 +6,7 @@ if (!isset($_SESSION['username'])) {
     exit;
 }
 
-require_once 'config.php';
+require_once '../config.php';
 
 $error_message = '';
 $success_message = '';

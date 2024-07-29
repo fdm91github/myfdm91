@@ -6,7 +6,7 @@ if (!isset($_SESSION['username'])) {
     exit;
 }
 
-require_once 'config.php';
+require_once '../config.php';
 
 $user_id = $_SESSION['id'];
 $expense_id = $_GET['id'] ?? null;

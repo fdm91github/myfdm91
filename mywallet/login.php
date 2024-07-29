@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require_once 'config.php';
+require_once '../config.php';
 
 // Check if the user is already logged in, if yes then redirect to dashboard
 if (isset($_SESSION['username'])) {
