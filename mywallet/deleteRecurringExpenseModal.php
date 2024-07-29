@@ -1,0 +1,47 @@
+<!-- Modale per l'eliminazione di una spesa ricorrente -->
+<div class="modal fade" id="deleteRecurringExpenseModal" tabindex="-1" role="dialog" aria-labelledby="deleteRecurringExpenseModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteRecurringExpenseModalLabel">Elimina spesa ricorrente</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="deleteRecurringExpenseStatus"></div>
+                <p>Sei sicuro di voler eliminare questa voce?</p>
+                <form id="deleteRecurringExpenseForm">
+                    <input type="hidden" name="id" id="deleteRecurringExpenseId">
+                    <button type="submit" class="btn btn-danger btn-block">Elimina</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $('#deleteRecurringExpenseModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var id = button.data('id');
+
+            $('#deleteRecurringExpenseId').val(id);
+        });
+
+        $('#deleteRecurringExpenseForm').submit(function(e) {
+            e.preventDefault();
+            $.ajax({
+                url: 'deleteRecurringExpense.php',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    $('#deleteRecurringExpenseStatus').html('<div class="alert alert-success">Spesa eliminata con successo!</div>');
+                    setTimeout(function() { window.location.reload(); }, 1000);
+                },
+                error: function() {
+                    $('#deleteRecurringExpenseStatus').html('<div class="alert alert-danger">Qualcosa è andato storto. Riprova più tardi.</div>');
+                }
+            });
+        });
+    });
+</script>
