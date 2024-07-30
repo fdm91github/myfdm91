@@ -9,19 +9,13 @@
                 <a class="nav-link" href=".">Dashboard</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="incomes.php">Entrate</a>
+                <a class="nav-link" href="vehicles.php">I miei veicoli</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="recurringExpenses.php">Spese ricorrenti</a>
+                <a class="nav-link" href="repairs.php">Riparazioni</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="estimatedExpenses.php">Spese stimate</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="extraExpenses.php">Spese extra</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="piggyBank.php">Salvadanaio</a>
+                <a class="nav-link" href="services.php">Tagliandi</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="../logout.php">Esci</a>
