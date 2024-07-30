@@ -24,9 +24,6 @@
                 <a class="nav-link" href="piggyBank.php">Salvadanaio</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="profile.php">Il mio Profilo</a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" href="logout.php">Esci</a>
             </li>
         </ul>
