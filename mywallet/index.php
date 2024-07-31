@@ -23,6 +23,65 @@ if ($salaryDate) {
 
 $currentSelected = $currentDate->format('d/m/Y');
 $next_selected = $next_date->format('d/m/Y');
+
+// Recupero gli ultimi 12 mesi
+$last_12_months = [];
+$last_12_monthlyIncomes = [];
+$last_12_monthlyExpenses = [];
+$monthlyPiggyBank = []; // Aggiungo questa riga per tenere traccia delle somme nel salvadanaio
+
+$endDate = new DateTime("$selectedYear-$selectedMonth-01");
+$endDate->modify('+1 month'); // Imposta a inizio del mese successivo
+
+for ($i = 0; $i < 12; $i++) {
+    $endDate->modify('-1 month');
+    $month_year = $endDate->format('Y-m');
+    $last_12_months[] = $endDate->format('F Y');
+
+    // Recupero entrate per il mese corrente
+    $monthlyIncome = executeQuery($link, "SELECT SUM(amount) as monthly_incomes FROM incomes WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $month_year])['monthly_incomes'];
+    $last_12_monthlyIncomes[] = $monthlyIncome ?: 0;
+
+    // Recupero uscite per il mese corrente
+    $monthlyExpense = 0;
+
+    // Spese ricorrenti
+    $rows = executeQuery($link, "SELECT amount, billing_frequency FROM recurring_expenses WHERE user_id = ? AND (start_year < ? OR (start_year = ? AND start_month <= ?)) AND (end_year IS NULL OR end_year > ? OR (end_year = ? AND end_month >= ?))", ["iiiiiii", $user_id, $endDate->format('Y'), $endDate->format('Y'), $endDate->format('m'), $endDate->format('Y'), $endDate->format('Y'), $endDate->format('m')], false);
+    foreach ($rows as $row) {
+        $monthlyExpense += $row['amount'] / $row['billing_frequency'];
+    }
+
+    // Spese stimate
+    $rows = executeQuery($link, "SELECT amount, billing_frequency FROM estimated_expenses WHERE user_id = ? AND (start_year < ? OR (start_year = ? AND start_month <= ?)) AND (end_year IS NULL OR end_year > ? OR (end_year = ? AND end_month >= ?))", ["iiiiiii", $user_id, $endDate->format('Y'), $endDate->format('Y'), $endDate->format('m'), $endDate->format('Y'), $endDate->format('Y'), $endDate->format('m')], false);
+    foreach ($rows as $row) {
+        $monthlyExpense += $row['amount'] / $row['billing_frequency'];
+    }
+
+    // Spese extra
+    if ($salaryDate) {
+        // Salary date non nullo
+        $startDate = (clone $endDate)->modify('first day of this month')->setDate($endDate->format('Y'), $endDate->format('m'), $salaryDate);
+        $endDateTemp = (clone $startDate)->modify('+1 month')->modify('-1 day');
+        $extraRow = executeQuery($link, "SELECT SUM(amount) as total_extra FROM extra_expenses WHERE user_id = ? AND debit_date BETWEEN ? AND ?", ["iss", $user_id, $startDate->format('Y-m-d'), $endDateTemp->format('Y-m-d')]);
+        $monthlyExpense += $extraRow['total_extra'] ?: 0;
+    } else {
+        // Salary date nullo, considero il mese normalmente
+        $extraRow = executeQuery($link, "SELECT SUM(amount) as total_extra FROM extra_expenses WHERE user_id = ? AND MONTH(debit_date) = ? AND YEAR(debit_date) = ?", ["iis", $user_id, $endDate->format('m'), $endDate->format('Y')]);
+        $monthlyExpense += $extraRow['total_extra'] ?: 0;
+    }
+
+    $last_12_monthlyExpenses[] = $monthlyExpense;
+
+    // Recupero l'importo salvadanaio per il mese corrente
+    $monthly_piggy = executeQuery($link, "SELECT SUM(amount) as monthly_piggy_bank FROM piggy_bank WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $month_year])['monthly_piggy_bank'];
+    $monthlyPiggyBank[] = $monthly_piggy ?: 0;
+}
+
+// Inverto gli array per avere i mesi in ordine cronologico
+$last_12_months = array_reverse($last_12_months);
+$last_12_monthlyIncomes = array_reverse($last_12_monthlyIncomes);
+$last_12_monthlyExpenses = array_reverse($last_12_monthlyExpenses);
+$monthlyPiggyBank = array_reverse($monthlyPiggyBank);
 ?>
 
 <!DOCTYPE html>
@@ -31,7 +90,7 @@ $next_selected = $next_date->format('d/m/Y');
     <meta charset="UTF-8">
     <title>Dashboard</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<!-- jQuery -->
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Bootstrap JS e dipendenze varie -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
@@ -44,12 +103,12 @@ $next_selected = $next_date->format('d/m/Y');
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
     <!-- Custom CSS -->
-	<link href="../my.css" rel="stylesheet">
+    <link href="../my.css" rel="stylesheet">
 </head>
 <body>
     <?php include 'navbar.php'; ?>
     <div class="container mt-5">
-	<h2>MyWallet</h2>
+        <h2>MyWallet</h2>
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
                 <h4 class="mb-0">Panoramica</h4>
@@ -91,10 +150,10 @@ $next_selected = $next_date->format('d/m/Y');
                         <p><b>Totale spese stimate</b> per il periodo <?php echo $currentSelected . ' - ' . $next_selected; ?>: <b><?php echo $thisMonthTotalEstimatedExpenses; ?> euro</b></p>
                         <p><b>Totale spese extra</b> per il periodo <?php echo $currentSelected . ' - ' . $next_selected; ?>: <b><?php echo $thisMonthTotalExtraExpenses; ?> euro</b></p>
                         <p><b>Spese totali</b> per il periodo <?php echo $currentSelected . ' - ' . $next_selected; ?>: <b><?php echo $totalExpenses; ?> euro</b></p>
-						<p><b>Stipendio rimanente</b> per il periodo <?php echo $currentSelected . ' - ' . $next_selected; ?>: <b><?php echo $leftIncomes; ?> euro</b></p>
+                        <p><b>Stipendio rimanente</b> per il periodo <?php echo $currentSelected . ' - ' . $next_selected; ?>: <b><?php echo $leftIncomes; ?> euro</b></p>
                     </div>
                     <div class="col-12 col-md-6">
-						<p><b>Totale nel salvadanaio:</b> <b><?php if($totalPiggyBank > 0) {echo $totalPiggyBank;} else {echo '0';} ?> euro</b> di cui <b><?php if($thisMonthPiggyBank > 0) {echo $thisMonthPiggyBank;} else {echo '0';} ?> euro</b> aggiunti nel periodo <?php echo $currentSelected . ' - ' . $next_selected; ?></p>
+                        <p><b>Totale nel salvadanaio:</b> <b><?php if($totalPiggyBank > 0) {echo $totalPiggyBank;} else {echo '0';} ?> euro</b> di cui <b><?php if($thisMonthPiggyBank > 0) {echo $thisMonthPiggyBank;} else {echo '0';} ?> euro</b> aggiunti nel periodo <?php echo $currentSelected . ' - ' . $next_selected; ?></p>
                         <p>Sul salvadanaio delle Spese Ricorrenti dovresti avere <b><?php echo $recurringSavings; ?> euro</b></p>
                         <p>Sul salvadanaio delle Spese Stimate dovresti avere <b><?php echo $estimatedSavings; ?> euro</b></p>
                     </div>
@@ -102,131 +161,131 @@ $next_selected = $next_date->format('d/m/Y');
             </div>
         </div>
 
-		<div class="row">
-			<div class="col-12 col-md-6 mb-4">
-				<div class="card">
-					<div class="card-header">
-						<h4 class="mb-0">Distribuzione Spese</h4>
-					</div>
-					<div class="card-body">
-						<canvas id="expenseChart" width="300" height="300"></canvas>
-					</div>
-				</div>
-			</div>
+        <div class="row">
+            <div class="col-12 col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">Distribuzione Spese</h4>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="expenseChart" width="300" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
 
-			<div class="col-12 col-md-6 mb-4">
-				<div class="card">
-					<div class="card-header">
-						<h4 class="mb-0">Entrate e Uscite degli Ultimi 12 Mesi</h4>
-					</div>
-					<div class="card-body">
-						<canvas id="incomeExpenseChart" width="300" height="300"></canvas>                    
-					</div>
-				</div>
-			</div>
-		</div>
+            <div class="col-12 col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0">Entrate e Uscite degli Ultimi 12 Mesi</h4>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="incomeExpenseChart" width="300" height="300"></canvas>                    
+                    </div>
+                </div>
+            </div>
+        </div>
 
-		<script>
-			document.addEventListener("DOMContentLoaded", function() {
-				var ctx = document.getElementById('expenseChart').getContext('2d');
-				var expenseChart = new Chart(ctx, {
-					type: 'pie',
-					data: {
-						labels: ['Tot. spese ricorrenti', 'Tot. spese stimate', 'Tot. spese extra', 'Salvadanaio', 'Stipendio rimanente'],
-						datasets: [{
-							data: [
-								<?php echo $thisMonthTotalRecurringExpenses; ?>,
-								<?php echo $thisMonthTotalEstimatedExpenses; ?>,
-								<?php echo $thisMonthTotalExtraExpenses; ?>,
-								<?php echo $thisMonthPiggyBank; ?>,
-								<?php echo $leftIncomes; ?>
-							],
-							backgroundColor: [
-								'rgba(255, 99, 132, 1)',
-								'rgba(54, 162, 235, 1)',
-								'rgba(255, 206, 86, 1)',
-								'rgba(75, 192, 192, 1)',
-								'rgba(153, 102, 255, 1)'
-							],
-							borderColor: [
-								'rgba(255, 99, 132, 1)',
-								'rgba(54, 162, 235, 1)',
-								'rgba(255, 206, 86, 1)',
-								'rgba(75, 192, 192, 1)',
-								'rgba(153, 102, 255, 1)'
-							],
-							borderWidth: 1
-						}]
-					},
-					options: {
-						responsive: true,
-						maintainAspectRatio: false,
-						plugins: {
-							legend: {
-								labels: {
-									color: '#ecf0f1' // Colore del testo della legenda
-								}
-							}
-						}
-					}
-				});
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                var ctx = document.getElementById('expenseChart').getContext('2d');
+                var expenseChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Tot. spese ricorrenti', 'Tot. spese stimate', 'Tot. spese extra', 'Salvadanaio', 'Stipendio rimanente'],
+                        datasets: [{
+                            data: [
+                                <?php echo $thisMonthTotalRecurringExpenses; ?>,
+                                <?php echo $thisMonthTotalEstimatedExpenses; ?>,
+                                <?php echo $thisMonthTotalExtraExpenses; ?>,
+                                <?php echo $thisMonthPiggyBank; ?>,
+                                <?php echo $leftIncomes; ?>
+                            ],
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)'
+                            ],
+                            borderColor: [
+                                'rgba(255, 99, 132, 1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#ecf0f1' // Colore del testo della legenda
+                                }
+                            }
+                        }
+                    }
+                });
 
-				var incomeExpenseData = {
-					labels: [<?php echo implode(", ", array_map(function($month) { return "'$month'"; }, $last_12_months)); ?>],
-					datasets: [{
-						label: 'Entrate',
-						data: [<?php echo implode(", ", $last_12_monthlyIncomes); ?>],
-						backgroundColor: 'rgba(75, 192, 192, 1)',
-						borderColor: 'rgba(75, 192, 192, 1)',
-						borderWidth: 1
-					},
-					{
-						label: 'Uscite',
-						data: [<?php echo implode(", ", $last_12_monthlyExpenses); ?>],
-						backgroundColor: 'rgba(255, 99, 132, 1)',
-						borderColor: 'rgba(255, 99, 132, 1)',
-						borderWidth: 1
-					},
-					{
-						label: 'Salvadanaio',
-						data: [<?php echo implode(", ", $monthlyPiggyBank); ?>],
-						backgroundColor: 'rgba(153, 102, 255, 1)',
-						borderColor: 'rgba(153, 102, 255, 1)',
-						borderWidth: 1
-					}]
-				};
+                var incomeExpenseData = {
+                    labels: [<?php echo implode(", ", array_map(function($month) { return "'$month'"; }, $last_12_months)); ?>],
+                    datasets: [{
+                        label: 'Entrate',
+                        data: [<?php echo implode(", ", $last_12_monthlyIncomes); ?>],
+                        backgroundColor: 'rgba(75, 192, 192, 1)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Uscite',
+                        data: [<?php echo implode(", ", $last_12_monthlyExpenses); ?>],
+                        backgroundColor: 'rgba(255, 99, 132, 1)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Salvadanaio',
+                        data: [<?php echo implode(", ", $monthlyPiggyBank); ?>],
+                        backgroundColor: 'rgba(153, 102, 255, 1)',
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        borderWidth: 1
+                    }]
+                };
 
-				var ctx2 = document.getElementById('incomeExpenseChart').getContext('2d');
-				var incomeExpenseChart = new Chart(ctx2, {
-					type: 'bar',
-					data: incomeExpenseData,
-					options: {
-						responsive: true,
-						maintainAspectRatio: false,
-						scales: {
-							y: {
-								beginAtZero: true,
-								ticks: {
-									color: '#ecf0f1' // Colore del testo dell'asse Y
-								}
-							},
-							x: {
-								ticks: {
-									color: '#ecf0f1' // Colore del testo dell'asse X
-								}
-							}
-						},
-						plugins: {
-							legend: {
-								labels: {
-									color: '#ecf0f1' // Colore del testo della legenda
-								}
-							}
-						}
-					}
-				});
-			});
-		</script>
+                var ctx2 = document.getElementById('incomeExpenseChart').getContext('2d');
+                var incomeExpenseChart = new Chart(ctx2, {
+                    type: 'bar',
+                    data: incomeExpenseData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    color: '#ecf0f1' // Colore del testo dell'asse Y
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    color: '#ecf0f1' // Colore del testo dell'asse X
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: '#ecf0f1' // Colore del testo della legenda
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
     </div>
 </body>
 </html>
