@@ -105,11 +105,7 @@ function processExpenses($link, $user_id, $selectedDate, $salaryDate, &$expenses
             $startDate = DateTime::createFromFormat('Y-m', $startDate_string);
             if (!$startDate) continue;
 
-            if ($debitDate >= $salaryDate) {
-                $relevantDate = $selectedDate;
-            } else {
-                $relevantDate = (clone $selectedDate)->modify('+1 month');
-            }
+			$relevantDate = $selectedDate;
 
             $interval = $startDate->diff($relevantDate);
             if ($startDate > $relevantDate) {
