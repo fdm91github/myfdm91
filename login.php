@@ -1,8 +1,8 @@
 <?php
 session_start();
+
 require_once 'config.php';
 
-// Check if the user is already logged in, if yes then redirect to the selection page
 if (isset($_SESSION['username'])) {
     header("location: index.php");
     exit;
@@ -61,7 +61,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 $selector . ':' . base64_encode($authenticator),
                                 time() + 2592000,
                                 '/',
-                                'website.com', // Change this to your domain
+                                'fdm91.net', // Change this to your domain
                                 true, // Secure, set to true if using HTTPS
                                 true  // HttpOnly
                             );
@@ -81,14 +81,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         header("location: index.php");
                         exit;
                     } else {
-                        $error_message = "Incorrect password.";
+                        $error_message = "Hai inserito una password errata.";
                     }
                 }
             } else {
-                $error_message = "No user found with username $username.";
+                $error_message = "Non ho trovato nessun utente che si chiami $username :(";
             }
         } else {
-            $error_message = "Something went wrong. Please try again later.";
+            $error_message = "Qualcosa è andato storto. Riprova più tardi.";
         }
         $stmt->close();
     }
@@ -116,6 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </style>
 </head>
 <body>
+    <!-- Login Form -->
     <div class="container login-container">
         <div class="card">
             <div class="card-header text-center">
@@ -144,11 +145,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 
+    <!-- Error Modal -->
     <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="errorModalLabel">Error</h5>
+                    <h5 class="modal-title" id="errorModalLabel">Errore</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -157,12 +159,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <p id="errorMessage"></p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -176,4 +179,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </script>
 </body>
 </html>
-
