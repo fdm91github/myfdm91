@@ -105,7 +105,7 @@ function processExpenses($link, $user_id, $selectedDate, $salaryDate, &$expenses
             $startDate = DateTime::createFromFormat('Y-m', $startDate_string);
             if (!$startDate) continue;
 
-			$relevantDate = $selectedDate;
+            $relevantDate = $selectedDate;
 
             $interval = $startDate->diff($relevantDate);
             if ($startDate > $relevantDate) {
@@ -172,7 +172,7 @@ function processExpenses($link, $user_id, $selectedDate, $salaryDate, &$expenses
 
             if ($billingFrequency > 1 && ($endDate > $selectedDate || $undetermined == 1)) {
                 $savings += $monthlyAmount * $currentInstallment;
-            } else if ($billingFrequency = 1 && ($endDate > $selectedDate || $undetermined == 1)) {
+            } else if ($billingFrequency == 1 && ($endDate > $selectedDate || $undetermined == 1)) {
                 $savings += $monthlyAmount;
             }
 
