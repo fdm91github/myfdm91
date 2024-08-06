@@ -103,7 +103,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $success_message = "Modifica del profilo avvenuta con successo. Sarai reindirizzato alla pagina di login in pochi istanti.";
         echo "<script>
             setTimeout(function(){
-                window.location.href = 'logout.php';
+                window.location.href = '../logout.php';
             }, 3000);
             </script>";
     }
