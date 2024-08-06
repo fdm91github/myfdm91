@@ -98,7 +98,6 @@ function processExpenses($link, $user_id, $selectedDate, $salaryDate, &$expenses
         while ($stmt->fetch()) {
             $amount = (float) $amount;
             $billingFrequency = (int) $billingFrequency;
-            $monthlyAmount = $amount / $billingFrequency;
 
             $startDate_string = $startYear . '-' . $startMonth;
             $endDate_string = $endYear ? $endYear . '-' . $endMonth : null;
@@ -153,6 +152,11 @@ function processExpenses($link, $user_id, $selectedDate, $salaryDate, &$expenses
                 }
             }
 
+			$monthlyAmount = 0;
+			if ($currentInstallment != 0){
+			$monthlyAmount = $amount / $billingFrequency;
+			}
+
             if ($endDate_string && $billingFrequency > 1){
                 $nextDebitDate = (clone $startDate)->modify('+' . $billingFrequency . ' months');
             } else {
@@ -177,9 +181,7 @@ function processExpenses($link, $user_id, $selectedDate, $salaryDate, &$expenses
                 $savings += $monthlyAmount;
             }
 
-            if($relevantDate > $startDate && ($endDate > $selectedDate || $undetermined == 1)){
-                $totalExpenses += $monthlyAmount;
-            }
+			$totalExpenses += $monthlyAmount;
 
             $expenses[] = [
                 'id' => $id,
