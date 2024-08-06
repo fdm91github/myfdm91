@@ -118,16 +118,17 @@ function processExpenses($link, $user_id, $selectedDate, $salaryDate, &$expenses
                         $currentInstallment = 1;
                     }
                 } else {
-                    if ($endDate_string || $undetermined == 1) {
-                        $monthsPassed = ($interval->y * 12 + $interval->m -1) + 1;
-                        $totalPeriods = intdiv($monthsPassed, $billingFrequency);
-                        $currentPeriod_months = $monthsPassed % $billingFrequency;
-                        $currentInstallment = $currentPeriod_months + 1;
-                    } else {
-                        $monthsPassed = ($interval->y * 12 + $interval->m);
-                        $currentPeriod_months = $monthsPassed % $billingFrequency;
-                        $currentInstallment = $currentPeriod_months;
-                    }
+					if($debitDate > $salaryDate){
+						$monthsPassed = ($interval->y * 12 + $interval->m -1) + 1;
+						$totalPeriods = intdiv($monthsPassed, $billingFrequency);
+						$currentPeriod_months = $monthsPassed % $billingFrequency;
+						$currentInstallment = $currentPeriod_months + 1;
+					} else {
+						$monthsPassed = ($interval->y * 12 + $interval->m) + 1;
+						$totalPeriods = intdiv($monthsPassed, $billingFrequency);
+						$currentPeriod_months = $monthsPassed % $billingFrequency;
+						$currentInstallment = $currentPeriod_months + 1;
+					}
                 }
             }
 
