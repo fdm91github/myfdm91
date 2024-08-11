@@ -1,4 +1,4 @@
-<body style="display: flex; flex-direction: column; min-height: 100vh; margin: 0;">
+<body style="display: flex; flex-direction: column; margin: 0;">
     <div style="flex: 1;">
         <!-- Your content goes here -->
     </div>
