@@ -1,28 +1,44 @@
-<!-- Modale per la modifica di una spesa extra -->
-<div class="modal fade" id="editExtraExpenseModal" tabindex="-1" role="dialog" aria-labelledby="editExtraExpenseModalLabel" aria-hidden="true">
+<!-- Modale per la modifica di un veicolo -->
+<div class="modal fade" id="editVehicleModal" tabindex="-1" role="dialog" aria-labelledby="editVehicleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editExtraExpenseModalLabel">Modifica spesa extra</h5>
+                <h5 class="modal-title" id="editVehicleModalLabel">Modifica veicolo</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <div id="editExtraExpenseStatus"></div>
-                <form id="editExtraExpenseForm" method="POST" action="editExtraExpense.php">
-                    <input type="hidden" name="id" id="editExtraExpenseId">
+                <div id="editVehicleStatus"></div>
+                <form id="editVehicleForm">
+                    <input type="hidden" name="id" id="editVehicleId">
                     <div class="form-group">
-                        <label for="editExtraExpenseName">Descrizione</label>
-                        <input type="text" name="name" id="editExtraExpenseName" class="form-control" required>
+                        <label for="editVehicleDescription">Descrizione</label>
+                        <input type="text" name="description" id="editVehicleDescription" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label for="editExtraExpenseAmount">Totale</label>
-                        <input type="number" name="amount" id="editExtraExpenseAmount" class="form-control" step="0.01" required>
+                        <label for="editVehicleBuyingDate">Data di acquisto</label>
+                        <input type="date" name="buying_date" id="editVehicleBuyingDate" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label for="editExtraExpenseDate">Data</label>
-                        <input type="date" name="debit_date" id="editExtraExpenseDate" class="form-control" required>
+                        <label for="editVehiclePlateNumber">Targa</label>
+                        <input type="text" name="plate_number" id="editVehiclePlateNumber" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editVehicleChassisNumber">Nr. di telaio</label>
+                        <input type="text" name="chassis_number" id="editVehicleChassisNumber" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editVehicleTaxMonth">Mese di scadenza del bollo</label>
+                        <input type="text" name="tax_month" id="editVehicleTaxMonth" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editVehicleRevisionMonth">Mese di scadenza della revisione</label>
+                        <input type="text" name="revision_month" id="editVehicleRevisionMonth" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editVehicleInsuranceExpirationDate">Data di scadenza dell'assicurazione</label>
+                        <input type="date" name="insurance_expiration_date" id="editVehicleInsuranceExpirationDate" class="form-control" required>
                     </div>
                     <button type="submit" class="btn btn-primary btn-block">Aggiorna</button>
                 </form>
@@ -30,35 +46,69 @@
         </div>
     </div>
 </div>
+
 <script>
+    function validatePlateNumber(plateNumber) {
+        // Regular expression for 6-character plates (e.g., A12345)
+        var sixCharPattern = /^[A-Z][A-Z0-9]{5}$/;
+        
+        // Regular expression for 7-character plates (e.g., AB123CD for cars, AB12345 for motorcycles)
+        var sevenCharPatternCar = /^[A-Z]{2}\d{3}[A-Z]{2}$/;
+        var sevenCharPatternMotorcycle = /^[A-Z]{2}\d{5}$/;
+        
+        if (plateNumber.length === 6) {
+            return sixCharPattern.test(plateNumber);
+        } else if (plateNumber.length === 7) {
+            return sevenCharPatternCar.test(plateNumber) || sevenCharPatternMotorcycle.test(plateNumber);
+        } else {
+            return false;
+        }
+    }
+
     $(document).ready(function() {
-		$('#editExtraExpenseModal').on('show.bs.modal', function (event) {
-			var button = $(event.relatedTarget);
-			var id = button.data('id');
-			var name = button.data('name');
-			var amount = button.data('amount');
-			var date = button.data('date');
+        $('#editVehicleModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var id = button.data('id');
+            var description = button.data('description');
+            var buyingDate = button.data('buying-date');
+            var plateNumber = button.data('plate-number');
+            var chassisNumber = button.data('chassis-number');
+            var taxMonth = button.data('tax-month');
+            var revisionMonth = button.data('revision-month');
+            var insuranceExpirationDate = button.data('insurance-expiration-date');
 
-			$('#editExtraExpenseId').val(id);
-			$('#editExtraExpenseName').val(name);
-			$('#editExtraExpenseAmount').val(amount);
-			$('#editExtraExpenseDate').val(date);
-		});
+            $('#editVehicleId').val(id);
+            $('#editVehicleDescription').val(description);
+            $('#editVehicleBuyingDate').val(buyingDate);
+            $('#editVehiclePlateNumber').val(plateNumber);
+            $('#editVehicleChassisNumber').val(chassisNumber);
+            $('#editVehicleTaxMonth').val(taxMonth);
+            $('#editVehicleRevisionMonth').val(revisionMonth);
+            $('#editVehicleInsuranceExpirationDate').val(insuranceExpirationDate);
+        });
 
-        $('#editExtraExpenseForm').submit(function(e) {
+        $('#editVehicleForm').submit(function(e) {
             e.preventDefault();
+
+            var plateNumber = $('#editVehiclePlateNumber').val().toUpperCase();
+
+            if (!validatePlateNumber(plateNumber)) {
+                $('#editVehicleStatus').html('<div class="alert alert-danger">Il numero di targa non è valido. Assicurati che sia nel formato corretto.</div>');
+                return;
+            }
+
             $.ajax({
-                url: 'editExtraExpense.php?id=' + $('#editExtraExpenseId').val(),
+                url: 'editVehicle.php?id=' + $('#editVehicleId').val(),
                 type: 'POST',
                 data: $(this).serialize(),
                 success: function(response) {
-                    $('#editExtraExpenseStatus').html('<div class="alert alert-success">Spesa aggiornata con successo.</div>');
+                    $('#editVehicleStatus').html('<div class="alert alert-success">Veicolo aggiornato con successo!</div>');
                     setTimeout(function() { window.location.reload(); }, 1000);
                 },
                 error: function() {
-                    $('#editExtraExpenseStatus').html('<div class="alert alert-danger">Qualcosa è andato storto. Riprova più tardi.</div>');
+                    $('#editVehicleStatus').html('<div class="alert alert-danger">Qualcosa è andato storto. Riprova più tardi.</div>');
                 }
-			});
+            });
         });
     });
 </script>

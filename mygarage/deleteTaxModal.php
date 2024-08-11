@@ -1,0 +1,47 @@
+<!-- Modale per l'eliminazione di una voce dei bolli -->
+<div class="modal fade" id="deleteTaxModal" tabindex="-1" role="dialog" aria-labelledby="deleteTaxModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteTaxModalLabel">Elimina bollo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="deleteTaxStatus"></div>
+                <p>Sei sicuro di voler eliminare questo bollo?</p>
+                <form id="deleteTaxForm" method="POST" action="deleteTax.php">
+                    <input type="hidden" name="id" id="deleteTaxId">
+                    <button type="submit" class="btn btn-danger btn-block">Elimina</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+		$('#deleteTaxModal').on('show.bs.modal', function (event) {
+			var button = $(event.relatedTarget);
+			var id = button.data('id');
+
+			$('#deleteTaxId').val(id);
+		});
+
+        $('#deleteTaxForm').submit(function(e) {
+            e.preventDefault();
+            $.ajax({
+                url: 'deleteTax.php',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    $('#deleteTaxStatus').html('<div class="alert alert-success">Bollo eliminato con successo.</div>');
+                    setTimeout(function() { window.location.reload(); }, 1000);
+                },
+                error: function() {
+                    $('#deleteTaxStatus').html('<div class="alert alert-danger">Qualcosa è andato storto. Riprova più tardi.</div>');
+                }
+            });
+		});
+    });
+</script>

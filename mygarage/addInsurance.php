@@ -12,35 +12,32 @@ $response = ["status" => "error", "message" => ""];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user_id = $_SESSION['id'];
-    $description = trim($_POST["description"]);
+    $vehicle_id = trim($_POST['vehicle_id']); // Get the vehicle_id from the POST data
+    $company = trim($_POST["company"]);
+    $amount = trim($_POST["amount"]);
     $buying_date = trim($_POST["buying_date"]);
-    $plate_number = trim($_POST["plate"]);
-    $chassis_number = trim($_POST["chassis_number"]);
-    $tax_month = trim($_POST["tax_expiry_month"]);
-    $revision_month = trim($_POST["inspection_expiry_month"]);
-    $insurance_expiration_date = trim($_POST["insurance_expiry_date"]);
 
     // Validate inputs
-    if (empty($description) || empty($buying_date) || empty($plate_number) || empty($chassis_number) || empty($tax_month) || empty($revision_month) || empty($insurance_expiration_date)) {
+    if (empty($vehicle_id) || empty($company) || empty($amount) || empty($buying_date)) {
         $response["message"] = "Inserisci tutti i campi obbligatori.";
     } else {
         // Check for duplicate entry
-        $check_sql = "SELECT id FROM vehicles WHERE user_id = ? AND plate_number = ? AND chassis_number = ?";
+        $check_sql = "SELECT id FROM vehicle_insurances WHERE user_id = ? AND vehicle_id = ? AND buying_date = ?";
         if ($check_stmt = $link->prepare($check_sql)) {
-            $check_stmt->bind_param("iss", $user_id, $plate_number, $chassis_number);
+            $check_stmt->bind_param("iis", $user_id, $vehicle_id, $buying_date);
             $check_stmt->execute();
             $check_stmt->store_result();
             
             if ($check_stmt->num_rows > 0) {
-                $response["message"] = "Il veicolo che stai provando ad aggiungere esiste già.";
+                $response["message"] = "Il veicolo ha già un'assicurazione per la stessa data.";
             } else {
                 // Insert new entry if no duplicate found
-                $sql = "INSERT INTO vehicles (user_id, description, buying_date, plate_number, chassis_number, tax_month, revision_month, insurance_expiration_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                $sql = "INSERT INTO vehicle_insurances (user_id, vehicle_id, company, amount, buying_date) VALUES (?, ?, ?, ?, ?)";
                 if ($stmt = $link->prepare($sql)) {
-                    $stmt->bind_param("isssssss", $user_id, $description, $buying_date, $plate_number, $chassis_number, $tax_month, $revision_month, $insurance_expiration_date);
+                    $stmt->bind_param("iisss", $user_id, $vehicle_id, $company, $amount, $buying_date);
                     if ($stmt->execute()) {
                         $response["status"] = "success";
-                        $response["message"] = "Veicolo aggiunto con successo!";
+                        $response["message"] = "Assicurazione aggiunta con successo!";
                     } else {
                         $response["message"] = "Qualcosa è andato storto. Riprova più tardi.";
                     }

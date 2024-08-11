@@ -12,10 +12,16 @@
                 <a class="nav-link" href="vehicles.php">I miei veicoli</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="repairs.php">Riparazioni</a>
+                <a class="nav-link" href="services.php">Manutenzioni</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="services.php">Tagliandi</a>
+                <a class="nav-link" href="insurances.php">Assicurazioni</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="revisions.php">Revisioni</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="taxes.php">Bolli</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="../logout.php">Esci</a>

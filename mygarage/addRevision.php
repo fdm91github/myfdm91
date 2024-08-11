@@ -12,33 +12,32 @@ $response = ["status" => "error", "message" => ""];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user_id = $_SESSION['id'];
-    $name = trim($_POST["name"]);
+    $vehicle_id = trim($_POST['vehicle_id']); // Get the vehicle_id from the POST data
     $amount = trim($_POST["amount"]);
-    $debit_date = trim($_POST["debit_date"]);
+    $buying_date = trim($_POST["buying_date"]);
 
     // Validate inputs
-    if (empty($name) || empty($amount) || empty($debit_date)) {
+    if (empty($vehicle_id) || empty($amount) || empty($buying_date)) {
         $response["message"] = "Inserisci tutti i campi obbligatori.";
-    } elseif (!is_numeric($amount) || $amount <= 0) {
-        $response["message"] = "Inserisci un importo valido.";
     } else {
         // Check for duplicate entry
-        $check_sql = "SELECT id FROM extra_expenses WHERE user_id = ? AND name = ? AND amount = ? AND debit_date = ?";
+        $check_sql = "SELECT id FROM vehicle_revisions WHERE user_id = ? AND vehicle_id = ? AND buying_date = ?";
         if ($check_stmt = $link->prepare($check_sql)) {
-            $check_stmt->bind_param("isds", $user_id, $name, $amount, $debit_date);
+            $check_stmt->bind_param("iis", $user_id, $vehicle_id, $buying_date);
             $check_stmt->execute();
             $check_stmt->store_result();
             
             if ($check_stmt->num_rows > 0) {
-                $response["message"] = "La spesa che stai provando ad aggiungere esiste già.";
+                $response["message"] = "Il veicolo ha già una revisione per la stessa data.";
             } else {
                 // Insert new entry if no duplicate found
-                $sql = "INSERT INTO extra_expenses (user_id, name, amount, debit_date) VALUES (?, ?, ?, ?)";
+                $sql = "INSERT INTO vehicle_revisions (user_id, vehicle_id, amount, buying_date) VALUES (?, ?, ?, ?)";
                 if ($stmt = $link->prepare($sql)) {
-                    $stmt->bind_param("isds", $user_id, $name, $amount, $debit_date);
+                    // Note that we should pass only four parameters here, matching the four columns in the INSERT statement.
+                    $stmt->bind_param("iiss", $user_id, $vehicle_id, $amount, $buying_date);
                     if ($stmt->execute()) {
                         $response["status"] = "success";
-                        $response["message"] = "Spesa aggiunta con successo!";
+                        $response["message"] = "Revisione aggiunta con successo!";
                     } else {
                         $response["message"] = "Qualcosa è andato storto. Riprova più tardi.";
                     }
@@ -58,4 +57,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 header('Content-Type: application/json');
 echo json_encode($response);
 ?>
-

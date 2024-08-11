@@ -13,16 +13,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['month']) && isset($_PO
 
 if ($salaryDate) {
     $currentDate = DateTime::createFromFormat('Y-m-d', "$selectedYear-$selectedMonth-$salaryDate");
-    $next_date = clone $currentDate;
-    $next_date->modify('+1 month')->modify('-1 day');
+    $nearest_date = clone $currentDate;
+    $nearest_date->modify('+1 month')->modify('-1 day');
 } else {
     $currentDate = DateTime::createFromFormat('Y-m-d', "$selectedYear-$selectedMonth-01");
-    $next_date = clone $currentDate;
-    $next_date->modify('+1 month')->modify('-1 day');
+    $nearest_date = clone $currentDate;
+    $nearest_date->modify('+1 month')->modify('-1 day');
 }
 
 $currentSelected = $currentDate->format('d/m/Y');
-$next_selected = $next_date->format('d/m/Y');
+$nearest_selected = $nearest_date->format('d/m/Y');
 ?>
 
 <!DOCTYPE html>
@@ -49,7 +49,7 @@ $next_selected = $next_date->format('d/m/Y');
 <body>
     <?php include 'navbar.php'; ?>
     <div class="container mt-5">
-	<h2>MyGarage</h2>
+	<h2>MyGarage</h2><br/>
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
                 <h4 class="mb-0">Panoramica</h4>
@@ -86,17 +86,18 @@ $next_selected = $next_date->format('d/m/Y');
             <div class="card-body">
                 <div class="row">
                     <div class="col-12 col-md-6">
-                        <p><b>Entrate totali</b> per il periodo <?php echo $currentSelected . ' - ' . $next_selected; ?>: <b><?php echo isset($thisMonthIncomes) ? $thisMonthIncomes : '0'; ?> euro</b></p>
-                        <p><b>Totale spese ricorrenti</b> per il periodo <?php echo $currentSelected . ' - ' . $next_selected; ?>: <b><?php echo $thisMonthTotalRecurringExpenses; ?> euro</b></p>
-                        <p><b>Totale spese stimate</b> per il periodo <?php echo $currentSelected . ' - ' . $next_selected; ?>: <b><?php echo $thisMonthTotalEstimatedExpenses; ?> euro</b></p>
-                        <p><b>Totale spese extra</b> per il periodo <?php echo $currentSelected . ' - ' . $next_selected; ?>: <b><?php echo $thisMonthTotalExtraExpenses; ?> euro</b></p>
-                        <p><b>Spese totali</b> per il periodo <?php echo $currentSelected . ' - ' . $next_selected; ?>: <b><?php echo $totalExpenses; ?> euro</b></p>
-						<p><b>Stipendio rimanente</b> per il periodo <?php echo $currentSelected . ' - ' . $next_selected; ?>: <b><?php echo $leftIncomes; ?> euro</b></p>
+						<h5>Riepilogo</h5><br/>
+                        <p><b>Nell'ultimo anno hai speso <?php echo isset($lastYearExpenses) ? $lastYearExpenses : '0'; ?> euro</b></p>
+						<p><b>Nel mese selezionato hai speso <?php echo isset($thisMonthExpenses) ? $thisMonthExpenses : '0'; ?> euro</b></p>
+                        <p><b>Negli ultimi 12 mesi hai effettuato <?php echo isset($lastYearMaintenances) ? $lastYearMaintenances : '0'; ?> manutenzioni</b></p>
+						<p><b>L'ultima manutenzione è costata <?php echo isset($lastMaintenanceCost) ? $lastMaintenanceCost : '0'; ?> euro</b></p>
                     </div>
                     <div class="col-12 col-md-6">
-						<p><b>Totale nel salvadanaio:</b> <b><?php if($totalPiggyBank > 0) {echo $totalPiggyBank;} else {echo '0';} ?> euro</b> di cui <b><?php if($thisMonthPiggyBank > 0) {echo $thisMonthPiggyBank;} else {echo '0';} ?> euro</b> aggiunti nel periodo <?php echo $currentSelected . ' - ' . $next_selected; ?></p>
-                        <p>Sul salvadanaio delle Spese Ricorrenti dovresti avere <b><?php echo $recurringSavings; ?> euro</b></p>
-                        <p>Sul salvadanaio delle Spese Stimate dovresti avere <b><?php echo $estimatedSavings; ?> euro</b></p>
+						<h5>Scadenze</h5><br/>
+                        <p><b><?php echo isset($nearestTaxExpirationVehicle) ? "Il prossimo bollo scade il $nearestTaxExpirationDate per il veicolo $nearestTaxExpirationVehicle" : "Nessuna scadenza impostata per il bollo"; ?></b></p>
+                        <p><b><?php echo isset($nearestServiceExpirationDate) ? "Il prossimo tagliando va effettuato entro il $nearestServiceExpirationDate per il veicolo $nearestServiceExpirationVehicle" : "Nessuna scadenza impostata per il tagliando"; ?></b></p>
+						<p><b><?php echo isset($nearestRevisionExpirationDate) ? "La prossima revisione scade il $nearestRevisionExpirationDate per il veicolo $nearestRevisionExpirationVehicle" : "Nessuna scadenza impostata per la revisione"; ?></b></p>
+						<p><b><?php echo isset($nearestInsuranceExpirationDate) ? "L'assicurazione per $nearestInsuranceExpirationVehicle scade il $nearestInsuranceExpirationDate" : "Nessuna scadenza impostata per l'assicurazione"; ?></b></p>
                     </div>
                 </div>
             </div>
@@ -106,10 +107,10 @@ $next_selected = $next_date->format('d/m/Y');
 			<div class="col-12 col-md-6 mb-4">
 				<div class="card">
 					<div class="card-header">
-						<h4 class="mb-0">Distribuzione Spese</h4>
+						<h4 class="mb-0">Distribuzione spese annuali</h4>
 					</div>
 					<div class="card-body">
-						<canvas id="expenseChart" width="300" height="300"></canvas>
+						<canvas id="MonthExpenseChart" width="300" height="300"></canvas>
 					</div>
 				</div>
 			</div>
@@ -117,10 +118,23 @@ $next_selected = $next_date->format('d/m/Y');
 			<div class="col-12 col-md-6 mb-4">
 				<div class="card">
 					<div class="card-header">
-						<h4 class="mb-0">Entrate e Uscite degli Ultimi 12 Mesi</h4>
+						<h4 class="mb-0">Statistiche dell'ultimo anno</h4>
 					</div>
 					<div class="card-body">
-						<canvas id="incomeExpenseChart" width="300" height="300"></canvas>                    
+						<canvas id="YearExpenseChart" width="300" height="300"></canvas>                    
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="card mb-4">
+			<div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+				<h4 class="mb-0">KM percorsi</h4>
+			</div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12 col-md-6">
+						<canvas id="travelledkmChart" width="300" height="300"></canvas>
 					</div>
 				</div>
 			</div>
@@ -128,18 +142,17 @@ $next_selected = $next_date->format('d/m/Y');
 
 		<script>
 			document.addEventListener("DOMContentLoaded", function() {
-				var ctx = document.getElementById('expenseChart').getContext('2d');
-				var expenseChart = new Chart(ctx, {
+				var ctx = document.getElementById('MonthExpenseChart').getContext('2d');
+				var MonthExpenseChart = new Chart(ctx, {
 					type: 'pie',
 					data: {
-						labels: ['Tot. spese ricorrenti', 'Tot. spese stimate', 'Tot. spese extra', 'Salvadanaio', 'Stipendio rimanente'],
+						labels: ['Assicurazioni', 'Bolli', 'Manutenzioni', 'Revisioni'],
 						datasets: [{
 							data: [
-								<?php echo $thisMonthTotalRecurringExpenses; ?>,
-								<?php echo $thisMonthTotalEstimatedExpenses; ?>,
-								<?php echo $thisMonthTotalExtraExpenses; ?>,
-								<?php echo $thisMonthPiggyBank; ?>,
-								<?php echo $leftIncomes; ?>
+								<?php echo $thisYearInsuranceExpenses; ?>,
+								<?php echo $thisYearTaxExpenses; ?>,
+								<?php echo $thisYearMaintenanceExpenses; ?>,
+								<?php echo $thisYearRevisionExpenses; ?>
 							],
 							backgroundColor: [
 								'rgba(255, 99, 132, 1)',
@@ -174,30 +187,37 @@ $next_selected = $next_date->format('d/m/Y');
 				var incomeExpenseData = {
 					labels: [<?php echo implode(", ", array_map(function($month) { return "'$month'"; }, $last_12_months)); ?>],
 					datasets: [{
-						label: 'Entrate',
-						data: [<?php echo implode(", ", $last_12_monthlyIncomes); ?>],
+						label: 'Assicurazioni',
+						data: [<?php echo implode(", ", $last_12_insuranceExpenses); ?>],
 						backgroundColor: 'rgba(75, 192, 192, 1)',
 						borderColor: 'rgba(75, 192, 192, 1)',
 						borderWidth: 1
 					},
 					{
-						label: 'Uscite',
-						data: [<?php echo implode(", ", $last_12_monthlyExpenses); ?>],
+						label: 'Bolli',
+						data: [<?php echo implode(", ", $last_12_taxExpenses); ?>],
 						backgroundColor: 'rgba(255, 99, 132, 1)',
 						borderColor: 'rgba(255, 99, 132, 1)',
 						borderWidth: 1
 					},
 					{
-						label: 'Salvadanaio',
-						data: [<?php echo implode(", ", $monthlyPiggyBank); ?>],
+						label: 'Manutenzioni',
+						data: [<?php echo implode(", ", $last_12_maintenanceExpenses); ?>],
+						backgroundColor: 'rgba(153, 102, 255, 1)',
+						borderColor: 'rgba(153, 102, 255, 1)',
+						borderWidth: 1
+					},
+					{
+						label: 'Revisioni',
+						data: [<?php echo implode(", ", $last_12_revisionExpenses); ?>],
 						backgroundColor: 'rgba(153, 102, 255, 1)',
 						borderColor: 'rgba(153, 102, 255, 1)',
 						borderWidth: 1
 					}]
 				};
 
-				var ctx2 = document.getElementById('incomeExpenseChart').getContext('2d');
-				var incomeExpenseChart = new Chart(ctx2, {
+				var ctx2 = document.getElementById('YearExpenseChart').getContext('2d');
+				var YearExpenseChart = new Chart(ctx2, {
 					type: 'bar',
 					data: incomeExpenseData,
 					options: {

@@ -15,7 +15,7 @@ if (isset($_POST['id'])) {
     $id = $_POST['id'];
     $user_id = $_SESSION['id'];
 
-    $sql = "UPDATE vehicles SET deleted_at = NOW() WHERE id = ? AND user_id = ?";
+    $sql = "DELETE FROM vehicles WHERE id = ? AND user_id = ?";
     if ($stmt = $link->prepare($sql)) {
         $stmt->bind_param("ii", $id, $user_id);
 

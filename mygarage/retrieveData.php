@@ -36,9 +36,11 @@ if ($today->format('d') > $daysInSelectedMonth) {
 
 $selectedDate = DateTime::createFromFormat('Y-m', $selectedYearMonth);
 $nextMonthDate = (clone $selectedDate)->modify('+1 month');
-$leftIncomes = 0;
-$recurringSavings = 0;
-$estimatedSavings = 0;
+
+// Creo una funzione per formattare le date nel formato gg/mm/aaaa
+function formatDate($date) {
+    return date('d/m/Y', strtotime($date));
+}
 
 // Creo una funzione per eseguire le query SQL
 function executeQuery($link, $sql, $params, $singleRow = true) {
@@ -59,12 +61,74 @@ function executeQuery($link, $sql, $params, $singleRow = true) {
     return $data;
 }
 
-// Recupero la somma di tutte le entrate inserite dall'utente corrente
-$totalIncomes = executeQuery($link, "SELECT SUM(amount) as total_incomes FROM incomes WHERE user_id = ?", ["i", $user_id])['total_incomes'];
+// Creo una funzione per calcolare le scadenze di bollo e revisione
+function getNextExpirationDate($month) {
+    $currentYear = date('Y');
+    $currentMonth = date('n');
 
-// Recupero le singole entrate dell'utente corrente
-$incomes = executeQuery($link, "SELECT id, name, amount, added_date FROM incomes WHERE user_id = ? ORDER BY added_date DESC", ["i", $user_id], false);
+    if ($month >= $currentMonth) {
+        $year = $currentYear;
+    } else {
+        $year = $currentYear + 1;
+    }
 
+    $date = DateTime::createFromFormat('Y-n-j', "$year-$month-1");
+
+    $date->modify('last day of this month');
+
+    return $date->format('Y-m-d');
+}
+
+// Recupero i veicoli dell'utente corrente
+$vehiclesQuery = executeQuery($link, "SELECT id, description, buying_date, plate_number, chassis_number, tax_month, revision_month, insurance_expiration_date, deleted_at FROM vehicles WHERE user_id = ? ORDER BY id ASC", ["i", $user_id], false);
+$vehicles = [];
+
+foreach ($vehiclesQuery as $vehicle) {
+    $id = $vehicle['id'];
+    $description = $vehicle['description'];
+    $buyingDate = $vehicle['buying_date'];
+    $plateNumber = $vehicle['plate_number'];
+    $chassisNumber = $vehicle['chassis_number'];
+    $taxMonth = $vehicle['tax_month'];
+    $revisionMonth = $vehicle['revision_month'];
+    $insuranceExpirationDate = $vehicle['insurance_expiration_date'];
+    $deletedAt = $vehicle['deleted_at'];
+
+	$nextTaxExpirationDate = getNextExpirationDate($taxMonth);
+	$nextRevisionExpirationDate = getNextExpirationDate($revisionMonth);
+
+    $vehicles[] = [
+        'id' => $id,
+        'description' => $description,
+        'buyingDate' => $buyingDate,
+        'plateNumber' => $plateNumber,
+        'chassisNumber' => $chassisNumber,
+        'nextTaxExpirationDate' => $nextTaxExpirationDate,
+        'nextRevisionExpirationDate' => $nextRevisionExpirationDate,
+        'nextInsuranceExpirationDate' => $insuranceExpirationDate,
+		'taxMonth' => $taxMonth,
+		'revisionMonth' => $revisionMonth,
+        'deletedAt' => $deletedAt
+    ];
+}
+
+// Recupero tutte le assicurazioni
+$vehicleInsurances = executeQuery($link, "SELECT id, vehicle_id, company, amount, buying_date FROM vehicle_insurances WHERE user_id = ?", ["i", $user_id], false);
+
+// Recupero tutte le revisioni
+$vehicleRevisions = executeQuery($link, "SELECT id, vehicle_id, amount, buying_date FROM vehicle_revisions WHERE user_id = ?", ["i", $user_id], false);
+
+// Recupero tutti i bolli
+$vehicleTaxes = executeQuery($link, "SELECT id, vehicle_id, amount, buying_date FROM vehicle_taxes WHERE user_id = ?", ["i", $user_id], false);
+
+//VECCHIO CODICE NON PIÙ NECESSARIO DA CUI PRENDERE SPUNTO
+//VECCHIO CODICE NON PIÙ NECESSARIO DA CUI PRENDERE SPUNTO
+//VECCHIO CODICE NON PIÙ NECESSARIO DA CUI PRENDERE SPUNTO
+//VECCHIO CODICE NON PIÙ NECESSARIO DA CUI PRENDERE SPUNTO
+//VECCHIO CODICE NON PIÙ NECESSARIO DA CUI PRENDERE SPUNTO
+//VECCHIO CODICE NON PIÙ NECESSARIO DA CUI PRENDERE SPUNTO
+//VECCHIO CODICE NON PIÙ NECESSARIO DA CUI PRENDERE SPUNTO
+//VECCHIO CODICE NON PIÙ NECESSARIO DA CUI PRENDERE SPUNTO
 // Recupero le entrate dell'utente corrente e del mese selezionato
 $thisMonthIncomes = executeQuery($link, "SELECT SUM(amount) as thisMonthIncomes FROM incomes WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $selectedYearMonth])['thisMonthIncomes'];
 
