@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $response["message"] = "Inserisci un importo valido.";
     } else {
         // Check for duplicate entry
-        $check_sql = "SELECT id FROM wallet_extra_expenses WHERE user_id = ? AND name = ? AND amount = ? AND debit_date = ?";
+        $check_sql = "SELECT id FROM wallet_wallet_extra_expenses WHERE user_id = ? AND name = ? AND amount = ? AND debit_date = ?";
         if ($check_stmt = $link->prepare($check_sql)) {
             $check_stmt->bind_param("isds", $user_id, $name, $amount, $debit_date);
             $check_stmt->execute();
@@ -33,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $response["message"] = "La spesa che stai provando ad aggiungere esiste già.";
             } else {
                 // Insert new entry if no duplicate found
-                $sql = "INSERT INTO wallet_extra_expenses (user_id, name, amount, debit_date) VALUES (?, ?, ?, ?)";
+                $sql = "INSERT INTO wallet_wallet_extra_expenses (user_id, name, amount, debit_date) VALUES (?, ?, ?, ?)";
                 if ($stmt = $link->prepare($sql)) {
                     $stmt->bind_param("isds", $user_id, $name, $amount, $debit_date);
                     if ($stmt->execute()) {

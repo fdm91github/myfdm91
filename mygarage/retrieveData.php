@@ -279,7 +279,7 @@ processExpenses($link, $user_id, $selectedDate, $salaryDate, $recurringExpenses,
 $estimatedExpenses = [];
 $thisMonthTotalEstimatedExpenses = 0;
 $estimatedSavings = 0;
-processExpenses($link, $user_id, $selectedDate, $salaryDate, $estimatedExpenses, $thisMonthTotalEstimatedExpenses, $estimatedSavings, 'estimated_expenses');
+processExpenses($link, $user_id, $selectedDate, $salaryDate, $estimatedExpenses, $thisMonthTotalEstimatedExpenses, $estimatedSavings, 'wallet_estimated_expenses');
 
 // Recupero le spese extra
 $extraExpenses = executeQuery($link, "SELECT id, name, amount, debit_date FROM wallet_extra_expenses WHERE user_id = ?", ["i", $user_id], false);
@@ -332,7 +332,7 @@ for ($i = 0; $i < 12; $i++) {
     }
 
     // Spese stimate
-    $rows = executeQuery($link, "SELECT amount, billing_frequency FROM estimated_expenses WHERE user_id = ? AND (start_year < ? OR (start_year = ? AND start_month <= ?)) AND (end_year IS NULL OR end_year > ? OR (end_year = ? AND end_month >= ?))", ["iiiiiii", $user_id, $date->format('Y'), $date->format('Y'), $date->format('m'), $date->format('Y'), $date->format('Y'), $date->format('m')], false);
+    $rows = executeQuery($link, "SELECT amount, billing_frequency FROM wallet_estimated_expenses WHERE user_id = ? AND (start_year < ? OR (start_year = ? AND start_month <= ?)) AND (end_year IS NULL OR end_year > ? OR (end_year = ? AND end_month >= ?))", ["iiiiiii", $user_id, $date->format('Y'), $date->format('Y'), $date->format('m'), $date->format('Y'), $date->format('Y'), $date->format('m')], false);
     foreach ($rows as $row) {
         $monthlyExpense += $row['amount'] / $row['billing_frequency'];
     }

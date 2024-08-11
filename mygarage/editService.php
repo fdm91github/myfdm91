@@ -16,7 +16,7 @@ $success_message = '';
 
 if ($expense_id) {
     // Fetch existing extra expense details
-    $sql = "SELECT name, amount, debit_date FROM wallet_extra_expenses WHERE id = ? AND user_id = ?";
+    $sql = "SELECT name, amount, debit_date FROM wallet_wallet_extra_expenses WHERE id = ? AND user_id = ?";
     if ($stmt = $link->prepare($sql)) {
         $stmt->bind_param("ii", $expense_id, $user_id);
         $stmt->execute();
@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif (!is_numeric($amount) || $amount <= 0) {
         $error_message = "Inserisci un importo valido.";
     } else {
-        $sql = "UPDATE wallet_extra_expenses SET name = ?, amount = ?, debit_date = ? WHERE id = ? AND user_id = ?";
+        $sql = "UPDATE wallet_wallet_extra_expenses SET name = ?, amount = ?, debit_date = ? WHERE id = ? AND user_id = ?";
         if ($stmt = $link->prepare($sql)) {
             $stmt->bind_param("sdssi", $name, $amount, $debit_date, $expense_id, $user_id);
             if ($stmt->execute()) {
