@@ -15,7 +15,7 @@ if (isset($_POST['id'])) {
     $id = $_POST['id'];
     $user_id = $_SESSION['id'];
 
-    $sql = "DELETE FROM extra_expenses WHERE id = ? AND user_id = ?";
+    $sql = "DELETE FROM wallet_extra_expenses WHERE id = ? AND user_id = ?";
     if ($stmt = $link->prepare($sql)) {
         $stmt->bind_param("ii", $id, $user_id);
 

@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $response['status'] = 'error';
         $response['message'] = 'ID entrata mancante.';
     } else {
-        $sql = "DELETE FROM incomes WHERE id = ? AND user_id = ?";
+        $sql = "DELETE FROM wallet_incomes WHERE id = ? AND user_id = ?";
         if ($stmt = $link->prepare($sql)) {
             $stmt->bind_param("ii", $income_id, $user_id);
 

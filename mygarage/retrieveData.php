@@ -130,16 +130,16 @@ $vehicleTaxes = executeQuery($link, "SELECT id, vehicle_id, amount, buying_date 
 //VECCHIO CODICE NON PIÙ NECESSARIO DA CUI PRENDERE SPUNTO
 //VECCHIO CODICE NON PIÙ NECESSARIO DA CUI PRENDERE SPUNTO
 // Recupero le entrate dell'utente corrente e del mese selezionato
-$thisMonthIncomes = executeQuery($link, "SELECT SUM(amount) as thisMonthIncomes FROM incomes WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $selectedYearMonth])['thisMonthIncomes'];
+$thisMonthIncomes = executeQuery($link, "SELECT SUM(amount) as thisMonthIncomes FROM wallet_incomes WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $selectedYearMonth])['thisMonthIncomes'];
 
 // Recupero la somma di tutte le voci a salvadanaio inserite dall'utente corrente
-$totalPiggyBank = executeQuery($link, "SELECT SUM(amount) as total_piggy_bank FROM piggy_bank WHERE user_id = ?", ["i", $user_id])['total_piggy_bank'];
+$totalPiggyBank = executeQuery($link, "SELECT SUM(amount) as total_wallet_piggy_bank FROM wallet_piggy_bank WHERE user_id = ?", ["i", $user_id])['total_wallet_piggy_bank'];
 
 // Recupero le singole voci a salvadanaio dell'utente corrente
-$piggyBankEntries = executeQuery($link, "SELECT id, name, amount, added_date FROM piggy_bank WHERE user_id = ? ORDER BY added_date DESC", ["i", $user_id], false);
+$piggyBankEntries = executeQuery($link, "SELECT id, name, amount, added_date FROM wallet_piggy_bank WHERE user_id = ? ORDER BY added_date DESC", ["i", $user_id], false);
 
 // Recupero le voci a salvadanaio dell'utente corrente e del mese selezionato
-$thisMonthPiggyBank = executeQuery($link, "SELECT SUM(amount) as total_piggy_bank_current_month FROM piggy_bank WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $selectedYearMonth])['total_piggy_bank_current_month'];
+$thisMonthPiggyBank = executeQuery($link, "SELECT SUM(amount) as total_wallet_piggy_bank_current_month FROM wallet_piggy_bank WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $selectedYearMonth])['total_wallet_piggy_bank_current_month'];
 
 // Recupero la data dello stipendio definita dall'utente
 $salaryDate = executeQuery($link, "SELECT salary_date FROM users WHERE id = ?", ["i", $user_id])['salary_date'];
@@ -273,7 +273,7 @@ function processExpenses($link, $user_id, $selectedDate, $salaryDate, &$expenses
 $recurringExpenses = [];
 $thisMonthTotalRecurringExpenses = 0;
 $recurringSavings = 0;
-processExpenses($link, $user_id, $selectedDate, $salaryDate, $recurringExpenses, $thisMonthTotalRecurringExpenses, $recurringSavings, 'recurring_expenses');
+processExpenses($link, $user_id, $selectedDate, $salaryDate, $recurringExpenses, $thisMonthTotalRecurringExpenses, $recurringSavings, 'wallet_recurring_expenses');
 
 // Recupero tutte le spese stimate
 $estimatedExpenses = [];
@@ -282,7 +282,7 @@ $estimatedSavings = 0;
 processExpenses($link, $user_id, $selectedDate, $salaryDate, $estimatedExpenses, $thisMonthTotalEstimatedExpenses, $estimatedSavings, 'estimated_expenses');
 
 // Recupero le spese extra
-$extraExpenses = executeQuery($link, "SELECT id, name, amount, debit_date FROM extra_expenses WHERE user_id = ?", ["i", $user_id], false);
+$extraExpenses = executeQuery($link, "SELECT id, name, amount, debit_date FROM wallet_extra_expenses WHERE user_id = ?", ["i", $user_id], false);
 
 // Recupero le spese extra relative al mese corrente
 $thismonthExtraExpenses = [];
@@ -291,10 +291,10 @@ if ($salaryDate) {
     // Salary date non nullo
     $startDate = (new DateTime())->setDate($selectedYear, $selectedMonth, $salaryDate);
     $endDate = (clone $startDate)->modify('+1 month')->modify('-1 day');
-    $thismonthExtraExpenses = executeQuery($link, "SELECT id, name, amount, debit_date FROM extra_expenses WHERE user_id = ? AND debit_date BETWEEN ? AND ?", ["iss", $user_id, $startDate->format('Y-m-d'), $endDate->format('Y-m-d')], false);
+    $thismonthExtraExpenses = executeQuery($link, "SELECT id, name, amount, debit_date FROM wallet_extra_expenses WHERE user_id = ? AND debit_date BETWEEN ? AND ?", ["iss", $user_id, $startDate->format('Y-m-d'), $endDate->format('Y-m-d')], false);
 } else {
     // Salary date nullo, considero il mese normalmente
-    $thismonthExtraExpenses = executeQuery($link, "SELECT id, name, amount, debit_date FROM extra_expenses WHERE user_id = ? AND MONTH(debit_date) = ? AND YEAR(debit_date) = ?", ["iis", $user_id, $selectedMonth, $selectedYear], false);
+    $thismonthExtraExpenses = executeQuery($link, "SELECT id, name, amount, debit_date FROM wallet_extra_expenses WHERE user_id = ? AND MONTH(debit_date) = ? AND YEAR(debit_date) = ?", ["iis", $user_id, $selectedMonth, $selectedYear], false);
 }
 
 // Calcolo il totale delle spese extra del mese in corso
@@ -319,14 +319,14 @@ for ($i = 0; $i < 12; $i++) {
     $last_12_months[] = $date->format('F Y');
 
     // Recupero entrate per il mese corrente
-    $monthlyIncome = executeQuery($link, "SELECT SUM(amount) as monthly_incomes FROM incomes WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $month_year])['monthly_incomes'];
+    $monthlyIncome = executeQuery($link, "SELECT SUM(amount) as monthly_wallet_incomes FROM wallet_incomes WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $month_year])['monthly_wallet_incomes'];
     $last_12_monthlyIncomes[] = $monthlyIncome ?: 0;
 
     // Recupero uscite per il mese corrente
     $monthlyExpense = 0;
 
     // Spese ricorrenti
-    $rows = executeQuery($link, "SELECT amount, billing_frequency FROM recurring_expenses WHERE user_id = ? AND (start_year < ? OR (start_year = ? AND start_month <= ?)) AND (end_year IS NULL OR end_year > ? OR (end_year = ? AND end_month >= ?))", ["iiiiiii", $user_id, $date->format('Y'), $date->format('Y'), $date->format('m'), $date->format('Y'), $date->format('Y'), $date->format('m')], false);
+    $rows = executeQuery($link, "SELECT amount, billing_frequency FROM wallet_recurring_expenses WHERE user_id = ? AND (start_year < ? OR (start_year = ? AND start_month <= ?)) AND (end_year IS NULL OR end_year > ? OR (end_year = ? AND end_month >= ?))", ["iiiiiii", $user_id, $date->format('Y'), $date->format('Y'), $date->format('m'), $date->format('Y'), $date->format('Y'), $date->format('m')], false);
     foreach ($rows as $row) {
         $monthlyExpense += $row['amount'] / $row['billing_frequency'];
     }
@@ -342,18 +342,18 @@ for ($i = 0; $i < 12; $i++) {
         // Salary date non nullo
         $startDate = (clone $date)->setDate($date->format('Y'), $date->format('m'), $salaryDate);
         $endDate = (clone $startDate)->modify('+1 month')->modify('-1 day');
-        $extraRow = executeQuery($link, "SELECT SUM(amount) as total_extra FROM extra_expenses WHERE user_id = ? AND debit_date BETWEEN ? AND ?", ["iss", $user_id, $startDate->format('Y-m-d'), $endDate->format('Y-m-d')]);
+        $extraRow = executeQuery($link, "SELECT SUM(amount) as total_extra FROM wallet_extra_expenses WHERE user_id = ? AND debit_date BETWEEN ? AND ?", ["iss", $user_id, $startDate->format('Y-m-d'), $endDate->format('Y-m-d')]);
         $monthlyExpense += $extraRow['total_extra'] ?: 0;
     } else {
         // Salary date nullo, considero il mese normalmente
-        $extraRow = executeQuery($link, "SELECT SUM(amount) as total_extra FROM extra_expenses WHERE user_id = ? AND MONTH(debit_date) = ? AND YEAR(debit_date) = ?", ["iis", $user_id, $date->format('m'), $date->format('Y')]);
+        $extraRow = executeQuery($link, "SELECT SUM(amount) as total_extra FROM wallet_extra_expenses WHERE user_id = ? AND MONTH(debit_date) = ? AND YEAR(debit_date) = ?", ["iis", $user_id, $date->format('m'), $date->format('Y')]);
         $monthlyExpense += $extraRow['total_extra'] ?: 0;
     }
 
     $last_12_monthlyExpenses[] = $monthlyExpense;
 
     // Recupero l'importo salvadanaio per il mese corrente
-    $monthly_piggy = executeQuery($link, "SELECT SUM(amount) as monthly_piggy_bank FROM piggy_bank WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $month_year])['monthly_piggy_bank'];
+    $monthly_piggy = executeQuery($link, "SELECT SUM(amount) as monthly_wallet_piggy_bank FROM wallet_piggy_bank WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $month_year])['monthly_wallet_piggy_bank'];
     $monthlyPiggyBank[] = $monthly_piggy ?: 0;
 }
 

@@ -39,20 +39,20 @@ for ($i = 0; $i < 12; $i++) {
     $last_12_months[] = $endDate->format('F Y');
 
     // Recupero entrate per il mese corrente
-    $monthlyIncome = executeQuery($link, "SELECT SUM(amount) as monthly_incomes FROM incomes WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $month_year])['monthly_incomes'];
+    $monthlyIncome = executeQuery($link, "SELECT SUM(amount) as monthly_wallet_incomes FROM wallet_incomes WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $month_year])['monthly_wallet_incomes'];
     $last_12_monthlyIncomes[] = $monthlyIncome ?: 0;
 
     // Recupero uscite per il mese corrente
     $monthlyExpense = 0;
 
     // Spese ricorrenti
-    $rows = executeQuery($link, "SELECT amount, billing_frequency FROM recurring_expenses WHERE user_id = ? AND (start_year < ? OR (start_year = ? AND start_month <= ?)) AND (end_year IS NULL OR end_year > ? OR (end_year = ? AND end_month >= ?))", ["iiiiiii", $user_id, $endDate->format('Y'), $endDate->format('Y'), $endDate->format('m'), $endDate->format('Y'), $endDate->format('Y'), $endDate->format('m')], false);
+    $rows = executeQuery($link, "SELECT amount, billing_frequency FROM wallet_recurring_expenses WHERE user_id = ? AND (start_year < ? OR (start_year = ? AND start_month <= ?)) AND (end_year IS NULL OR end_year > ? OR (end_year = ? AND end_month >= ?))", ["iiiiiii", $user_id, $endDate->format('Y'), $endDate->format('Y'), $endDate->format('m'), $endDate->format('Y'), $endDate->format('Y'), $endDate->format('m')], false);
     foreach ($rows as $row) {
         $monthlyExpense += $row['amount'] / $row['billing_frequency'];
     }
 
     // Spese stimate
-    $rows = executeQuery($link, "SELECT amount, billing_frequency FROM estimated_expenses WHERE user_id = ? AND (start_year < ? OR (start_year = ? AND start_month <= ?)) AND (end_year IS NULL OR end_year > ? OR (end_year = ? AND end_month >= ?))", ["iiiiiii", $user_id, $endDate->format('Y'), $endDate->format('Y'), $endDate->format('m'), $endDate->format('Y'), $endDate->format('Y'), $endDate->format('m')], false);
+    $rows = executeQuery($link, "SELECT amount, billing_frequency FROM wallet_estimated_expenses WHERE user_id = ? AND (start_year < ? OR (start_year = ? AND start_month <= ?)) AND (end_year IS NULL OR end_year > ? OR (end_year = ? AND end_month >= ?))", ["iiiiiii", $user_id, $endDate->format('Y'), $endDate->format('Y'), $endDate->format('m'), $endDate->format('Y'), $endDate->format('Y'), $endDate->format('m')], false);
     foreach ($rows as $row) {
         $monthlyExpense += $row['amount'] / $row['billing_frequency'];
     }
@@ -62,18 +62,18 @@ for ($i = 0; $i < 12; $i++) {
         // Salary date non nullo
         $startDate = (clone $endDate)->modify('first day of this month')->setDate($endDate->format('Y'), $endDate->format('m'), $salaryDate);
         $endDateTemp = (clone $startDate)->modify('+1 month')->modify('-1 day');
-        $extraRow = executeQuery($link, "SELECT SUM(amount) as total_extra FROM extra_expenses WHERE user_id = ? AND debit_date BETWEEN ? AND ?", ["iss", $user_id, $startDate->format('Y-m-d'), $endDateTemp->format('Y-m-d')]);
+        $extraRow = executeQuery($link, "SELECT SUM(amount) as total_extra FROM wallet_extra_expenses WHERE user_id = ? AND debit_date BETWEEN ? AND ?", ["iss", $user_id, $startDate->format('Y-m-d'), $endDateTemp->format('Y-m-d')]);
         $monthlyExpense += $extraRow['total_extra'] ?: 0;
     } else {
         // Salary date nullo, considero il mese normalmente
-        $extraRow = executeQuery($link, "SELECT SUM(amount) as total_extra FROM extra_expenses WHERE user_id = ? AND MONTH(debit_date) = ? AND YEAR(debit_date) = ?", ["iis", $user_id, $endDate->format('m'), $endDate->format('Y')]);
+        $extraRow = executeQuery($link, "SELECT SUM(amount) as total_extra FROM wallet_extra_expenses WHERE user_id = ? AND MONTH(debit_date) = ? AND YEAR(debit_date) = ?", ["iis", $user_id, $endDate->format('m'), $endDate->format('Y')]);
         $monthlyExpense += $extraRow['total_extra'] ?: 0;
     }
 
     $last_12_monthlyExpenses[] = $monthlyExpense;
 
     // Recupero l'importo salvadanaio per il mese corrente
-    $monthly_piggy = executeQuery($link, "SELECT SUM(amount) as monthly_piggy_bank FROM piggy_bank WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $month_year])['monthly_piggy_bank'];
+    $monthly_piggy = executeQuery($link, "SELECT SUM(amount) as monthly_wallet_piggy_bank FROM wallet_piggy_bank WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $month_year])['monthly_wallet_piggy_bank'];
     $monthlyPiggyBank[] = $monthly_piggy ?: 0;
 }
 

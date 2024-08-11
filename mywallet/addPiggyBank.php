@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif (!is_numeric($amount)) {
         $error_message = "Inserisci un importo valido.";
     } else {
-        $sql = "INSERT INTO piggy_bank (name, user_id, amount, added_date) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO wallet_piggy_bank (name, user_id, amount, added_date) VALUES (?, ?, ?, ?)";
 
         if ($stmt = $link->prepare($sql)) {
             $stmt->bind_param("sids", $name, $user_id, $amount, $date);

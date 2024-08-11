@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif (!is_numeric($amount)) {
         $response["message"] = "Inserisci un valore valido.";
     } else {
-        $sql = "UPDATE piggy_bank SET name = ?, amount = ?, added_date = ? WHERE id = ? AND user_id = ?";
+        $sql = "UPDATE wallet_piggy_bank SET name = ?, amount = ?, added_date = ? WHERE id = ? AND user_id = ?";
 
         if ($stmt = $link->prepare($sql)) {
             $stmt->bind_param("sdsii", $name, $amount, $added_date, $id, $user_id);

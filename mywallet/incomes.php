@@ -46,7 +46,7 @@ include 'retrieveData.php';
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($incomes as $entry): ?>
+                            <?php foreach ($wallet_incomes as $entry): ?>
                                 <tr>
 									<td><?php echo htmlspecialchars($entry['name']); ?></td>
                                     <td><?php echo htmlspecialchars($entry['amount']); ?></td>

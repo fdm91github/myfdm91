@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif (!is_numeric($amount) || $amount<=0) {
         $error_message = "Inserisci un importo valido.";
     } else {
-        $sql = "INSERT INTO incomes (name, user_id, amount, added_date) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO wallet_incomes (name, user_id, amount, added_date) VALUES (?, ?, ?, ?)";
 
         if ($stmt = $link->prepare($sql)) {
             $stmt->bind_param("sids", $name, $user_id, $amount, $date);

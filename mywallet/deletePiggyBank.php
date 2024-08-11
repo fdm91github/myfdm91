@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user_id = $_SESSION['id'];
     $id = $_POST["id"];
 
-    $sql = "DELETE FROM piggy_bank WHERE id = ? AND user_id = ?";
+    $sql = "DELETE FROM wallet_piggy_bank WHERE id = ? AND user_id = ?";
 
     if ($stmt = $link->prepare($sql)) {
         $stmt->bind_param("ii", $id, $user_id);
