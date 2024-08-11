@@ -80,5 +80,7 @@ include 'retrieveData.php';
     <?php include 'editPiggyBankModal.php'; ?>
     <?php include 'deletePiggyBankModal.php'; ?>
     <?php include 'navbar.php'; ?>
+	<?php include '../footer.php'; ?>
+	
 </body>
 </html>

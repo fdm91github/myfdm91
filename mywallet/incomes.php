@@ -80,5 +80,6 @@ include 'retrieveData.php';
     <?php include 'editIncomeModal.php'; ?>
     <?php include 'deleteIncomeModal.php'; ?>
     <?php include 'navbar.php'; ?>
+	<?php include '../footer.php'; ?>
 </body>
 </html>

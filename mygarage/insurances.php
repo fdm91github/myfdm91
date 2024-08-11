@@ -104,5 +104,7 @@ include 'retrieveData.php';
     <?php include 'editInsuranceModal.php'; ?>
     <?php include 'deleteInsuranceModal.php'; ?>
     <?php include 'navbar.php'; ?>
+	<?php include '../footer.php'; ?>
+	
 </body>
 </html>

@@ -16,11 +16,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $amount = trim($_POST["amount"]);
     $buying_date = trim($_POST["buying_date"]);
 
-    // Validate inputs
+    // Convalido i dati
     if (empty($vehicle_id) || empty($amount) || empty($buying_date)) {
         $response["message"] = "Inserisci tutti i campi obbligatori.";
     } else {
-        // Check for duplicate entry
+        // Verifico la presenza di duplicati
         $check_sql = "SELECT id FROM vehicle_revisions WHERE user_id = ? AND vehicle_id = ? AND buying_date = ?";
         if ($check_stmt = $link->prepare($check_sql)) {
             $check_stmt->bind_param("iis", $user_id, $vehicle_id, $buying_date);
@@ -30,10 +30,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($check_stmt->num_rows > 0) {
                 $response["message"] = "Il veicolo ha già una revisione per la stessa data.";
             } else {
-                // Insert new entry if no duplicate found
                 $sql = "INSERT INTO vehicle_revisions (user_id, vehicle_id, amount, buying_date) VALUES (?, ?, ?, ?)";
                 if ($stmt = $link->prepare($sql)) {
-                    // Note that we should pass only four parameters here, matching the four columns in the INSERT statement.
                     $stmt->bind_param("iiss", $user_id, $vehicle_id, $amount, $buying_date);
                     if ($stmt->execute()) {
                         $response["status"] = "success";

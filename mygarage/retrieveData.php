@@ -112,6 +112,24 @@ foreach ($vehiclesQuery as $vehicle) {
     ];
 }
 
+// Recupero tutte le manutenzioni
+$vehicleServices = executeQuery($link, "SELECT id, vehicle_id, description, amount, buying_date, registered_kilometers FROM vehicle_services WHERE user_id = ?", ["i", $user_id], false);
+
+// Recupero tutti i pezzi delle manutenzioni
+$vehicleServiceParts = executeQuery($link, "SELECT id, service_id, part_name, part_number FROM vehicle_service_parts WHERE user_id = ?", ["i", $user_id], false);
+
+$serviceParts = [];
+foreach ($vehicleServiceParts as $part) {
+    $serviceId = $part['service_id'];
+    if (!isset($serviceParts[$serviceId])) {
+        $serviceParts[$serviceId] = [];
+    }
+    $serviceParts[$serviceId][] = [
+        'part_name' => $part['part_name'],
+        'part_number' => $part['part_number']
+    ];
+}
+
 // Recupero tutte le assicurazioni
 $vehicleInsurances = executeQuery($link, "SELECT id, vehicle_id, company, amount, buying_date FROM vehicle_insurances WHERE user_id = ?", ["i", $user_id], false);
 
@@ -236,11 +254,11 @@ function processExpenses($link, $user_id, $selectedDate, $salaryDate, &$expenses
 
             if ($billingFrequency > 1 && ($endDate > $selectedDate || $undetermined == 1)) {
                 $savings += $monthlyAmount * $currentInstallment;
-            } else if ($billingFrequency == 1 && ($endDate > $selectedDate || $undetermined == 1)) {
+            } else if ($billingFrequency == 1) {
                 $savings += $monthlyAmount;
             }
 
-            if($relevantDate > $startDate && ($endDate > $selectedDate || $undetermined == 1)){
+            if($relevantDate > $startDate){
                 $totalExpenses += $monthlyAmount;
             }
 

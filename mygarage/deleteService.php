@@ -8,84 +8,53 @@ if (!isset($_SESSION['username'])) {
 
 require_once '../config.php';
 
-$error_message = '';
-$success_message = '';
+$response = ["status" => "error", "message" => ""];
 
 if (isset($_POST['id'])) {
     $id = $_POST['id'];
     $user_id = $_SESSION['id'];
 
-    $sql = "DELETE FROM wallet_wallet_extra_expenses WHERE id = ? AND user_id = ?";
-    if ($stmt = $link->prepare($sql)) {
-        $stmt->bind_param("ii", $id, $user_id);
+    // Start transaction
+    $link->begin_transaction();
 
-        if ($stmt->execute()) {
-            $success_message = "Spesa eliminata con successo.";
-            header("refresh:3; url=dashboard.php");
+    try {
+        // Delete related parts
+        $sql_parts = "DELETE FROM vehicle_service_parts WHERE service_id = ? AND user_id = ?";
+        if ($stmt_parts = $link->prepare($sql_parts)) {
+            $stmt_parts->bind_param("ii", $id, $user_id);
+            $stmt_parts->execute();
+            $stmt_parts->close();
         } else {
-            $error_message = "Qualcosa è andato storto. Riprova più tardi.";
+            throw new Exception("Errore nella preparazione della query per l'eliminazione delle parti.");
         }
-        $stmt->close();
-    } else {
-        $error_message = "Qualcosa è andato storto. Riprova più tardi.";
+
+        // Delete the service
+        $sql_service = "DELETE FROM vehicle_services WHERE id = ? AND user_id = ?";
+        if ($stmt_service = $link->prepare($sql_service)) {
+            $stmt_service->bind_param("ii", $id, $user_id);
+            $stmt_service->execute();
+            $stmt_service->close();
+        } else {
+            throw new Exception("Errore nella preparazione della query per l'eliminazione della manutenzione.");
+        }
+
+        // Commit transaction
+        $link->commit();
+
+        $response["status"] = "success";
+        $response["message"] = "Manutenzione e parti correlate eliminate con successo.";
+    } catch (Exception $e) {
+        // Rollback transaction if any query fails
+        $link->rollback();
+
+        $response["message"] = $e->getMessage();
     }
+
     $link->close();
 } else {
-    $error_message = "Invalid request. No expense ID provided.";
+    $response["message"] = "Invalid request. No service ID provided.";
 }
+
+header('Content-Type: application/json');
+echo json_encode($response);
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Delete Recurring Expense</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-    <style>
-        body {
-            padding-top: 56px;
-        }
-        .message-container {
-            max-width: 500px;
-            margin: 50px auto;
-            text-align: center;
-        }
-    </style>
-</head>
-<body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <a class="navbar-brand" href="#">Wallet Manager</a>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="dashboard.php">Dashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="logout.php">Logout</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-
-    <!-- Message Container -->
-    <div class="container message-container">
-        <?php
-        if (!empty($error_message)) {
-            echo '<div class="alert alert-danger">' . htmlspecialchars($error_message) . '</div>';
-        } elseif (!empty($success_message)) {
-            echo '<div class="alert alert-success">' . htmlspecialchars($success_message) . '</div>';
-        }
-        ?>
-        <p class="text-center"><a href="dashboard.php">Back to Dashboard</a></p>
-    </div>
-
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-</body>
-</html>
-

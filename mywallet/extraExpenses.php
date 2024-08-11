@@ -151,5 +151,7 @@ foreach ($extraExpenses as $expense) {
     <?php include 'editExtraExpenseModal.php'; ?>
     <?php include 'deleteExtraExpenseModal.php'; ?>
     <?php include 'navbar.php'; ?>
+	<?php include '../footer.php'; ?>
+	
 </body>
 </html>

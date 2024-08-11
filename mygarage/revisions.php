@@ -101,5 +101,7 @@ include 'retrieveData.php';
     <?php include 'editRevisionModal.php'; ?>
     <?php include 'deleteRevisionModal.php'; ?>
     <?php include 'navbar.php'; ?>
+	<?php include '../footer.php'; ?>
+	
 </body>
 </html>

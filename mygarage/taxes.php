@@ -101,5 +101,7 @@ include 'retrieveData.php';
     <?php include 'editTaxModal.php'; ?>
     <?php include 'deleteTaxModal.php'; ?>
     <?php include 'navbar.php'; ?>
+	<?php include '../footer.php'; ?>
+	
 </body>
 </html>

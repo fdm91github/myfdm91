@@ -17,11 +17,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $amount = trim($_POST["amount"]);
     $buying_date = trim($_POST["buying_date"]);
 
-    // Validate inputs
+    // Convalido i dati
     if (empty($vehicle_id) || empty($company) || empty($amount) || empty($buying_date)) {
         $response["message"] = "Inserisci tutti i campi obbligatori.";
     } else {
-        // Check for duplicate entry
+        // Verifico la presenza di duplicati
         $check_sql = "SELECT id FROM vehicle_insurances WHERE user_id = ? AND vehicle_id = ? AND buying_date = ?";
         if ($check_stmt = $link->prepare($check_sql)) {
             $check_stmt->bind_param("iis", $user_id, $vehicle_id, $buying_date);
@@ -31,7 +31,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($check_stmt->num_rows > 0) {
                 $response["message"] = "Il veicolo ha già un'assicurazione per la stessa data.";
             } else {
-                // Insert new entry if no duplicate found
                 $sql = "INSERT INTO vehicle_insurances (user_id, vehicle_id, company, amount, buying_date) VALUES (?, ?, ?, ?, ?)";
                 if ($stmt = $link->prepare($sql)) {
                     $stmt->bind_param("iisss", $user_id, $vehicle_id, $company, $amount, $buying_date);

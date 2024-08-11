@@ -250,7 +250,8 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
     <?php include 'editEstimatedExpenseModal.php'; ?>
     <?php include 'deleteEstimatedExpenseModal.php'; ?>
     <?php include 'navbar.php'; ?>
-
+	<?php include '../footer.php'; ?>
+	
     <script>
         $('#editEstimatedExpenseModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);

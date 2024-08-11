@@ -250,7 +250,8 @@ usort($active_expenses, function($a, $b) use ($sort_by, $order) {
     <?php include 'editRecurringExpenseModal.php'; ?>
     <?php include 'deleteRecurringExpenseModal.php'; ?>
     <?php include 'navbar.php'; ?>
-
+	<?php include '../footer.php'; ?>
+	
     <script>
         $('#editRecurringExpenseModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);

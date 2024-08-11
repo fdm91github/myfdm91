@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($vehicle_id) || empty($amount) || empty($buying_date)) {
         $response["message"] = "Inserisci tutti i campi obbligatori.";
     } else {
-        // Controllo eventuali duplicati
+        // Verifico la presenza di duplicati
         $check_sql = "SELECT id FROM vehicle_taxes WHERE user_id = ? AND vehicle_id = ? AND buying_date = ?";
         if ($check_stmt = $link->prepare($check_sql)) {
             $check_stmt->bind_param("iis", $user_id, $vehicle_id, $buying_date);

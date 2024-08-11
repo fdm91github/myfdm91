@@ -1,18 +1,18 @@
-<!-- Modale per l'eliminazione di una spesa extra -->
-<div class="modal fade" id="deleteExtraExpenseModal" tabindex="-1" role="dialog" aria-labelledby="deleteExtraExpenseModalLabel" aria-hidden="true">
+<!-- Modale per l'eliminazione di una voce delle manutenzioni -->
+<div class="modal fade" id="deleteServiceModal" tabindex="-1" role="dialog" aria-labelledby="deleteServiceModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="deleteExtraExpenseModalLabel">Elimina spesa extra</h5>
+                <h5 class="modal-title" id="deleteServiceModalLabel">Elimina manutenzione</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <div id="deleteExtraExpenseStatus"></div>
-                <p>Sei sicuro di voler eliminare questa voce?</p>
-                <form id="deleteExtraExpenseForm" method="POST" action="deleteExtraExpense.php">
-                    <input type="hidden" name="id" id="deleteExtraExpenseId">
+                <div id="deleteServiceStatus"></div>
+                <p>Sei sicuro di voler eliminare questa manutenzione?</p>
+                <form id="deleteServiceForm" method="POST" action="deleteService.php">
+                    <input type="hidden" name="id" id="deleteServiceId">
                     <button type="submit" class="btn btn-danger btn-block">Elimina</button>
                 </form>
             </div>
@@ -21,27 +21,26 @@
 </div>
 <script>
     $(document).ready(function() {
-		$('#deleteExtraExpenseModal').on('show.bs.modal', function (event) {
-			var button = $(event.relatedTarget);
-			var id = button.data('id');
+        $('#deleteServiceModal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var id = button.data('id');
+            $('#deleteServiceId').val(id);
+        });
 
-			$('#deleteExtraExpenseId').val(id);
-		});
-
-        $('#deleteExtraExpenseForm').submit(function(e) {
+        $('#deleteServiceForm').submit(function(e) {
             e.preventDefault();
             $.ajax({
-                url: 'deleteExtraExpense.php',
+                url: 'deleteService.php',
                 type: 'POST',
                 data: $(this).serialize(),
                 success: function(response) {
-                    $('#deleteExtraExpenseStatus').html('<div class="alert alert-success">Spesa eliminata con successo.</div>');
+                    $('#deleteServiceStatus').html('<div class="alert alert-success">Manutenzione eliminata con successo.</div>');
                     setTimeout(function() { window.location.reload(); }, 1000);
                 },
                 error: function() {
-                    $('#deleteExtraExpenseStatus').html('<div class="alert alert-danger">Qualcosa è andato storto. Riprova più tardi.</div>');
+                    $('#deleteServiceStatus').html('<div class="alert alert-danger">Qualcosa è andato storto. Riprova più tardi.</div>');
                 }
             });
-		});
+        });
     });
 </script>
