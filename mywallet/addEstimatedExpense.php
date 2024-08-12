@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $end_year = $undetermined ? NULL : $end_year;
 
         // Controlla se esiste già una spesa identica
-        $check_sql = "SELECT id FROM estimated_expenses WHERE user_id = ? AND name = ? AND amount = ? AND start_month = ? AND start_year = ? AND (end_month = ? OR end_month IS NULL) AND (end_year = ? OR end_year IS NULL) AND undetermined = ? AND debit_date = ? AND billing_frequency = ?";
+        $check_sql = "SELECT id FROM wallet_estimated_expenses WHERE user_id = ? AND name = ? AND amount = ? AND start_month = ? AND start_year = ? AND (end_month = ? OR end_month IS NULL) AND (end_year = ? OR end_year IS NULL) AND undetermined = ? AND debit_date = ? AND billing_frequency = ?";
         if ($check_stmt = $link->prepare($check_sql)) {
             $check_stmt->bind_param("isdiiiiiii", $user_id, $name, $amount, $start_month, $start_year, $end_month, $end_year, $undetermined, $debit_date, $billing_frequency);
             $check_stmt->execute();
@@ -44,7 +44,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($check_stmt->num_rows > 0) {
                 $response["message"] = "La spesa che stai provando ad aggiungere esiste già.";
             } else {
-                $sql = "INSERT INTO estimated_expenses (user_id, name, amount, start_month, start_year, end_month, end_year, undetermined, debit_date, billing_frequency) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $sql = "INSERT INTO wallet_estimated_expenses (user_id, name, amount, start_month, start_year, end_month, end_year, undetermined, debit_date, billing_frequency) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
                 if ($stmt = $link->prepare($sql)) {
                     $stmt->bind_param("isdiiiiiii", $user_id, $name, $amount, $start_month, $start_year, $end_month, $end_year, $undetermined, $debit_date, $billing_frequency);
                     if ($stmt->execute()) {

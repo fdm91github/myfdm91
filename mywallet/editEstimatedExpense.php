@@ -17,7 +17,7 @@ $success_message = '';
 if ($expense_id) {
     // Carico le spese stimate esistenti
     $sql = "SELECT name, amount, start_month, start_year, end_month, end_year, undetermined, debit_date, billing_frequency
-            FROM estimated_expenses
+            FROM wallet_estimated_expenses
             WHERE id = ? AND user_id = ?";
     if ($stmt = $link->prepare($sql)) {
         $stmt->bind_param("ii", $expense_id, $user_id);
@@ -54,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $end_month = $undetermined ? NULL : $end_month;
         $end_year = $undetermined ? NULL : $end_year;
 
-        $sql = "UPDATE estimated_expenses
+        $sql = "UPDATE wallet_estimated_expenses
                 SET name = ?, amount = ?, start_month = ?, start_year = ?, end_month = ?, end_year = ?, undetermined = ?, debit_date = ?, billing_frequency = ?
                 WHERE id = ? AND user_id = ?";
 
