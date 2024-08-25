@@ -10,7 +10,7 @@
             </div>
             <div class="modal-body">
                 <div id="addServiceStatus"></div>
-                <form id="addServiceForm">
+                <form id="addServiceForm" enctype="multipart/form-data">
                     <input type="hidden" name="vehicle_id" id="addServiceVehicleId"> <!-- Hidden vehicle_id -->
                     <div class="form-group">
                         <label for="addServiceDescription">Descrizione</label>
@@ -27,6 +27,10 @@
                     <div class="form-group">
                         <label for="addServiceKilometers">Kilometri registrati</label>
                         <input type="number" name="registered_kilometers" id="addServiceKilometers" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="addServiceAttachment">Aggiungi allegato</label>
+                        <input type="file" name="attachment" id="addServiceAttachment" class="form-control-file">
                     </div>
                     <div id="partsSection">
                         <h6>Parti utilizzate</h6>
@@ -53,7 +57,7 @@
         });
 
         // Add a new part row when "Aggiungi voce" is clicked
-        $('#addPartBtn').click(function() {
+        $('#addNewPartBtn').click(function() {
             var partRow = `
                 <div class="form-row align-items-end mb-2">
                     <div class="col">
@@ -66,7 +70,7 @@
                         <button type="button" class="btn btn-danger removePartBtn">&times;</button>
                     </div>
                 </div>`;
-            $('#partsContainer').append(partRow);
+            $('#addPartsContainer').append(partRow);
         });
 
         // Remove a part row when the remove button is clicked
@@ -74,89 +78,93 @@
             $(this).closest('.form-row').remove();
         });
 
-		$('#addServiceForm').submit(function(e) {
-			e.preventDefault();
+        $('#addServiceForm').submit(function(e) {
+            e.preventDefault();
 
-			// Basic client-side validation
-			let isValid = true;
-			$('#addServiceForm input[required]').each(function() {
-				if ($(this).val() === '') {
-					isValid = false;
-					$(this).addClass('is-invalid');
-				} else {
-					$(this).removeClass('is-invalid');
-				}
-			});
+            // Basic client-side validation
+            let isValid = true;
+            $('#addServiceForm input[required]').each(function() {
+                if ($(this).val() === '') {
+                    isValid = false;
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
 
-			if (!isValid) {
-				$('#addServiceStatus').html('<div class="alert alert-danger">Per favore compila tutti i campi obbligatori.</div>');
-				return;
-			}
+            if (!isValid) {
+                $('#addServiceStatus').html('<div class="alert alert-danger">Per favore compila tutti i campi obbligatori.</div>');
+                return;
+            }
 
-			$('button[type="submit"]').prop('disabled', true);
+            $('button[type="submit"]').prop('disabled', true);
 
-			$.ajax({
-				url: 'addService.php',
-				type: 'POST',
-				data: $(this).serialize(),
-				success: function(response) {
-					if (response.status === 'success') {
-						$('#addServiceStatus').html('<div class="alert alert-success">Manutenzione aggiunta con successo!</div>');
+            // Prepare the form data
+            var formData = new FormData(this);
 
-						// If parts were added, submit them separately with the new service ID
-						if ($('#partsContainer').children().length > 0) {
-							submitParts(response.service_id);
-						} else {
-							setTimeout(function() { window.location.reload(); }, 1000);
-						}
-					} else {
-						$('#addServiceStatus').html('<div class="alert alert-danger">' + response.message + '</div>');
-					}
-					$('button[type="submit"]').prop('disabled', false);
-				},
+            $.ajax({
+                url: 'addService.php',
+                type: 'POST',
+                data: formData,
+                contentType: false, // Don't set any content type header
+                processData: false, // Don't process the data
+                success: function(response) {
+                    if (response.status === 'success') {
+                        $('#addServiceStatus').html('<div class="alert alert-success">Manutenzione aggiunta con successo!</div>');
 
-				error: function() {
-					$('#addServiceStatus').html('<div class="alert alert-danger">Qualcosa è andato storto. Riprova più tardi.</div>');
-					$('button[type="submit"]').prop('disabled', false);
-				}
-			});
-		});
+                        // If parts were added, submit them separately with the new service ID
+                        if ($('#addPartsContainer').children().length > 0) {
+                            submitParts(response.service_id);
+                        } else {
+                            setTimeout(function() { window.location.reload(); }, 1000);
+                        }
+                    } else {
+                        $('#addServiceStatus').html('<div class="alert alert-danger">' + response.message + '</div>');
+                    }
+                    $('button[type="submit"]').prop('disabled', false);
+                },
+                error: function() {
+                    $('#addServiceStatus').html('<div class="alert alert-danger">Qualcosa è andato storto. Riprova più tardi.</div>');
+                    $('button[type="submit"]').prop('disabled', false);
+                }
+            });
+        });
 
-		function submitParts(serviceId) {
-			var partsData = [];
-			$('#partsContainer .form-row').each(function() {
-				var partName = $(this).find('input[name="part_name[]"]').val();
-				var partNumber = $(this).find('input[name="part_number[]"]').val();
+        function submitParts(serviceId) {
+            var partsData = [];
+            $('#addPartsContainer .form-row').each(function() {
+                var partName = $(this).find('input[name="part_name[]"]').val();
+                var partNumber = $(this).find('input[name="part_number[]"]').val();
 
-				if (partName && partNumber) {
-					partsData.push({ name: 'part_name[]', value: partName });
-					partsData.push({ name: 'part_number[]', value: partNumber });
-				}
-			});
+                if (partName && partNumber) {
+                    partsData.push({ name: 'part_name[]', value: partName });
+                    partsData.push({ name: 'part_number[]', value: partNumber });
+                }
+            });
 
-			if (partsData.length === 0) {
-				// No parts to add
-				setTimeout(function() { window.location.reload(); }, 1000);
-				return;
-			}
+            if (partsData.length === 0) {
+                // No parts to add
+                setTimeout(function() { window.location.reload(); }, 1000);
+                return;
+            }
 
-			partsData.push({ name: 'service_id', value: serviceId });
+            partsData.push({ name: 'service_id', value: serviceId });
 
-			$.ajax({
-				url: 'addServicePart.php',
-				type: 'POST',
-				data: $.param(partsData),
-				success: function(response) {
-					if (response.status === 'success') {
-						setTimeout(function() { window.location.reload(); }, 1000);
-					} else {
-						$('#addServiceStatus').html('<div class="alert alert-danger">Parti non aggiunte: ' + (response.message || 'Errore sconosciuto') + '</div>');
-					}
-				},
-				error: function() {
-					$('#addServiceStatus').html('<div class="alert alert-danger">Qualcosa è andato storto nell\'aggiunta delle parti. Riprova più tardi.</div>');
-				}
-			});
-		}
+            $.ajax({
+                url: 'addServicePart.php',
+                type: 'POST',
+                data: $.param(partsData),
+                success: function(response) {
+                    if (response.status === 'success') {
+                        setTimeout(function() { window.location.reload(); }, 1000);
+                    } else {
+                        $('#addServiceStatus').html('<div class="alert alert-danger">Parti non aggiunte: ' + (response.message || 'Errore sconosciuto') + '</div>');
+                    }
+                },
+                error: function() {
+                    $('#addServiceStatus').html('<div class="alert alert-danger">Qualcosa è andato storto nell\'aggiunta delle parti. Riprova più tardi.</div>');
+                }
+            });
+        }
     });
 </script>

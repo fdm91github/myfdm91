@@ -3,26 +3,6 @@ session_start();
 require_once '../config.php';
 include 'retrieveData.php';
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['month']) && isset($_POST['year'])) {
-    $selectedMonth = $_POST['month'];
-    $selectedYear = $_POST['year'];
-} else {
-    $selectedMonth = date('m');
-    $selectedYear = date('Y');
-}
-
-if ($salaryDate) {
-    $currentDate = DateTime::createFromFormat('Y-m-d', "$selectedYear-$selectedMonth-$salaryDate");
-    $nearest_date = clone $currentDate;
-    $nearest_date->modify('+1 month')->modify('-1 day');
-} else {
-    $currentDate = DateTime::createFromFormat('Y-m-d', "$selectedYear-$selectedMonth-01");
-    $nearest_date = clone $currentDate;
-    $nearest_date->modify('+1 month')->modify('-1 day');
-}
-
-$currentSelected = $currentDate->format('d/m/Y');
-$nearest_selected = $nearest_date->format('d/m/Y');
 ?>
 
 <!DOCTYPE html>
@@ -53,34 +33,6 @@ $nearest_selected = $nearest_date->format('d/m/Y');
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
                 <h4 class="mb-0">Panoramica</h4>
-                <form method="POST" action="" class="form-inline">
-                    <label for="month">Mese:</label>
-                    <select name="month" id="month" class="form-control mx-2">
-                        <?php
-                        $months = [
-                            '01' => 'Gennaio', '02' => 'Febbraio', '03' => 'Marzo',
-                            '04' => 'Aprile', '05' => 'Maggio', '06' => 'Giugno',
-                            '07' => 'Luglio', '08' => 'Agosto', '09' => 'Settembre',
-                            '10' => 'Ottobre', '11' => 'Novembre', '12' => 'Dicembre'
-                        ];
-
-                        for ($m = 1; $m <= 12; $m++) {
-                            $month = str_pad($m, 2, '0', STR_PAD_LEFT);
-                            $month_name = $months[$month];
-                            echo "<option value='$month'" . ($selectedMonth == $month ? ' selected' : '') . ">$month_name</option>";
-                        }
-                        ?>
-                    </select>
-                    <label for="year">Anno:</label>
-                    <select name="year" id="year" class="form-control mx-2">
-                        <?php
-                        for ($y = 2020; $y <= 2099; $y++) {
-                            echo "<option value='$y'" . ($selectedYear == $y ? ' selected' : '') . ">$y</option>";
-                        }
-                        ?>
-                    </select>
-                    <button type="submit" class="btn btn-primary ml-2">Visualizza</button>
-                </form>
             </div>
 
             <div class="card-body">
@@ -88,16 +40,15 @@ $nearest_selected = $nearest_date->format('d/m/Y');
                     <div class="col-12 col-md-6">
 						<h5>Riepilogo</h5><br/>
                         <p><b>Nell'ultimo anno hai speso <?php echo isset($lastYearExpenses) ? $lastYearExpenses : '0'; ?> euro</b></p>
-						<p><b>Nel mese selezionato hai speso <?php echo isset($thisMonthExpenses) ? $thisMonthExpenses : '0'; ?> euro</b></p>
                         <p><b>Negli ultimi 12 mesi hai effettuato <?php echo isset($lastYearMaintenances) ? $lastYearMaintenances : '0'; ?> manutenzioni</b></p>
 						<p><b>L'ultima manutenzione è costata <?php echo isset($lastMaintenanceCost) ? $lastMaintenanceCost : '0'; ?> euro</b></p>
                     </div>
                     <div class="col-12 col-md-6">
-						<h5>Scadenze</h5><br/>
-                        <p><b><?php echo isset($nearestTaxExpirationVehicle) ? "Il prossimo bollo scade il $nearestTaxExpirationDate per il veicolo $nearestTaxExpirationVehicle" : "Nessuna scadenza impostata per il bollo"; ?></b></p>
-                        <p><b><?php echo isset($nearestServiceExpirationDate) ? "Il prossimo tagliando va effettuato entro il $nearestServiceExpirationDate per il veicolo $nearestServiceExpirationVehicle" : "Nessuna scadenza impostata per il tagliando"; ?></b></p>
-						<p><b><?php echo isset($nearestRevisionExpirationDate) ? "La prossima revisione scade il $nearestRevisionExpirationDate per il veicolo $nearestRevisionExpirationVehicle" : "Nessuna scadenza impostata per la revisione"; ?></b></p>
-						<p><b><?php echo isset($nearestInsuranceExpirationDate) ? "L'assicurazione per $nearestInsuranceExpirationVehicle scade il $nearestInsuranceExpirationDate" : "Nessuna scadenza impostata per l'assicurazione"; ?></b></p>
+						<h5>Prossime scadenze</h5><br/>
+                        <p><b><?php echo isset($nearestTaxExpirationVehicle) ? "Il bollo del veicolo $nearestTaxExpirationVehicle scade il " . htmlspecialchars(formatDate($nearestTaxExpirationDate)) : "Nessuna scadenza impostata per il bollo"; ?></b></p>
+                        <p><b><?php echo isset($nearestServiceExpirationDate) ? "Il tagliando del veicolo $nearestServiceExpirationVehicle scade il  " . htmlspecialchars(formatDate($nearestServiceExpirationDate)) : "Nessuna scadenza impostata per il tagliando"; ?></b></p>
+						<p><b><?php echo isset($nearestRevisionExpirationDate) ? "La revisione del veicolo $nearestRevisionExpirationVehicle scade il " . htmlspecialchars(formatDate($nearestRevisionExpirationDate)) : "Nessuna scadenza impostata per la revisione"; ?></b></p>
+						<p><b><?php echo isset($nearestInsuranceExpirationDate) ? "L'assicurazione del veicolo $nearestInsuranceExpirationVehicle scade il " . htmlspecialchars(formatDate($nearestRevisionExpirationDate)) : "Nessuna scadenza impostata per l'assicurazione"; ?></b></p>
                     </div>
                 </div>
             </div>
@@ -107,10 +58,10 @@ $nearest_selected = $nearest_date->format('d/m/Y');
 			<div class="col-12 col-md-6 mb-4">
 				<div class="card">
 					<div class="card-header">
-						<h4 class="mb-0">Distribuzione spese annuali</h4>
+						<h4 class="mb-0">Spese totali del <?php echo date('Y'); ?></h4>
 					</div>
 					<div class="card-body">
-						<canvas id="MonthExpenseChart" width="300" height="300"></canvas>
+						<canvas id="YearlyExpenseChart" width="300" height="300"></canvas>
 					</div>
 				</div>
 			</div>
@@ -118,7 +69,7 @@ $nearest_selected = $nearest_date->format('d/m/Y');
 			<div class="col-12 col-md-6 mb-4">
 				<div class="card">
 					<div class="card-header">
-						<h4 class="mb-0">Statistiche dell'ultimo anno</h4>
+						<h4 class="mb-0">Statistiche degli ultimi 12 mesi</h4>
 					</div>
 					<div class="card-body">
 						<canvas id="YearExpenseChart" width="300" height="300"></canvas>                    
@@ -131,10 +82,10 @@ $nearest_selected = $nearest_date->format('d/m/Y');
 			<div class="card-header d-flex justify-content-between align-items-center flex-wrap">
 				<h4 class="mb-0">KM percorsi</h4>
 			</div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-12 col-md-6">
-						<canvas id="travelledkmChart" width="300" height="300"></canvas>
+			<div class="card-body">
+				<div class="row">
+					<div class="col-12">
+						<canvas id="travelledkmChart" width="1200" height="250"></canvas>
 					</div>
 				</div>
 			</div>
@@ -142,8 +93,8 @@ $nearest_selected = $nearest_date->format('d/m/Y');
 
 		<script>
 			document.addEventListener("DOMContentLoaded", function() {
-				var ctx = document.getElementById('MonthExpenseChart').getContext('2d');
-				var MonthExpenseChart = new Chart(ctx, {
+				var ctx = document.getElementById('YearlyExpenseChart').getContext('2d');
+				var YearlyExpenseChart = new Chart(ctx, {
 					type: 'pie',
 					data: {
 						labels: ['Assicurazioni', 'Bolli', 'Manutenzioni', 'Revisioni'],
@@ -184,34 +135,34 @@ $nearest_selected = $nearest_date->format('d/m/Y');
 					}
 				});
 
-				var incomeExpenseData = {
+				var YearlyStats = {
 					labels: [<?php echo implode(", ", array_map(function($month) { return "'$month'"; }, $last_12_months)); ?>],
 					datasets: [{
 						label: 'Assicurazioni',
 						data: [<?php echo implode(", ", $last_12_insuranceExpenses); ?>],
-						backgroundColor: 'rgba(75, 192, 192, 1)',
-						borderColor: 'rgba(75, 192, 192, 1)',
-						borderWidth: 1
-					},
-					{
-						label: 'Bolli',
-						data: [<?php echo implode(", ", $last_12_taxExpenses); ?>],
 						backgroundColor: 'rgba(255, 99, 132, 1)',
 						borderColor: 'rgba(255, 99, 132, 1)',
 						borderWidth: 1
 					},
 					{
+						label: 'Bolli',
+						data: [<?php echo implode(", ", $last_12_taxExpenses); ?>],
+						backgroundColor: 'rgba(54, 162, 235, 1)',
+						borderColor: 'rgba(54, 162, 235, 1)',
+						borderWidth: 1
+					},
+					{
 						label: 'Manutenzioni',
 						data: [<?php echo implode(", ", $last_12_maintenanceExpenses); ?>],
-						backgroundColor: 'rgba(153, 102, 255, 1)',
-						borderColor: 'rgba(153, 102, 255, 1)',
+						backgroundColor: 'rgba(255, 206, 86, 1)',
+						borderColor: 'rgba(255, 206, 86, 1)',
 						borderWidth: 1
 					},
 					{
 						label: 'Revisioni',
 						data: [<?php echo implode(", ", $last_12_revisionExpenses); ?>],
-						backgroundColor: 'rgba(153, 102, 255, 1)',
-						borderColor: 'rgba(153, 102, 255, 1)',
+						backgroundColor: 'rgba(75, 192, 192, 1)',
+						borderColor: 'rgba(75, 192, 192, 1)',
 						borderWidth: 1
 					}]
 				};
@@ -219,7 +170,7 @@ $nearest_selected = $nearest_date->format('d/m/Y');
 				var ctx2 = document.getElementById('YearExpenseChart').getContext('2d');
 				var YearExpenseChart = new Chart(ctx2, {
 					type: 'bar',
-					data: incomeExpenseData,
+					data: YearlyStats,
 					options: {
 						responsive: true,
 						maintainAspectRatio: false,
@@ -240,6 +191,52 @@ $nearest_selected = $nearest_date->format('d/m/Y');
 							legend: {
 								labels: {
 									color: '#ecf0f1' // Colore del testo della legenda
+								}
+							}
+						}
+					}
+				});
+				
+				var ctx3 = document.getElementById('travelledkmChart').getContext('2d');
+				var datasets = [];
+
+				<?php foreach ($last_12_travelledKms as $vehicleData): ?>
+					datasets.push({
+						label: '<?php echo $vehicleData['vehicle']; ?>',
+						data: [<?php echo implode(", ", $vehicleData['kms']); ?>],
+						backgroundColor: 'rgba(0, 0, 0, 0)', // Transparent background
+						borderColor: '<?php echo $vehicleData['color']; ?>',
+						borderWidth: 2,
+						fill: false  // Line chart without filling
+					});
+				<?php endforeach; ?>
+
+				var travelledKmChart = new Chart(ctx3, {
+					type: 'line',
+					data: {
+						labels: [<?php echo implode(", ", array_map(function($month) { return "'$month'"; }, $last_12_months)); ?>],
+						datasets: datasets
+					},
+					options: {
+						responsive: true,
+						maintainAspectRatio: false,
+						scales: {
+							y: {
+								beginAtZero: true,
+								ticks: {
+									color: '#ecf0f1' // Color of Y-axis text
+								}
+							},
+							x: {
+								ticks: {
+									color: '#ecf0f1' // Color of X-axis text
+								}
+							}
+						},
+						plugins: {
+							legend: {
+								labels: {
+									color: '#ecf0f1' // Color of legend text
 								}
 							}
 						}

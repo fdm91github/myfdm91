@@ -12,35 +12,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $amount = trim($_POST["amount"]);
     $buying_date = trim($_POST["buying_date"]);
     $registered_kilometers = trim($_POST["registered_kilometers"]);
-    $attachment_path = null;
 
-    // Check if a file was uploaded
-    if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
-        // Define the target directory for uploads
-        $targetDir = 'uploads/';
-        // Generate a unique name for the uploaded file
-        $fileName = basename($_FILES['attachment']['name']);
-        $targetFilePath = $targetDir . uniqid() . '_' . $fileName;
-
-        // Move the uploaded file to the target directory
-        if (move_uploaded_file($_FILES['attachment']['tmp_name'], $targetFilePath)) {
-            // File upload succeeded
-            $attachment_path = $targetFilePath;
-        } else {
-            $response["message"] = "Errore durante il caricamento del file.";
-            echo json_encode($response);
-            exit;
-        }
-    }
-
-    // Validate the data
+    // Convalido i dati
     if (empty($vehicle_id) || empty($description) || empty($amount) || empty($buying_date) || empty($registered_kilometers)) {
         $response["message"] = "Inserisci tutti i campi obbligatori.";
     } else {
-        $sql = "INSERT INTO vehicle_services (user_id, vehicle_id, description, amount, buying_date, registered_kilometers, attachment_path) 
-                VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $sql = "INSERT INTO vehicle_services (user_id, vehicle_id, description, amount, buying_date, registered_kilometers) VALUES (?, ?, ?, ?, ?, ?)";
         if ($stmt = $link->prepare($sql)) {
-            $stmt->bind_param("iisssis", $user_id, $vehicle_id, $description, $amount, $buying_date, $registered_kilometers, $attachment_path);
+            $stmt->bind_param("iisssi", $user_id, $vehicle_id, $description, $amount, $buying_date, $registered_kilometers);
             if ($stmt->execute()) {
                 $response["status"] = "success";
                 $response["message"] = "Manutenzione aggiunta con successo!";

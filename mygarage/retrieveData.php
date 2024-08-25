@@ -10,32 +10,12 @@ require_once '../config.php';
 
 $user_id = $_SESSION['id'];
 
-// Usa i parametri di mese e anno selezionati se forniti tramite GET o POST
-if (isset($_POST['month']) && isset($_POST['year'])) {
-    $selectedMonth = $_POST['month'];
-    $selectedYear = $_POST['year'];
-} elseif (isset($_GET['month']) && isset($_GET['year'])) {
-    $selectedMonth = $_GET['month'];
-    $selectedYear = $_GET['year'];
-} else {
-    // Altrimenti, usa mese e anno correnti
-    $selectedMonth = date('m');
-    $selectedYear = date('Y');
-}
+$selectedMonth = date('m');
+$selectedYear = date('Y');
 
-$today = new DateTime();
-$selectedYearMonth = $selectedYear . '-' . $selectedMonth;
-
-// Ottieni il numero di giorni nel mese selezionato
-$daysInSelectedMonth = cal_days_in_month(CAL_GREGORIAN, $selectedMonth, $selectedYear);
-
-// Se oggi è un giorno maggiore del numero di giorni nel mese selezionato, imposta il giorno all'ultimo giorno del mese selezionato
-if ($today->format('d') > $daysInSelectedMonth) {
-    $today->setDate($selectedYear, $selectedMonth, $daysInSelectedMonth);
-}
-
-$selectedDate = DateTime::createFromFormat('Y-m', $selectedYearMonth);
-$nextMonthDate = (clone $selectedDate)->modify('+1 month');
+// Variabili relative alle date utilizzate nel codice
+$oneYearAgo = (new DateTime())->modify('-1 year')->format('Y-m-d');
+$today = (new DateTime())->format('Y-m-d');
 
 // Creo una funzione per formattare le date nel formato gg/mm/aaaa
 function formatDate($date) {
@@ -59,6 +39,30 @@ function executeQuery($link, $sql, $params, $singleRow = true) {
         $stmt->close();
     }
     return $data;
+}
+
+// Creo una funzione per sommare le spese
+function sumExpenses($link, $table, $user_id, $oneYearAgo, $today) {
+    $sql = "SELECT SUM(amount) as total FROM $table WHERE user_id = ? AND buying_date BETWEEN ? AND ?";
+    $params = ["iss", $user_id, $oneYearAgo, $today];
+    $result = executeQuery($link, $sql, $params);
+    return $result['total'] ? $result['total'] : 0;
+}
+
+// Creo una funzione per calcolare il numero di manutenzioni dell'ultimo anno
+function countMaintenancesLastYear($link, $user_id, $oneYearAgo, $today) {
+    $sql = "SELECT COUNT(*) as total FROM vehicle_services WHERE user_id = ? AND buying_date BETWEEN ? AND ?";
+    $params = ["iss", $user_id, $oneYearAgo, $today];
+    $result = executeQuery($link, $sql, $params);
+    return $result['total'] ? $result['total'] : 0;
+}
+
+// Creo una funzione per calcolare il costo dell'ultima manutenzione
+function costOfLastMaintenance($link, $user_id) {
+    $sql = "SELECT amount FROM vehicle_services WHERE user_id = ? ORDER BY buying_date DESC LIMIT 1";
+    $params = ["i", $user_id];
+    $result = executeQuery($link, $sql, $params);
+    return $result['amount'] ? $result['amount'] : 0;
 }
 
 // Creo una funzione per calcolare le scadenze di bollo e revisione
@@ -113,7 +117,7 @@ foreach ($vehiclesQuery as $vehicle) {
 }
 
 // Recupero tutte le manutenzioni
-$vehicleServices = executeQuery($link, "SELECT id, vehicle_id, description, amount, buying_date, registered_kilometers FROM vehicle_services WHERE user_id = ?", ["i", $user_id], false);
+$vehicleServices = executeQuery($link, "SELECT id, vehicle_id, description, amount, buying_date, registered_kilometers, attachment_path FROM vehicle_services WHERE user_id = ? ORDER BY buying_date DESC", ["i", $user_id], false);
 
 // Recupero tutti i pezzi delle manutenzioni
 $vehicleServiceParts = executeQuery($link, "SELECT id, service_id, part_name, part_number FROM vehicle_service_parts WHERE user_id = ?", ["i", $user_id], false);
@@ -139,245 +143,177 @@ $vehicleRevisions = executeQuery($link, "SELECT id, vehicle_id, amount, buying_d
 // Recupero tutti i bolli
 $vehicleTaxes = executeQuery($link, "SELECT id, vehicle_id, amount, buying_date FROM vehicle_taxes WHERE user_id = ?", ["i", $user_id], false);
 
-//VECCHIO CODICE NON PIÙ NECESSARIO DA CUI PRENDERE SPUNTO
-//VECCHIO CODICE NON PIÙ NECESSARIO DA CUI PRENDERE SPUNTO
-//VECCHIO CODICE NON PIÙ NECESSARIO DA CUI PRENDERE SPUNTO
-//VECCHIO CODICE NON PIÙ NECESSARIO DA CUI PRENDERE SPUNTO
-//VECCHIO CODICE NON PIÙ NECESSARIO DA CUI PRENDERE SPUNTO
-//VECCHIO CODICE NON PIÙ NECESSARIO DA CUI PRENDERE SPUNTO
-//VECCHIO CODICE NON PIÙ NECESSARIO DA CUI PRENDERE SPUNTO
-//VECCHIO CODICE NON PIÙ NECESSARIO DA CUI PRENDERE SPUNTO
-// Recupero le entrate dell'utente corrente e del mese selezionato
-$thisMonthIncomes = executeQuery($link, "SELECT SUM(amount) as thisMonthIncomes FROM wallet_incomes WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $selectedYearMonth])['thisMonthIncomes'];
+// Recupero tutte le percorrenze
+$vehicleKilometers = executeQuery($link, "SELECT id, vehicle_id, kilometers, date FROM vehicle_km_registered WHERE user_id = ?", ["i", $user_id], false);
 
-// Recupero la somma di tutte le voci a salvadanaio inserite dall'utente corrente
-$totalPiggyBank = executeQuery($link, "SELECT SUM(amount) as total_wallet_piggy_bank FROM wallet_piggy_bank WHERE user_id = ?", ["i", $user_id])['total_wallet_piggy_bank'];
+// Calcolo le spese totali dell'ultimo anno
+$totalVehicleServices = sumExpenses($link, "vehicle_services", $user_id, $oneYearAgo, $today);
+$totalVehicleInsurances = sumExpenses($link, "vehicle_insurances", $user_id, $oneYearAgo, $today);
+$totalVehicleRevisions = sumExpenses($link, "vehicle_revisions", $user_id, $oneYearAgo, $today);
+$totalVehicleTaxes = sumExpenses($link, "vehicle_taxes", $user_id, $oneYearAgo, $today);
 
-// Recupero le singole voci a salvadanaio dell'utente corrente
-$piggyBankEntries = executeQuery($link, "SELECT id, name, amount, added_date FROM wallet_piggy_bank WHERE user_id = ? ORDER BY added_date DESC", ["i", $user_id], false);
+// Calcolo le spese totali dell'ultimo anno
+$lastYearExpenses = $totalVehicleServices + $totalVehicleInsurances + $totalVehicleRevisions + $totalVehicleTaxes;
 
-// Recupero le voci a salvadanaio dell'utente corrente e del mese selezionato
-$thisMonthPiggyBank = executeQuery($link, "SELECT SUM(amount) as total_wallet_piggy_bank_current_month FROM wallet_piggy_bank WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $selectedYearMonth])['total_wallet_piggy_bank_current_month'];
+// Calcolo le manutenzioni dell'ultimo anno
+$lastYearMaintenances = countMaintenancesLastYear($link, $user_id, $oneYearAgo, $today);
 
-// Recupero la data dello stipendio definita dall'utente
-$salaryDate = executeQuery($link, "SELECT salary_date FROM users WHERE id = ?", ["i", $user_id])['salary_date'];
+// Calculate the cost of the last maintenance
+$lastMaintenanceCost = costOfLastMaintenance($link, $user_id);
 
-// Inizializzo le variabili relative alle spese totali
-$totalExpenses = 0;
-$thisMonthTotalRecurringExpenses = 0;
-$thisMonthTotalEstimatedExpenses = 0;
+// Calcolo le prossime scadenze
+$nearestTaxExpirationDate = null;
+$nearestTaxExpirationVehicle = null;
 
-// Creo una funzione per processare le spese ricorrenti e stimate
-function processExpenses($link, $user_id, $selectedDate, $salaryDate, &$expenses, &$totalExpenses, &$savings, $tableName) {
-    $sql = "SELECT id, name, amount, start_month, start_year, end_month, end_year, undetermined, debit_date, billing_frequency
-            FROM $tableName
-            WHERE user_id = ?";
+$nearestServiceExpirationDate = null;
+$nearestServiceExpirationVehicle = null;
 
-    if ($stmt = $link->prepare($sql)) {
-        $stmt->bind_param("i", $user_id);
-        $stmt->execute();
-        $stmt->bind_result($id, $name, $amount, $startMonth, $startYear, $endMonth, $endYear, $undetermined, $debitDate, $billingFrequency);
-        while ($stmt->fetch()) {
-            $amount = (float) $amount;
-            $billingFrequency = (int) $billingFrequency;
-            $monthlyAmount = $amount / $billingFrequency;
+$nearestRevisionExpirationDate = null;
+$nearestRevisionExpirationVehicle = null;
 
-            $startDate_string = $startYear . '-' . $startMonth;
-            $endDate_string = $endYear ? $endYear . '-' . $endMonth : null;
-            $startDate = DateTime::createFromFormat('Y-m', $startDate_string);
-            if (!$startDate) continue;
+$nearestInsuranceExpirationDate = null;
+$nearestInsuranceExpirationVehicle = null;
 
-            $relevantDate = $selectedDate;
+foreach ($vehicles as $vehicle) {
+    // Bollo
+    if ($vehicle['nextTaxExpirationDate'] && (is_null($nearestTaxExpirationDate) || $vehicle['nextTaxExpirationDate'] < $nearestTaxExpirationDate)) {
+        $nearestTaxExpirationDate = $vehicle['nextTaxExpirationDate'];
+        $nearestTaxExpirationVehicle = $vehicle['description'];
+    }
 
-            $interval = $startDate->diff($relevantDate);
-            if ($startDate > $relevantDate) {
-                $currentInstallment = 0;
-            } else {
-                if ($billingFrequency == 1) {
-                    if ($endDate_string) {
-                        $currentInstallment = ($interval->y * 12 + $interval->m) + 1;
-                    } else {
-                        $currentInstallment = 1;
-                    }
-                } else {
-                    if ($endDate_string || $undetermined == 1) {
-                        $monthsPassed = ($interval->y * 12 + $interval->m -1) + 1;
-                        $totalPeriods = intdiv($monthsPassed, $billingFrequency);
-                        $currentPeriod_months = $monthsPassed % $billingFrequency;
-                        $currentInstallment = $currentPeriod_months + 1;
-                    } else {
-                        $monthsPassed = ($interval->y * 12 + $interval->m);
-                        $currentPeriod_months = $monthsPassed % $billingFrequency;
-                        $currentInstallment = $currentPeriod_months;
-                    }
-                }
-            }
+    // Revisione
+    if ($vehicle['nextRevisionExpirationDate'] && (is_null($nearestRevisionExpirationDate) || $vehicle['nextRevisionExpirationDate'] < $nearestRevisionExpirationDate)) {
+        $nearestRevisionExpirationDate = $vehicle['nextRevisionExpirationDate'];
+        $nearestRevisionExpirationVehicle = $vehicle['description'];
+    }
 
-            $totalInstallments = 1;
-            if ($endDate_string) {
-                $endDate = DateTime::createFromFormat('Y-m', $endDate_string);
-                if ($endDate) {
-                    $totalInterval = $startDate->diff($endDate);
-                    if ($billingFrequency == 1) {
-                        $totalInstallments = ($totalInterval->y * 12 + $totalInterval->m) + 1;
-                    } else {
-                        $totalInstallments = $billingFrequency;
-                    }
+    // Assicurazione
+    if ($vehicle['nextInsuranceExpirationDate'] && (is_null($nearestInsuranceExpirationDate) || $vehicle['nextInsuranceExpirationDate'] < $nearestInsuranceExpirationDate)) {
+        $nearestInsuranceExpirationDate = $vehicle['nextInsuranceExpirationDate'];
+        $nearestInsuranceExpirationVehicle = $vehicle['description'];
+    }
+}
 
-                    if ($endDate < $relevantDate) {
-                        $currentInstallment = 0;
-                    }
-                }
-            } else {
-                if ($billingFrequency > 1) {
-                    $totalInstallments = $billingFrequency;
-                }
-            }
+foreach ($vehicleServices as $service) {
+    $serviceDate = new DateTime($service['buying_date']);
+    $nextServiceDate = $serviceDate->modify('+1 year')->format('Y-m-d'); // Assuming a service interval of 1 year
 
-            if ($endDate_string && $billingFrequency > 1){
-                $nextDebitDate = (clone $startDate)->modify('+' . $billingFrequency . ' months');
-            } else {
-                $nextDebitDate = (clone $startDate)->modify('+' . $billingFrequency . ' months - 1 month');
-            }
+    if (is_null($nearestServiceExpirationDate) || $nextServiceDate < $nearestServiceExpirationDate) {
+        $nearestServiceExpirationDate = $nextServiceDate;
+        $vehicle = array_filter($vehicles, function($v) use ($service) { return $v['id'] == $service['vehicle_id']; });
+        $vehicle = reset($vehicle);
+        $nearestServiceExpirationVehicle = $vehicle['description'];
+    }
+}
 
-            while ($nextDebitDate < $relevantDate) {
-                $nextDebitDate->modify('+' . $billingFrequency . ' months');
-            }
-            if ($endDate_string) {
-                $endDate = DateTime::createFromFormat('Y-m', $endDate_string);
-                if ($nextDebitDate > $endDate) {
-                    $nextDebitDate = $endDate;
-                }
-            }
-            $nextDebitDate->setDate($nextDebitDate->format('Y'), $nextDebitDate->format('m'), $debitDate);
-            $nextDebitDate_formatted = $nextDebitDate->format('d/m/Y');
+// Creo gli array per le spese degli ultimi 12 mesi e per i KM percorsi
+$last_12_months = [];
+$last_12_insuranceExpenses = [];
+$last_12_taxExpenses = [];
+$last_12_maintenanceExpenses = [];
+$last_12_revisionExpenses = [];
+$last_12_travelledKms = [];
 
-            if ($billingFrequency > 1 && ($endDate > $selectedDate || $undetermined == 1)) {
-                $savings += $monthlyAmount * $currentInstallment;
-            } else if ($billingFrequency == 1) {
-                $savings += $monthlyAmount;
-            }
+$vehicleColors = ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)', 'rgba(75, 192, 192, 1)'];
+$vehicleIndex = 0;
 
-            if($relevantDate > $startDate){
-                $totalExpenses += $monthlyAmount;
-            }
+// Calcolo i 12 mesi una sola volta e li inverto subito
+for ($i = 11; $i >= 0; $i--) {
+    $month = date('Y-m', strtotime("-$i months"));
+    $last_12_months[] = date('M Y', strtotime($month));
 
-            $expenses[] = [
-                'id' => $id,
-                'name' => $name,
-                'amount' => $amount,
-                'start_month' => $startMonth,
-                'start_year' => $startYear,
-                'end_month' => $endMonth,
-                'end_year' => $endYear,
-                'undetermined' => $undetermined,
-                'debit_date' => $debitDate,
-                'billing_frequency' => $billingFrequency,
-                'monthly_debit' => round($monthlyAmount, 2),
-                'current_installment' => $currentInstallment,
-                'total_installments' => $totalInstallments,
-                'monthly_amount' => $monthlyAmount,
-                'next_debit_date' => $nextDebitDate_formatted
-            ];
+    // Spese per assicurazioni
+    $sql = "SELECT SUM(amount) as total FROM vehicle_insurances WHERE user_id = ? AND DATE_FORMAT(buying_date, '%Y-%m') = ?";
+    $insuranceExpense = executeQuery($link, $sql, ["is", $user_id, $month]);
+    $last_12_insuranceExpenses[] = $insuranceExpense['total'] ?? 0;
+
+    // Spese per bolli
+    $sql = "SELECT SUM(amount) as total FROM vehicle_taxes WHERE user_id = ? AND DATE_FORMAT(buying_date, '%Y-%m') = ?";
+    $taxExpense = executeQuery($link, $sql, ["is", $user_id, $month]);
+    $last_12_taxExpenses[] = $taxExpense['total'] ?? 0;
+
+    // Spese per manutenzioni
+    $sql = "SELECT SUM(amount) as total FROM vehicle_services WHERE user_id = ? AND DATE_FORMAT(buying_date, '%Y-%m') = ?";
+    $maintenanceExpense = executeQuery($link, $sql, ["is", $user_id, $month]);
+    $last_12_maintenanceExpenses[] = $maintenanceExpense['total'] ?? 0;
+
+    // Spese per revisioni
+    $sql = "SELECT SUM(amount) as total FROM vehicle_revisions WHERE user_id = ? AND DATE_FORMAT(buying_date, '%Y-%m') = ?";
+    $revisionExpense = executeQuery($link, $sql, ["is", $user_id, $month]);
+    $last_12_revisionExpenses[] = $revisionExpense['total'] ?? 0;
+}
+
+// Invertiamo i mesi una volta calcolati
+$last_12_months = array_reverse($last_12_months);
+$last_12_insuranceExpenses = array_reverse($last_12_insuranceExpenses);
+$last_12_taxExpenses = array_reverse($last_12_taxExpenses);
+$last_12_maintenanceExpenses = array_reverse($last_12_maintenanceExpenses);
+$last_12_revisionExpenses = array_reverse($last_12_revisionExpenses);
+
+$vehiclesQuery = executeQuery($link, "SELECT id, description FROM vehicles WHERE user_id = ?", ["i", $user_id], false);
+
+// Calcolo i km percorsi per ciascun veicolo combinando i risultati delle tabelle vehicle_km_registered e vehicle_services
+foreach ($vehiclesQuery as $vehicle) {
+    $vehicleId = $vehicle['id'];
+    $cumulativeKm = 0;
+    $vehicleData = [];
+
+    for ($i = 11; $i >= 0; $i--) {
+        $month = date('Y-m', strtotime("-$i months"));
+
+        // KM percorsi (cumulativi) - vehicle_services table
+        $sql = "SELECT MAX(registered_kilometers) as max_km_services FROM vehicle_services WHERE user_id = ? AND vehicle_id = ? AND DATE_FORMAT(buying_date, '%Y-%m') = ?";
+        $resultServices = executeQuery($link, $sql, ["iis", $user_id, $vehicleId, $month]);
+        $maxKmServices = $resultServices['max_km_services'] ?? 0;
+
+        // KM percorsi (cumulativi) - vehicle_km_registered table
+        $sql = "SELECT MAX(kilometers) as max_km_registered FROM vehicle_km_registered WHERE user_id = ? AND vehicle_id = ? AND DATE_FORMAT(date, '%Y-%m') = ?";
+        $resultRegistered = executeQuery($link, $sql, ["iis", $user_id, $vehicleId, $month]);
+        $maxKmRegistered = $resultRegistered['max_km_registered'] ?? 0;
+
+        // Take the maximum of the two sources
+        $monthlyKm = max($maxKmServices, $maxKmRegistered);
+
+        // Garantire che i chilometri siano cumulativi e non diminuiscano
+        if ($monthlyKm > $cumulativeKm) {
+            $cumulativeKm = $monthlyKm;
         }
 
-        $totalExpenses = round($totalExpenses, 2);
-        $savings = round($savings, 2);
-        $stmt->close();
+        // Memorizzare i km cumulativi per questo mese
+        $vehicleData[] = $cumulativeKm;
     }
+
+    // Non invertire i dati dei veicoli, li aggiungiamo direttamente
+    $last_12_travelledKms[] = [
+        'vehicle' => $vehicle['description'],
+        'kms' => $vehicleData,
+        'color' => $vehicleColors[$vehicleIndex % count($vehicleColors)]
+    ];
+
+    $vehicleIndex++;
 }
 
-// Recupero tutte le spese ricorrenti
-$recurringExpenses = [];
-$thisMonthTotalRecurringExpenses = 0;
-$recurringSavings = 0;
-processExpenses($link, $user_id, $selectedDate, $salaryDate, $recurringExpenses, $thisMonthTotalRecurringExpenses, $recurringSavings, 'wallet_recurring_expenses');
 
-// Recupero tutte le spese stimate
-$estimatedExpenses = [];
-$thisMonthTotalEstimatedExpenses = 0;
-$estimatedSavings = 0;
-processExpenses($link, $user_id, $selectedDate, $salaryDate, $estimatedExpenses, $thisMonthTotalEstimatedExpenses, $estimatedSavings, 'wallet_estimated_expenses');
+// Calcolo le spese totali dell'ultimo anno per ciascuna categoria
+$thisYear = date('Y');
 
-// Recupero le spese extra
-$extraExpenses = executeQuery($link, "SELECT id, name, amount, debit_date FROM wallet_extra_expenses WHERE user_id = ?", ["i", $user_id], false);
+$sql = "SELECT SUM(amount) as total FROM vehicle_insurances WHERE user_id = ? AND YEAR(buying_date) = ?";
+$thisYearInsuranceExpenses = executeQuery($link, $sql, ["ii", $user_id, $thisYear])['total'] ?? 0;
 
-// Recupero le spese extra relative al mese corrente
-$thismonthExtraExpenses = [];
+$sql = "SELECT SUM(amount) as total FROM vehicle_taxes WHERE user_id = ? AND YEAR(buying_date) = ?";
+$thisYearTaxExpenses = executeQuery($link, $sql, ["ii", $user_id, $thisYear])['total'] ?? 0;
 
-if ($salaryDate) {
-    // Salary date non nullo
-    $startDate = (new DateTime())->setDate($selectedYear, $selectedMonth, $salaryDate);
-    $endDate = (clone $startDate)->modify('+1 month')->modify('-1 day');
-    $thismonthExtraExpenses = executeQuery($link, "SELECT id, name, amount, debit_date FROM wallet_extra_expenses WHERE user_id = ? AND debit_date BETWEEN ? AND ?", ["iss", $user_id, $startDate->format('Y-m-d'), $endDate->format('Y-m-d')], false);
-} else {
-    // Salary date nullo, considero il mese normalmente
-    $thismonthExtraExpenses = executeQuery($link, "SELECT id, name, amount, debit_date FROM wallet_extra_expenses WHERE user_id = ? AND MONTH(debit_date) = ? AND YEAR(debit_date) = ?", ["iis", $user_id, $selectedMonth, $selectedYear], false);
-}
+$sql = "SELECT SUM(amount) as total FROM vehicle_services WHERE user_id = ? AND YEAR(buying_date) = ?";
+$thisYearMaintenanceExpenses = executeQuery($link, $sql, ["ii", $user_id, $thisYear])['total'] ?? 0;
 
-// Calcolo il totale delle spese extra del mese in corso
-$thisMonthTotalExtraExpenses = array_sum(array_column($thismonthExtraExpenses, 'amount'));
-
-// Calcolo le spese totali come somma di quelle ricorrenti, stimate, extra e la somma messa nel salvadanaio per il mese corrente
-$totalExpenses = round($thisMonthTotalRecurringExpenses + $thisMonthTotalEstimatedExpenses + $thisMonthTotalExtraExpenses, 2);
-
-// Calcolo lo stipendio rimanente
-$leftIncomes = round($thisMonthIncomes - $totalExpenses - $thisMonthPiggyBank, 2);
-
-// Recupero gli ultimi 12 mesi
-$last_12_months = [];
-$last_12_monthlyIncomes = [];
-$last_12_monthlyExpenses = [];
-$monthlyPiggyBank = []; // Aggiungo questa riga per tenere traccia delle somme nel salvadanaio
-
-for ($i = 0; $i < 12; $i++) {
-    $date = new DateTime();
-    $date->modify("-$i months");
-    $month_year = $date->format('Y-m');
-    $last_12_months[] = $date->format('F Y');
-
-    // Recupero entrate per il mese corrente
-    $monthlyIncome = executeQuery($link, "SELECT SUM(amount) as monthly_wallet_incomes FROM wallet_incomes WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $month_year])['monthly_wallet_incomes'];
-    $last_12_monthlyIncomes[] = $monthlyIncome ?: 0;
-
-    // Recupero uscite per il mese corrente
-    $monthlyExpense = 0;
-
-    // Spese ricorrenti
-    $rows = executeQuery($link, "SELECT amount, billing_frequency FROM wallet_recurring_expenses WHERE user_id = ? AND (start_year < ? OR (start_year = ? AND start_month <= ?)) AND (end_year IS NULL OR end_year > ? OR (end_year = ? AND end_month >= ?))", ["iiiiiii", $user_id, $date->format('Y'), $date->format('Y'), $date->format('m'), $date->format('Y'), $date->format('Y'), $date->format('m')], false);
-    foreach ($rows as $row) {
-        $monthlyExpense += $row['amount'] / $row['billing_frequency'];
-    }
-
-    // Spese stimate
-    $rows = executeQuery($link, "SELECT amount, billing_frequency FROM wallet_estimated_expenses WHERE user_id = ? AND (start_year < ? OR (start_year = ? AND start_month <= ?)) AND (end_year IS NULL OR end_year > ? OR (end_year = ? AND end_month >= ?))", ["iiiiiii", $user_id, $date->format('Y'), $date->format('Y'), $date->format('m'), $date->format('Y'), $date->format('Y'), $date->format('m')], false);
-    foreach ($rows as $row) {
-        $monthlyExpense += $row['amount'] / $row['billing_frequency'];
-    }
-
-    // Spese extra
-    if ($salaryDate) {
-        // Salary date non nullo
-        $startDate = (clone $date)->setDate($date->format('Y'), $date->format('m'), $salaryDate);
-        $endDate = (clone $startDate)->modify('+1 month')->modify('-1 day');
-        $extraRow = executeQuery($link, "SELECT SUM(amount) as total_extra FROM wallet_extra_expenses WHERE user_id = ? AND debit_date BETWEEN ? AND ?", ["iss", $user_id, $startDate->format('Y-m-d'), $endDate->format('Y-m-d')]);
-        $monthlyExpense += $extraRow['total_extra'] ?: 0;
-    } else {
-        // Salary date nullo, considero il mese normalmente
-        $extraRow = executeQuery($link, "SELECT SUM(amount) as total_extra FROM wallet_extra_expenses WHERE user_id = ? AND MONTH(debit_date) = ? AND YEAR(debit_date) = ?", ["iis", $user_id, $date->format('m'), $date->format('Y')]);
-        $monthlyExpense += $extraRow['total_extra'] ?: 0;
-    }
-
-    $last_12_monthlyExpenses[] = $monthlyExpense;
-
-    // Recupero l'importo salvadanaio per il mese corrente
-    $monthly_piggy = executeQuery($link, "SELECT SUM(amount) as monthly_wallet_piggy_bank FROM wallet_piggy_bank WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $month_year])['monthly_wallet_piggy_bank'];
-    $monthlyPiggyBank[] = $monthly_piggy ?: 0;
-}
+$sql = "SELECT SUM(amount) as total FROM vehicle_revisions WHERE user_id = ? AND YEAR(buying_date) = ?";
+$thisYearRevisionExpenses = executeQuery($link, $sql, ["ii", $user_id, $thisYear])['total'] ?? 0;
 
 // Inverto gli array per avere i mesi in ordine cronologico
 $last_12_months = array_reverse($last_12_months);
-$last_12_monthlyIncomes = array_reverse($last_12_monthlyIncomes);
-$last_12_monthlyExpenses = array_reverse($last_12_monthlyExpenses);
-$monthlyPiggyBank = array_reverse($monthlyPiggyBank);
+$last_12_insuranceExpenses = array_reverse($last_12_insuranceExpenses);
+$last_12_taxExpenses = array_reverse($last_12_taxExpenses);
+$last_12_maintenanceExpenses = array_reverse($last_12_maintenanceExpenses);
+$last_12_revisionExpenses = array_reverse($last_12_revisionExpenses);
+
 ?>

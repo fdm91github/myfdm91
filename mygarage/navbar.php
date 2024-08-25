@@ -24,6 +24,9 @@
                 <a class="nav-link" href="taxes.php">Bolli</a>
             </li>
             <li class="nav-item">
+                <a class="nav-link" href="kilometers.php">Percorrenza</a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link" href="../logout.php">Esci</a>
             </li>
         </ul>
