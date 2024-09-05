@@ -143,9 +143,6 @@ $vehicleRevisions = executeQuery($link, "SELECT id, vehicle_id, amount, buying_d
 // Recupero tutti i bolli
 $vehicleTaxes = executeQuery($link, "SELECT id, vehicle_id, amount, buying_date FROM vehicle_taxes WHERE user_id = ?", ["i", $user_id], false);
 
-// Recupero tutte le percorrenze
-$vehicleKilometers = executeQuery($link, "SELECT id, vehicle_id, kilometers, date FROM vehicle_km_registered WHERE user_id = ?", ["i", $user_id], false);
-
 // Calcolo le spese totali dell'ultimo anno
 $totalVehicleServices = sumExpenses($link, "vehicle_services", $user_id, $oneYearAgo, $today);
 $totalVehicleInsurances = sumExpenses($link, "vehicle_insurances", $user_id, $oneYearAgo, $today);
@@ -252,7 +249,7 @@ $last_12_revisionExpenses = array_reverse($last_12_revisionExpenses);
 
 $vehiclesQuery = executeQuery($link, "SELECT id, description FROM vehicles WHERE user_id = ?", ["i", $user_id], false);
 
-// Calcolo i km percorsi per ciascun veicolo combinando i risultati delle tabelle vehicle_km_registered e vehicle_services
+// Calcolo i km percorsi per ciascun veicolo
 foreach ($vehiclesQuery as $vehicle) {
     $vehicleId = $vehicle['id'];
     $cumulativeKm = 0;
@@ -266,17 +263,9 @@ foreach ($vehiclesQuery as $vehicle) {
         $resultServices = executeQuery($link, $sql, ["iis", $user_id, $vehicleId, $month]);
         $maxKmServices = $resultServices['max_km_services'] ?? 0;
 
-        // KM percorsi (cumulativi) - vehicle_km_registered table
-        $sql = "SELECT MAX(kilometers) as max_km_registered FROM vehicle_km_registered WHERE user_id = ? AND vehicle_id = ? AND DATE_FORMAT(date, '%Y-%m') = ?";
-        $resultRegistered = executeQuery($link, $sql, ["iis", $user_id, $vehicleId, $month]);
-        $maxKmRegistered = $resultRegistered['max_km_registered'] ?? 0;
-
-        // Take the maximum of the two sources
-        $monthlyKm = max($maxKmServices, $maxKmRegistered);
-
         // Garantire che i chilometri siano cumulativi e non diminuiscano
-        if ($monthlyKm > $cumulativeKm) {
-            $cumulativeKm = $monthlyKm;
+        if ($maxKmServices > $cumulativeKm) {
+            $cumulativeKm = $maxKmServices;
         }
 
         // Memorizzare i km cumulativi per questo mese
@@ -292,7 +281,6 @@ foreach ($vehiclesQuery as $vehicle) {
 
     $vehicleIndex++;
 }
-
 
 // Calcolo le spese totali dell'ultimo anno per ciascuna categoria
 $thisYear = date('Y');
