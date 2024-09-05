@@ -215,7 +215,8 @@
         // Submit the edit service form via AJAX
 		$('#editServiceForm').submit(function(e) {
 			e.preventDefault();
-
+			$('button[type="submit"]').prop('disabled', true);
+			
 			// Check file size before submitting
 			var fileInput = $('#editServiceAttachment')[0];
 			if (fileInput.files.length > 0) {
@@ -247,6 +248,7 @@
 				},
 				error: function() {
 					$('#editServiceStatus').html('<div class="alert alert-danger">Qualcosa è andato storto. Riprova più tardi.</div>');
+					$('button[type="submit"]').prop('disabled', false);
 				}
 			});
 		});
