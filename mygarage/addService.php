@@ -54,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Convalido i dati
-    if (empty($vehicle_id) || empty($description) || empty($amount) || empty($buying_date) || empty($registered_kilometers)) {
+    if (empty($vehicle_id) || empty($description) || empty($buying_date) || empty($registered_kilometers)) {
         $response["message"] = "Inserisci tutti i campi obbligatori.";
     } else {
         $sql = "INSERT INTO vehicle_services (user_id, vehicle_id, description, amount, buying_date, registered_kilometers, attachment_path) VALUES (?, ?, ?, ?, ?, ?, ?)";

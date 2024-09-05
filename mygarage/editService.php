@@ -30,7 +30,7 @@ if ($service_id) {
         $parts_to_delete = explode(',', $_POST['parts_to_delete'] ?? ''); // Parts to delete
 
         // Validate inputs
-        if (empty($description) || empty($amount) || empty($buying_date)) {
+        if (empty($description) || empty($buying_date)) {
             $error_message = "Inserisci tutti i campi obbligatori.";
         } else {
             // Start transaction
