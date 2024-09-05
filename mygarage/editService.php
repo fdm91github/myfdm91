@@ -127,35 +127,44 @@ if ($service_id) {
                 }
 
                 // Update existing parts or add new ones
-                foreach ($part_names as $index => $part_name) {
-                    $part_number = $part_numbers[$index] ?? '';
-                    $part_id = $part_ids[$index] ?? null;
+				foreach ($part_names as $index => $part_name) {
+					$part_number = $part_numbers[$index] ?? '';
+					$part_id = $part_ids[$index] ?? null;
 
-                    if ($part_id) {
-                        // Update existing part
-                        $sql = "UPDATE vehicle_service_parts 
-                                SET part_name = ?, part_number = ? 
-                                WHERE id = ? AND user_id = ?";
-                        if ($stmt = $link->prepare($sql)) {
-                            $stmt->bind_param("ssii", $part_name, $part_number, $part_id, $user_id);
-                            $stmt->execute();
-                            $stmt->close();
-                        } else {
-                            throw new Exception("Errore nella preparazione della query per l'aggiornamento delle parti: " . $link->error);
-                        }
-                    } else {
-                        // Add new part
-                        $sql = "INSERT INTO vehicle_service_parts (user_id, service_id, part_name, part_number) 
-                                VALUES (?, ?, ?, ?)";
-                        if ($stmt = $link->prepare($sql)) {
-                            $stmt->bind_param("iiss", $user_id, $service_id, $part_name, $part_number);
-                            $stmt->execute();
-                            $stmt->close();
-                        } else {
-                            throw new Exception("Errore nella preparazione della query per l'inserimento delle parti: " . $link->error);
-                        }
-                    }
-                }
+					if ($part_id) {
+						// Update existing part
+						$sql = "UPDATE vehicle_service_parts 
+								SET part_name = ?, part_number = ? 
+								WHERE id = ? AND user_id = ?";
+						if ($stmt = $link->prepare($sql)) {
+							$stmt->bind_param("ssii", $part_name, $part_number, $part_id, $user_id);
+							$stmt->execute();
+							$stmt->close();
+						} else {
+							throw new Exception("Errore nella preparazione della query per l'aggiornamento delle parti: " . $link->error);
+						}
+					} else {
+						// Check if part already exists to avoid duplication
+						$sql_check = "SELECT id FROM vehicle_service_parts WHERE user_id = ? AND service_id = ? AND part_name = ? AND part_number = ?";
+						if ($stmt_check = $link->prepare($sql_check)) {
+							$stmt_check->bind_param("iiss", $user_id, $service_id, $part_name, $part_number);
+							$stmt_check->execute();
+							$stmt_check->store_result();
+							if ($stmt_check->num_rows == 0) { // Part doesn't exist, insert it
+								$sql = "INSERT INTO vehicle_service_parts (user_id, service_id, part_name, part_number) 
+										VALUES (?, ?, ?, ?)";
+								if ($stmt = $link->prepare($sql)) {
+									$stmt->bind_param("iiss", $user_id, $service_id, $part_name, $part_number);
+									$stmt->execute();
+									$stmt->close();
+								} else {
+									throw new Exception("Errore nella preparazione della query per l'inserimento delle parti: " . $link->error);
+								}
+							}
+							$stmt_check->close();
+						}
+					}
+				}
 
                 // Commit transaction
                 $link->commit();
