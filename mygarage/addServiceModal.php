@@ -144,42 +144,44 @@
             });
         });
 
-        function submitParts(serviceId) {
-            var partsData = [];
-            $('#partsContainer .form-row').each(function() {
-                var partName = $(this).find('input[name="part_name[]"]').val();
-                var partNumber = $(this).find('input[name="part_number[]"]').val();
+		function submitParts(serviceId) {
+			console.log('submitParts called with serviceId:', serviceId); // Log per il debug
+			var partsData = [];
+			$('#addPartsContainer .form-row').each(function() {
+				var partName = $(this).find('input[name="part_name[]"]').val();
+				var partNumber = $(this).find('input[name="part_number[]"]').val();
 
-                if (partName && partNumber) {
-                    partsData.push({ name: 'part_name[]', value: partName });
-                    partsData.push({ name: 'part_number[]', value: partNumber });
-                }
-            });
+				if (partName && partNumber) {
+					partsData.push({ name: 'part_name[]', value: partName });
+					partsData.push({ name: 'part_number[]', value: partNumber });
+				}
+			});
 
-            if (partsData.length === 0) {
-                // No parts to add
-                setTimeout(function() { window.location.reload(); }, 1000);
-                return;
-            }
+			if (partsData.length === 0) {
+				console.log('No parts to submit');
+				setTimeout(function() { window.location.reload(); }, 1000);
+				return;
+			}
 
-            partsData.push({ name: 'service_id', value: serviceId });
+			partsData.push({ name: 'service_id', value: serviceId });
 
-            $.ajax({
-                url: 'addServicePart.php',
-                type: 'POST',
-                data: $.param(partsData),
-                success: function(response) {
-                    if (response.status === 'success') {
-                        setTimeout(function() { window.location.reload(); }, 1000);
-                    } else {
-                        $('#addServiceStatus').html('<div class="alert alert-danger">Parti non aggiunte: ' + (response.message || 'Errore sconosciuto') + '</div>');
-                    }
-                },
-                error: function() {
-                    $('#addServiceStatus').html('<div class="alert alert-danger">Qualcosa è andato storto nell\'aggiunta delle parti. Riprova più tardi.</div>');
-                }
-            });
-        }
+			$.ajax({
+				url: 'addServicePart.php',
+				type: 'POST',
+				data: $.param(partsData),
+				success: function(response) {
+					console.log('submitParts response:', response); // Log per il debug
+					if (response.status === 'success') {
+						setTimeout(function() { window.location.reload(); }, 1000);
+					} else {
+						$('#addServiceStatus').html('<div class="alert alert-danger">Parti non aggiunte: ' + (response.message || 'Errore sconosciuto') + '</div>');
+					}
+				},
+				error: function() {
+					$('#addServiceStatus').html('<div class="alert alert-danger">Qualcosa è andato storto nell\'aggiunta delle parti. Riprova più tardi.</div>');
+				}
+			});
+		}
     });
 	
 	// Show selected file name in input box
