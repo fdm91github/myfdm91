@@ -25,14 +25,16 @@
                         <input type="date" name="buying_date" id="addServiceBuyingDate" class="form-control" required>
                     </div>
                     <div class="form-group">
-						<label for="addServiceKilometers">Kilometri registrati</label>
-						<input type="number" name="registered_kilometers" id="addServiceKilometers" class="form-control" required>
-					</div>
-					<div class="form-group mt-3 d-flex align-items-center">
-						<label for="addServiceAttachment" class="btn btn-secondary" style="white-space: nowrap;">Scegli File</label>
-						<input type="file" name="attachment" id="addServiceAttachment" class="form-control-file" style="display: none;">
-						<input type="text" id="fileNameDisplay" class="form-control ml-2" placeholder="Nessun file selezionato" readonly>
-					</div>
+                        <label for="addServiceKilometers">Kilometri registrati</label>
+                        <input type="number" name="registered_kilometers" id="addServiceKilometers" class="form-control" required>
+                    </div>
+                    <div class="form-group mt-3 d-flex align-items-center">
+                        <label for="addServiceAttachment" class="btn btn-secondary" style="white-space: nowrap;">Scegli File</label>
+                        <input type="file" name="attachment" id="addServiceAttachment" class="form-control-file" style="display: none;">
+                        <input type="text" id="fileNameDisplay" class="form-control ml-2" placeholder="Nessun file selezionato" readonly>
+                    </div>
+                    
+                    <!-- Parts section -->
                     <div id="partsSection">
                         <h6>Parti utilizzate</h6>
                         <div id="addPartsContainer">
@@ -40,6 +42,7 @@
                         </div>
                         <button type="button" id="addNewPartBtn" class="btn btn-secondary btn-block">Aggiungi voce</button>
                     </div>
+
                     <button type="submit" class="btn btn-primary btn-block mt-3">Aggiungi</button>
                 </form>
             </div>
@@ -47,147 +50,86 @@
     </div>
 </div>
 
-<script>
-    $(document).ready(function() {
-        // Set the vehicle_id in the hidden field when the modal is shown
-        $('#addServiceModal').on('show.bs.modal', function(event) {
-            var button = $(event.relatedTarget); // Button that triggered the modal
-            var vehicleId = button.data('vehicle-id'); // Extract info from data-* attributes
-            var modal = $(this);
-            modal.find('#addServiceVehicleId').val(vehicleId);
-        });
 
-        // Add a new part row when "Aggiungi voce" is clicked
+<script>
+	$(document).ready(function() {
+		var maxFileSize = 5 * 1024 * 1024; // 5MB in bytes
+
+		// Set the vehicle_id in the hidden field when the modal is shown
+		$('#addServiceModal').on('show.bs.modal', function(event) {
+			var button = $(event.relatedTarget); // Button that triggered the modal
+			var vehicleId = button.data('vehicle-id'); // Extract info from data-* attributes
+			var modal = $(this);
+			modal.find('#addServiceVehicleId').val(vehicleId);
+		});
+
+		// Add a new part row when "Aggiungi voce" is clicked
 		$('#addNewPartBtn').click(function() {
+			addPartRow('addPartsContainer');
+		});
+
+		// Function to dynamically add a new part row
+		function addPartRow(containerId, partName = '', partNumber = '') {
 			var partRow = `
 				<div class="form-row align-items-end mb-2">
 					<div class="col">
-						<input type="text" name="part_name[]" class="form-control" placeholder="Nome prodotto" required>
+						<input type="text" name="part_name[]" class="form-control" placeholder="Nome prodotto" value="${partName}" required>
 					</div>
 					<div class="col">
-						<input type="text" name="part_number[]" class="form-control" placeholder="Codice prodotto" required>
+						<input type="text" name="part_number[]" class="form-control" placeholder="Codice prodotto" value="${partNumber}" required>
 					</div>
 					<div class="col-auto">
 						<button type="button" class="btn btn-danger removePartBtn">&times;</button>
 					</div>
 				</div>`;
-			$('#addPartsContainer').append(partRow);
+			$('#' + containerId).append(partRow);
+		}
+
+		// Remove a part row when the remove button is clicked
+		$(document).on('click', '.removePartBtn', function() {
+			$(this).closest('.form-row').remove();
 		});
 
-        // Remove a part row when the remove button is clicked
-        $(document).on('click', '.removePartBtn', function() {
-            $(this).closest('.form-row').remove();
-        });
+		// Submit the add service form via AJAX
+		$('#addServiceForm').submit(function(e) {
+			e.preventDefault();
 
-        // Maximum file size in bytes (5MB = 5 * 1024 * 1024)
-        var maxFileSize = 5 * 1024 * 1024;
-
-        $('#addServiceForm').submit(function(e) {
-            e.preventDefault();
-
-            // Check file size before submitting
-            var fileInput = $('#addServiceAttachment')[0];
-            if (fileInput.files.length > 0) {
-                var fileSize = fileInput.files[0].size;
-                if (fileSize > maxFileSize) {
-                    $('#addServiceStatus').html('<div class="alert alert-danger">Il file è troppo grande. La dimensione massima è 5MB.</div>');
-                    return;  // Stop form submission
-                }
-            }
-
-            // Basic client-side validation
-            let isValid = true;
-            $('#addServiceForm input[required]').each(function() {
-                if ($(this).val() === '') {
-                    isValid = false;
-                    $(this).addClass('is-invalid');
-                } else {
-                    $(this).removeClass('is-invalid');
-                }
-            });
-
-            if (!isValid) {
-                $('#addServiceStatus').html('<div class="alert alert-danger">Per favore compila tutti i campi obbligatori.</div>');
-                return;
-            }
-
-            $('button[type="submit"]').prop('disabled', true);
-
-            var formData = new FormData($('#addServiceForm')[0]);
-
-            $.ajax({
-                url: 'addService.php',
-                type: 'POST',
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function(response) {
-                    if (response.status === 'success') {
-                        $('#addServiceStatus').html('<div class="alert alert-success">Manutenzione aggiunta con successo!</div>');
-
-                        // If parts were added, submit them separately with the new service ID
-                        if ($('#partsContainer').children().length > 0) {
-                            submitParts(response.service_id);
-                        } else {
-                            setTimeout(function() { window.location.reload(); }, 1000);
-                        }
-                    } else {
-                        $('#addServiceStatus').html('<div class="alert alert-danger">' + response.message + '</div>');
-                    }
-                    $('button[type="submit"]').prop('disabled', false);
-                },
-
-                error: function() {
-                    $('#addServiceStatus').html('<div class="alert alert-danger">Qualcosa è andato storto. Riprova più tardi.</div>');
-                    $('button[type="submit"]').prop('disabled', false);
-                }
-            });
-        });
-
-		function submitParts(serviceId) {
-			console.log('submitParts called with serviceId:', serviceId); // Log per il debug
-			var partsData = [];
-			$('#addPartsContainer .form-row').each(function() {
-				var partName = $(this).find('input[name="part_name[]"]').val();
-				var partNumber = $(this).find('input[name="part_number[]"]').val();
-
-				if (partName && partNumber) {
-					partsData.push({ name: 'part_name[]', value: partName });
-					partsData.push({ name: 'part_number[]', value: partNumber });
+			// Check file size before submitting
+			var fileInput = $('#addServiceAttachment')[0];
+			if (fileInput.files.length > 0) {
+				var fileSize = fileInput.files[0].size;
+				if (fileSize > maxFileSize) {
+					$('#addServiceStatus').html('<div class="alert alert-danger">Il file è troppo grande. La dimensione massima è 5MB.</div>');
+					return; // Stop form submission
 				}
-			});
-
-			if (partsData.length === 0) {
-				console.log('No parts to submit');
-				setTimeout(function() { window.location.reload(); }, 1000);
-				return;
 			}
 
-			partsData.push({ name: 'service_id', value: serviceId });
+			var formData = new FormData($('#addServiceForm')[0]);
 
 			$.ajax({
-				url: 'addServicePart.php',
+				url: 'addService.php',
 				type: 'POST',
-				data: $.param(partsData),
+				data: formData,
+				contentType: false,
+				processData: false,
 				success: function(response) {
-					console.log('submitParts response:', response); // Log per il debug
 					if (response.status === 'success') {
+						$('#addServiceStatus').html('<div class="alert alert-success">Manutenzione aggiunta con successo!</div>');
 						setTimeout(function() { window.location.reload(); }, 1000);
 					} else {
-						$('#addServiceStatus').html('<div class="alert alert-danger">Parti non aggiunte: ' + (response.message || 'Errore sconosciuto') + '</div>');
+						$('#addServiceStatus').html('<div class="alert alert-danger">' + response.message + '</div>');
 					}
 				},
 				error: function() {
-					$('#addServiceStatus').html('<div class="alert alert-danger">Qualcosa è andato storto nell\'aggiunta delle parti. Riprova più tardi.</div>');
+					$('#addServiceStatus').html('<div class="alert alert-danger">Qualcosa è andato storto. Riprova più tardi.</div>');
 				}
 			});
-		}
-    });
-	
-	// Show selected file name in input box
-	$('#addServiceAttachment').on('change', function() {
-		var fileName = $(this).val().split('\\').pop(); // Get the file name
-		$('#fileNameDisplay').val(fileName); // Display the file name in the input box
-	});
+		});
 
+		// Show selected file name in input box
+		$('#addServiceAttachment').on('change', function() {
+			var fileName = $(this).val().split('\\').pop(); // Get the file name
+			$('#fileNameDisplay').val(fileName); // Display the file name in the input box
+		});
+	});
 </script>
