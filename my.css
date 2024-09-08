@@ -83,26 +83,13 @@ p, .table th, .table td, .modal-body {
     transform: scale(1.05); /* Effetto di ingrandimento al passaggio del mouse */
 }
 
-.btn-custom {
-    font-size: 1.5rem;
-    padding: 2px 5px;
-    background: linear-gradient(45deg, #007bff, #0056b3); /* Gradiente di sfondo blu */
-    border: none; /* Rimuovi il bordo */
-    color: white; /* Colore del testo bianco */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Ombra per dare profondità */
-}
-.btn-custom:hover {
-    background: linear-gradient(45deg, #0056b3, #007bff); /* Gradiente al passaggio del mouse */
-    transform: translateY(-2px); /* Effetto di sollevamento al passaggio del mouse */
-}
-
 /* Aggiungi animazioni */
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
 }
 
-.card, .modal-body, .btn-custom {
+.card, .modal-body {
     animation: fadeIn 0.5s ease-in-out; /* Animazione di fade in */
 }
 
@@ -133,8 +120,4 @@ p, .table th, .table td, .modal-body {
         padding: 0.5rem; /* Riduci il padding */
     }
 
-    .btn-custom {
-        font-size: 1.2rem; /* Riduci la dimensione del testo del bottone */
-        padding: 1px 3px; /* Riduci il padding del bottone */
-    }
 }

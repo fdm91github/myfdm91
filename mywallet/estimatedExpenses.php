@@ -45,213 +45,129 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
     <meta charset="UTF-8">
     <title>Spese stimate</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<!-- jQuery -->
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Bootstrap JS e dipendenze varie -->
+    <!-- Bootstrap JS and dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <!-- Charts e grafici -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
     <!-- Custom CSS -->
-	<link href="../my.css" rel="stylesheet">
+    <link href="../my.css" rel="stylesheet">
 </head>
 <body>
     <div class="container mt-5">
-		<div class="card mb-4">
-			<div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-				<h4 class="mb-0">Spese stimate attive</h4>
-				<button class="btn btn-primary btn-custom" data-toggle="modal" data-target="#addEstimatedExpenseModal">
-					<i class="bi bi-plus"></i>
-				</button>
-			</div>
-			<div class="card-body">
-				<div class="table-responsive">
-					<table class="table table-bordered">
-						<thead>
-							<tr>
-								<th>
-									<a href="?sort=name&order=<?php echo ($_GET['order'] ?? 'asc') === 'asc' ? 'desc' : 'asc'; ?>">
-										Descrizione
-										<?php if ($_GET['sort'] == 'name'): ?>
-											<i class="bi bi-arrow-<?php echo ($_GET['order'] ?? 'asc') === 'asc' ? 'down' : 'up'; ?>"></i>
-										<?php endif; ?>
-									</a>
-								</th>
-								<th class="d-none d-md-table-cell">
-									<a href="?sort=amount&order=<?php echo ($_GET['order'] ?? 'asc') === 'asc' ? 'desc' : 'asc'; ?>">
-										Totale
-										<?php if ($_GET['sort'] == 'amount'): ?>
-											<i class="bi bi-arrow-<?php echo ($_GET['order'] ?? 'asc') === 'asc' ? 'down' : 'up'; ?>"></i>
-										<?php endif; ?>
-									</a>
-								</th>
-								<th>
-									<a href="?sort=monthly_debit&order=<?php echo ($_GET['order'] ?? 'asc') === 'asc' ? 'desc' : 'asc'; ?>">
-										Questo mese
-										<?php if ($_GET['sort'] == 'monthly_debit'): ?>
-											<i class="bi bi-arrow-<?php echo ($_GET['order'] ?? 'asc') === 'asc' ? 'down' : 'up'; ?>"></i>
-										<?php endif; ?>
-									</a>
-								</th>
-								<th class="d-none d-md-table-cell">
-									<a href="?sort=next_debit_date&order=<?php echo ($_GET['order'] ?? 'asc') === 'asc' ? 'desc' : 'asc'; ?>">
-										Prossimo addebito
-										<?php if ($_GET['sort'] == 'next_debit_date'): ?>
-											<i class="bi bi-arrow-<?php echo ($_GET['order'] ?? 'asc') === 'asc' ? 'down' : 'up'; ?>"></i>
-										<?php endif; ?>
-									</a>
-								</th>
-								<th class="d-none d-md-table-cell">
-									<a href="?sort=billing_frequency&order=<?php echo ($_GET['order'] ?? 'asc') === 'asc' ? 'desc' : 'asc'; ?>">
-										Frequenza
-										<?php if ($_GET['sort'] == 'billing_frequency'): ?>
-											<i class="bi bi-arrow-<?php echo ($_GET['order'] ?? 'asc') === 'asc' ? 'down' : 'up'; ?>"></i>
-										<?php endif; ?>
-									</a>
-								</th>
-								<th class="d-none d-md-table-cell">
-									<a href="?sort=current_installment&order=<?php echo ($_GET['order'] ?? 'asc') === 'asc' ? 'desc' : 'asc'; ?>">
-										Rata corrente
-										<?php if ($_GET['sort'] == 'current_installment'): ?>
-											<i class="bi bi-arrow-<?php echo ($_GET['order'] ?? 'asc') === 'asc' ? 'down' : 'up'; ?>"></i>
-										<?php endif; ?>
-									</a>
-								</th>
-								<th>Azioni</th>
-							</tr>
-						</thead>
-						<tbody>
-							<?php foreach ($activeExpenses as $expense): ?>
-								<tr>
-									<td><?php echo htmlspecialchars($expense['name']); ?></td>
-									<td class="d-none d-md-table-cell"><?php echo htmlspecialchars($expense['amount']); ?></td>
-									<td><?php echo htmlspecialchars($expense['monthly_debit']); ?></td>
-									<td class="d-none d-md-table-cell"><?php echo htmlspecialchars($expense['next_debit_date']); ?></td>
-									<td class="d-none d-md-table-cell">
-										<?php
-										if($expense['billing_frequency'] > 1){
-											echo 'Ogni ' . htmlspecialchars($expense['billing_frequency']) . ' mesi';
-										} else {
-											echo 'Ogni mese';
-										}
-										?>
-									</td>
-									<td class="d-none d-md-table-cell" align=center>
-										<?php
-											echo htmlspecialchars($expense['current_installment']) . ' di ' . htmlspecialchars($expense['total_installments']);
-										?>
-									</td>
-									<td>
-										<button class="btn btn-warning btn-sm" 
-												data-toggle="modal" 
-												data-target="#editEstimatedExpenseModal" 
-												data-id="<?php echo $expense['id']; ?>" 
-												data-name="<?php echo htmlspecialchars($expense['name']); ?>" 
-												data-amount="<?php echo htmlspecialchars($expense['amount']); ?>" 
-												data-start-month="<?php echo htmlspecialchars($expense['start_month']); ?>" 
-												data-start-year="<?php echo htmlspecialchars($expense['start_year']); ?>" 
-												data-end-month="<?php echo htmlspecialchars($expense['end_month']); ?>" 
-												data-end-year="<?php echo htmlspecialchars($expense['end_year']); ?>" 
-												data-undetermined="<?php echo $expense['undetermined']; ?>" 
-												data-debit-date="<?php echo htmlspecialchars($expense['debit_date']); ?>" 
-												data-billing-frequency="<?php echo htmlspecialchars($expense['billing_frequency']); ?>">
-											<i class="bi bi-pencil"></i>
-										</button>
-										<button class="btn btn-danger btn-sm" 
-												data-toggle="modal" 
-												data-target="#deleteEstimatedExpenseModal" 
-												data-id="<?php echo $expense['id']; ?>">
-											<i class="bi bi-trash"></i>
-										</button>
-									</td>
-								</tr>
-							<?php endforeach; ?>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-        
-        <?php if (!empty($expiredExpenses)): ?>
+        <!-- Spese attive -->
         <div class="card mb-4">
-            <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-                <h4 class="mb-0">Spese stimate scadute</h4>
-                <button style="color:white" class="btn btn-link btn-custom" data-toggle="collapse" data-target="#expiredExpensesContent" aria-expanded="false" aria-controls="expiredExpensesContent">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Spese stimate attive</h4>
+                <button class="btn btn-primary" data-toggle="modal" data-target="#addEstimatedExpenseModal">
                     <i class="bi bi-plus"></i>
                 </button>
             </div>
-            <div id="expiredExpensesContent" class="collapse">
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered">
-                            <thead>
-                                <tr>
-                                    <th>Descrizione</th>
-                                    <th>Totale</th>
-                                    <th class="d-none d-md-table-cell">Ultimo addebito</th>
-                                    <th class="d-none d-md-table-cell">Frequenza</th>
-                                    <th>Azioni</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($expiredExpenses as $expense): ?>
-                                    <tr>
-                                        <td><?php echo htmlspecialchars($expense['name']); ?></td>
-                                        <td><?php echo htmlspecialchars($expense['amount']); ?></td>
-                                        <td class="d-none d-md-table-cell"><?php echo htmlspecialchars($expense['last_debit_date']); ?></td>
-                                        <td class="d-none d-md-table-cell">
-                                            <?php
-                                            if($expense['billing_frequency'] > 1){
-                                                echo 'Ogni ' . htmlspecialchars($expense['billing_frequency']) . ' mesi';
-                                            } else {
-                                                echo 'Ogni mese';
-                                            }
-                                            ?>
-                                        </td>
-                                        <td align=center>
-                                            <button class="btn btn-warning btn-sm" 
-                                                    data-toggle="modal" 
-                                                    data-target="#editEstimatedExpenseModal" 
-                                                    data-id="<?php echo $expense['id']; ?>" 
-                                                    data-name="<?php echo htmlspecialchars($expense['name']); ?>" 
-                                                    data-amount="<?php echo htmlspecialchars($expense['amount']); ?>" 
-                                                    data-start-month="<?php echo htmlspecialchars($expense['start_month']); ?>" 
-                                                    data-start-year="<?php echo htmlspecialchars($expense['start_year']); ?>" 
-                                                    data-end-month="<?php echo htmlspecialchars($expense['end_month']); ?>" 
-                                                    data-end-year="<?php echo htmlspecialchars($expense['end_year']); ?>" 
-                                                    data-undetermined="<?php echo $expense['undetermined']; ?>" 
-                                                    data-debit-date="<?php echo htmlspecialchars($expense['debit_date']); ?>" 
-                                                    data-billing-frequency="<?php echo htmlspecialchars($expense['billing_frequency']); ?>">
-                                                <i class="bi bi-pencil"></i>
-                                            </button>
-                                            <button class="btn btn-danger btn-sm" 
-                                                    data-toggle="modal" 
-                                                    data-target="#deleteEstimatedExpenseModal" 
-                                                    data-id="<?php echo $expense['id']; ?>">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+            <div class="card-body">
+                <?php if (!empty($activeExpenses)): ?>
+                    <?php foreach ($activeExpenses as $expense): ?>
+                        <div class="card mb-4">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><?php echo htmlspecialchars($expense['name']); ?></h5>
+                                <div>
+                                    <button class="btn btn-warning" data-toggle="modal" data-target="#editEstimatedExpenseModal" 
+                                        data-id="<?php echo $expense['id']; ?>" 
+                                        data-name="<?php echo htmlspecialchars($expense['name']); ?>" 
+                                        data-amount="<?php echo htmlspecialchars($expense['amount']); ?>">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-danger" data-toggle="modal" data-target="#deleteEstimatedExpenseModal" 
+                                        data-id="<?php echo $expense['id']; ?>">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Totale:</strong> €<?php echo htmlspecialchars($expense['amount']); ?></p>
+                                <p><strong>Questo mese:</strong> €<?php echo htmlspecialchars($expense['monthly_debit']); ?></p>
+                                <p><strong>Prossimo addebito:</strong> <?php echo htmlspecialchars($expense['next_debit_date']); ?></p>
+                                <p><strong>Frequenza:</strong> 
+                                    <?php 
+                                    if ($expense['billing_frequency'] > 1) {
+                                        echo 'Ogni ' . htmlspecialchars($expense['billing_frequency']) . ' mesi';
+                                    } else {
+                                        echo 'Ogni mese';
+                                    }
+                                    ?>
+                                </p>
+                                <p><strong>Rata corrente:</strong> <?php echo htmlspecialchars($expense['current_installment']) . ' di ' . htmlspecialchars($expense['total_installments']); ?></p>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="alert alert-info" role="alert">
+                        Nessuna spesa attiva trovata.
                     </div>
-                </div>
+                <?php endif; ?>
             </div>
         </div>
-        <?php endif; ?>
+
+        <!-- Spese scadute -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Spese stimate scadute</h4>
+                <button class="btn btn-primary toggle-content" data-toggle="collapse" data-target="#expiredExpensesContent" aria-expanded="false" aria-controls="expiredExpensesContent">
+                    <i class="bi bi-eye"></i>
+                </button>
+            </div>
+            <div id="expiredExpensesContent" class="collapse card-body">
+                <?php if (!empty($expiredExpenses)): ?>
+                    <?php foreach ($expiredExpenses as $expense): ?>
+                        <div class="card mb-4">
+                            <div class="card-body d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0"><?php echo htmlspecialchars($expense['name']); ?></h5>
+                                <div>
+                                    <button class="btn btn-warning" data-toggle="modal" data-target="#editEstimatedExpenseModal" 
+                                        data-id="<?php echo $expense['id']; ?>" 
+                                        data-name="<?php echo htmlspecialchars($expense['name']); ?>" 
+                                        data-amount="<?php echo htmlspecialchars($expense['amount']); ?>">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-danger" data-toggle="modal" data-target="#deleteEstimatedExpenseModal" 
+                                        data-id="<?php echo $expense['id']; ?>">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Totale:</strong> €<?php echo htmlspecialchars($expense['amount']); ?></p>
+                                <p><strong>Ultimo addebito:</strong> <?php echo htmlspecialchars($expense['last_debit_date']); ?></p>
+                                <p><strong>Frequenza:</strong> 
+                                    <?php 
+                                    if ($expense['billing_frequency'] > 1) {
+                                        echo 'Ogni ' . htmlspecialchars($expense['billing_frequency']) . ' mesi';
+                                    } else {
+                                        echo 'Ogni mese';
+                                    }
+                                    ?>
+                                </p>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="alert alert-info" role="alert">
+                        Nessuna spesa scaduta trovata.
+                    </div>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
+
+    <!-- Modals -->
     <?php include 'addEstimatedExpenseModal.php'; ?>
     <?php include 'editEstimatedExpenseModal.php'; ?>
     <?php include 'deleteEstimatedExpenseModal.php'; ?>
     <?php include 'navbar.php'; ?>
-	<?php include '../footer.php'; ?>
-	
+    <?php include '../footer.php'; ?>
+
     <script>
         $('#editEstimatedExpenseModal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);

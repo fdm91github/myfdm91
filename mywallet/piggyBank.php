@@ -30,7 +30,7 @@ include 'retrieveData.php';
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
                 <h4 class="mb-0">Salvadanaio</h4>
-                <button class="btn btn-primary btn-custom" data-toggle="modal" data-target="#addPiggyBankModal">
+                <button class="btn btn-primary" data-toggle="modal" data-target="#addPiggyBankModal">
                     <i class="bi bi-plus"></i>
                 </button>
             </div>

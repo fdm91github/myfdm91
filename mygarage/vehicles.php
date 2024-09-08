@@ -92,7 +92,7 @@ foreach ($vehicles as $vehicle) {
         <div class="mb-4">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <h4 class="mb-0">I miei veicoli</h4>
-                <button class="btn btn-primary btn-custom" data-toggle="modal" data-target="#addVehicleModal">
+                <button class="btn btn-primary" data-toggle="modal" data-target="#addVehicleModal">
                     <i class="bi bi-plus"></i>
                 </button>
             </div>
@@ -145,7 +145,7 @@ foreach ($vehicles as $vehicle) {
         <div class="mb-4">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <h4 class="mb-0">Veicoli non più attivi</h4>
-                <button style="color:white" class="btn btn-link btn-custom" data-toggle="collapse" data-target="#inactiveVehiclesContent" aria-expanded="false" aria-controls="inactiveVehiclesContent">
+                <button style="color:white" class="btn btn-link" data-toggle="collapse" data-target="#inactiveVehiclesContent" aria-expanded="false" aria-controls="inactiveVehiclesContent">
                     <i class="bi bi-plus"></i>
                 </button>
             </div>

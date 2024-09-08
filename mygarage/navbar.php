@@ -29,3 +29,25 @@
         </ul>
     </div>
 </nav>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get the current path (e.g., /incomes.php)
+        var currentPath = window.location.pathname.split("/").pop();
+
+        // Get all nav-link elements
+        var navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+
+        // Loop through the nav links and check if the href matches the current path
+        navLinks.forEach(function(link) {
+            var linkPath = link.getAttribute('href');
+
+            // If the href matches the current path, add the 'active' class
+            if (linkPath === currentPath || (linkPath === '.' && currentPath === '')) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+    });
+</script>

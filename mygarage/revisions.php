@@ -32,7 +32,7 @@ include 'retrieveData.php';
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
                     <h4 class="mb-0"><?php echo htmlspecialchars($vehicle['description']); ?> (<?php echo htmlspecialchars($vehicle['plateNumber']); ?>)</h4>
-                    <button class="btn btn-primary btn-custom add-revision-btn" data-toggle="modal" data-target="#addRevisionModal" data-vehicle-id="<?php echo $vehicle['id']; ?>">
+                    <button class="btn btn-primary add-revision-btn" data-toggle="modal" data-target="#addRevisionModal" data-vehicle-id="<?php echo $vehicle['id']; ?>">
                         <i class="bi bi-plus"></i>
                     </button>
                 </div>
