@@ -18,7 +18,7 @@
                     </div>
                     <div class="form-group">
                         <label for="editServiceAmount">Costo</label>
-                        <input type="number" name="amount" id="editServiceAmount" class="form-control" required>
+                        <input type="number" name="amount" id="editServiceAmount" step="0.01" class="form-control" required>
                     </div>
                     <div class="form-group">
                         <label for="editServiceBuyingDate">Data di acquisto</label>

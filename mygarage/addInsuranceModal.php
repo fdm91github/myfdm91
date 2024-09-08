@@ -18,7 +18,7 @@
                     </div>
                     <div class="form-group">
                         <label for="addInsuranceAmount">Costo</label>
-                        <input type="number" name="amount" id="addInsuranceAmount" class="form-control" placeholder="Costo" required>
+                        <input type="number" name="amount" id="addInsuranceAmount" class="form-control" step="0.01" placeholder="Costo" required>
                     </div>
                     <div class="form-group">
                         <label for="addInsuranceBuyingDate">Data di acquisto</label>

@@ -14,7 +14,7 @@
                     <input type="hidden" name="vehicle_id" id="addTaxVehicleId">
                     <div class="form-group">
                         <label for="addTaxAmount">Costo</label>
-                        <input type="number" name="amount" id="addTaxAmount" class="form-control" placeholder="Costo" required>
+                        <input type="number" name="amount" id="addTaxAmount" class="form-control" step="0.01" placeholder="Costo" required>
                     </div>
                     <div class="form-group">
                         <label for="addTaxBuyingDate">Data di acquisto</label>

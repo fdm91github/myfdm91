@@ -14,7 +14,7 @@
                     <input type="hidden" name="vehicle_id" id="addRevisionVehicleId">
                     <div class="form-group">
                         <label for="addRevisionAmount">Costo</label>
-                        <input type="number" name="amount" id="addRevisionAmount" class="form-control" placeholder="Costo" required>
+                        <input type="number" name="amount" id="addRevisionAmount" class="form-control" step="0.01" placeholder="Costo" required>
                     </div>
                     <div class="form-group">
                         <label for="addRevisionBuyingDate">Data di acquisto</label>
