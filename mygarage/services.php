@@ -61,10 +61,8 @@ include 'retrieveData.php';
                                 if (!$hasServices): 
                                     $hasServices = true; 
                     ?>
-                                <div class="row">
-                    <?php 
-                                endif; 
-                    ?>
+					<div class="row">
+                    <?php endif; ?>
                                     <div class="col-12 mb-3">
                                         <div class="card">
                                             <div class="card-body d-flex justify-content-between align-items-center">
@@ -119,31 +117,31 @@ include 'retrieveData.php';
                                             </div>
                                         </div>
                                     </div>
-                    <?php 
-                            endif;
-                        endforeach; 
-                    endif; 
-                    ?>
+								<?php 
+										endif;
+									endforeach; 
+								endif; 
+								?>
 
-                    <?php if (!$hasServices): ?>
-                        <div class="alert" role="alert">
-                            Nessuna manutenzione registrata per questo veicolo.
-                        </div>
-                    <?php endif; ?>
-                </div>
-            </div>
+								<?php if (!$hasServices): ?>
+									<div class="alert" role="alert">
+										Nessuna manutenzione registrata per questo veicolo.
+									</div>
+								<?php endif; ?>
+					</div>
+				</div>
+			<?php endforeach; ?>
 		</div>
-        <?php endforeach; ?>
-    </div>
+	</div>
 
-    <!-- Footer placed outside of the card structure -->
-    <?php include '../footer.php'; ?>
+<!-- Footer placed outside of the card structure -->
+<?php include '../footer.php'; ?>
 
-    <!-- Modals -->
-    <?php include 'addServiceModal.php'; ?>
-    <?php include 'editServiceModal.php'; ?>
-    <?php include 'deleteServiceModal.php'; ?>
-    <?php include 'navbar.php'; ?>
+<!-- Modals -->
+<?php include 'addServiceModal.php'; ?>
+<?php include 'editServiceModal.php'; ?>
+<?php include 'deleteServiceModal.php'; ?>
+<?php include 'navbar.php'; ?>
 
 </body>
 </html>
