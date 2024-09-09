@@ -145,8 +145,8 @@ foreach ($vehicles as $vehicle) {
         <div class="mb-4">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <h4 class="mb-0">Veicoli non più attivi</h4>
-                <button style="color:white" class="btn btn-link" data-toggle="collapse" data-target="#inactiveVehiclesContent" aria-expanded="false" aria-controls="inactiveVehiclesContent">
-                    <i class="bi bi-plus"></i>
+                <button style="color:white" class="btn btn-primary" data-toggle="collapse" data-target="#inactiveVehiclesContent" aria-expanded="false" aria-controls="inactiveVehiclesContent">
+                    <i class="bi bi-eye"></i>
                 </button>
             </div>
             <div id="inactiveVehiclesContent" class="collapse">
