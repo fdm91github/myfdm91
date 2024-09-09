@@ -135,13 +135,13 @@ foreach ($vehicleServiceParts as $part) {
 }
 
 // Recupero tutte le assicurazioni
-$vehicleInsurances = executeQuery($link, "SELECT id, vehicle_id, company, amount, buying_date FROM vehicle_insurances WHERE user_id = ?", ["i", $user_id], false);
+$vehicleInsurances = executeQuery($link, "SELECT id, vehicle_id, company, amount, buying_date FROM vehicle_insurances WHERE user_id = ? ORDER BY buying_date DESC", ["i", $user_id], false);
 
 // Recupero tutte le revisioni
-$vehicleRevisions = executeQuery($link, "SELECT id, vehicle_id, amount, buying_date FROM vehicle_revisions WHERE user_id = ?", ["i", $user_id], false);
+$vehicleRevisions = executeQuery($link, "SELECT id, vehicle_id, amount, buying_date FROM vehicle_revisions WHERE user_id = ? ORDER BY buying_date DESC", ["i", $user_id], false);
 
 // Recupero tutti i bolli
-$vehicleTaxes = executeQuery($link, "SELECT id, vehicle_id, amount, buying_date FROM vehicle_taxes WHERE user_id = ?", ["i", $user_id], false);
+$vehicleTaxes = executeQuery($link, "SELECT id, vehicle_id, amount, buying_date FROM vehicle_taxes WHERE user_id = ? ORDER BY buying_date DESC", ["i", $user_id], false);
 
 // Calcolo le spese totali dell'ultimo anno
 $totalVehicleServices = sumExpenses($link, "vehicle_services", $user_id, $oneYearAgo, $today);

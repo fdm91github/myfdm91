@@ -130,6 +130,7 @@ include 'retrieveData.php';
 								<?php endif; ?>
 					</div>
 				</div>
+			</div>
 			<?php endforeach; ?>
 		</div>
 	</div>
