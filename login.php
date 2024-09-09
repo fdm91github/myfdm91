@@ -140,6 +140,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <button type="submit" class="btn btn-primary btn-block">Accedi</button>
                     </div>
                     <p class="text-center">Non hai ancora un account? Cosa aspetti, <a href="register.php">registrati</a>!</p>
+                    <p class="text-center"><a href="passwordReset.php">Ho dimenticato la password</a></p>
                 </form>
             </div>
         </div>

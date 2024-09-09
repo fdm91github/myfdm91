@@ -1,0 +1,19 @@
+{
+    "name": "fdm91/myfdm91",
+    "description": "MyFDM91 Services",
+    "type": "project",
+    "require": {
+        "phpmailer/phpmailer": "^6.9"
+    },
+    "license": "GNU",
+    "autoload": {
+        "psr-4": {
+            "Fdm91\\Myfdm91\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Francesco Della Morte"
+        }
+    ]
+}
