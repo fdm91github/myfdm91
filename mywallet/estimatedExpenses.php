@@ -74,9 +74,16 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
                                 <h5 class="mb-0"><?php echo htmlspecialchars($expense['name']); ?></h5>
                                 <div>
                                     <button class="btn btn-warning" data-toggle="modal" data-target="#editEstimatedExpenseModal" 
-                                        data-id="<?php echo $expense['id']; ?>" 
-                                        data-name="<?php echo htmlspecialchars($expense['name']); ?>" 
-                                        data-amount="<?php echo htmlspecialchars($expense['amount']); ?>">
+										data-id="<?php echo $expense['id']; ?>"
+										data-name="<?php echo htmlspecialchars($expense['name']); ?>"
+										data-amount="<?php echo htmlspecialchars($expense['amount']); ?>"
+										data-start-month="<?php echo $expense['start_month']; ?>"
+										data-start-year="<?php echo $expense['start_year']; ?>"
+										data-end-month="<?php echo $expense['end_month']; ?>"
+										data-end-year="<?php echo $expense['end_year']; ?>"
+										data-undetermined="<?php echo $expense['undetermined']; ?>"
+										data-debit-date="<?php echo $expense['debit_date']; ?>"
+										data-billing-frequency="<?php echo $expense['billing_frequency']; ?>">
                                         <i class="bi bi-pencil"></i>
                                     </button>
                                     <button class="btn btn-danger" data-toggle="modal" data-target="#deleteEstimatedExpenseModal" 
@@ -126,9 +133,16 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
                                 <h5 class="mb-0"><?php echo htmlspecialchars($expense['name']); ?></h5>
                                 <div>
                                     <button class="btn btn-warning" data-toggle="modal" data-target="#editEstimatedExpenseModal" 
-                                        data-id="<?php echo $expense['id']; ?>" 
-                                        data-name="<?php echo htmlspecialchars($expense['name']); ?>" 
-                                        data-amount="<?php echo htmlspecialchars($expense['amount']); ?>">
+										data-id="<?php echo $expense['id']; ?>"
+										data-name="<?php echo htmlspecialchars($expense['name']); ?>"
+										data-amount="<?php echo htmlspecialchars($expense['amount']); ?>"
+										data-start-month="<?php echo $expense['start_month']; ?>"
+										data-start-year="<?php echo $expense['start_year']; ?>"
+										data-end-month="<?php echo $expense['end_month']; ?>"
+										data-end-year="<?php echo $expense['end_year']; ?>"
+										data-undetermined="<?php echo $expense['undetermined']; ?>"
+										data-debit-date="<?php echo $expense['debit_date']; ?>"
+										data-billing-frequency="<?php echo $expense['billing_frequency']; ?>">
                                         <i class="bi bi-pencil"></i>
                                     </button>
                                     <button class="btn btn-danger" data-toggle="modal" data-target="#deleteEstimatedExpenseModal" 
@@ -168,40 +182,5 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
     <?php include 'navbar.php'; ?>
     <?php include '../footer.php'; ?>
 
-    <script>
-        $('#editEstimatedExpenseModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var id = button.data('id');
-            var name = button.data('name');
-            var amount = button.data('amount');
-            var start_month = button.data('start-month');
-            var start_year = button.data('start-year');
-            var end_month = button.data('end-month');
-            var end_year = button.data('end-year');
-            var undetermined = button.data('undetermined');
-            var debit_date = button.data('debit-date');
-            var billing_frequency = button.data('billing-frequency');
-
-            var modal = $(this);
-            modal.find('#edit_expense_id').val(id);
-            modal.find('#edit_expense_name').val(name);
-            modal.find('#edit_expense_amount').val(amount);
-            modal.find('#edit_start_month').val(start_month);
-            modal.find('#edit_start_year').val(start_year);
-            modal.find('#edit_end_month').val(end_month);
-            modal.find('#edit_end_year').val(end_year);
-            modal.find('#edit_undetermined').prop('checked', undetermined);
-            modal.find('#edit_debit_date').val(debit_date);
-            modal.find('#edit_billing_frequency').val(billing_frequency);
-        });
-
-        $('#deleteEstimatedExpenseModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var id = button.data('id');
-
-            var modal = $(this);
-            modal.find('#delete_expense_id').val(id);
-        });
-    </script>
 </body>
 </html>

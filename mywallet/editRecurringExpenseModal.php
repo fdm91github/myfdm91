@@ -101,31 +101,32 @@
     }
 
     $(document).ready(function() {
-        $('#editRecurringExpenseModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var id = button.data('id');
-            var name = button.data('name');
-            var amount = button.data('amount');
-            var startMonth = button.data('start-month');
-            var startYear = button.data('start-year');
-            var endMonth = button.data('end-month');
-            var endYear = button.data('end-year');
-            var undetermined = button.data('undetermined');
-            var debitDate = button.data('debit-date');
-            var billingFrequency = button.data('billing-frequency');
+		$('#editRecurringExpenseModal').on('show.bs.modal', function (event) {
+			var button = $(event.relatedTarget);
+			
+			var id = button.data('id');
+			var name = button.data('name');
+			var amount = button.data('amount');
+			var start_month = button.data('start-month');
+			var start_year = button.data('start-year');
+			var end_month = button.data('end-month');
+			var end_year = button.data('end-year');
+			var undetermined = button.data('undetermined'); 
+			var debit_date = button.data('debit-date');
+			var billing_frequency = button.data('billing-frequency');
 
-            $('#editRecurringExpenseId').val(id);
-            $('#editRecurringExpenseName').val(name);
-            $('#editRecurringExpenseAmount').val(amount);
-            $('#editRecurringExpenseStartMonth').val(startMonth);
-            $('#editRecurringExpenseStartYear').val(startYear);
-            $('#editRecurringExpenseEndMonth').val(endMonth);
-            $('#editRecurringExpenseEndYear').val(endYear);
-            $('#editRecurringExpenseUndetermined').prop('checked', undetermined);
-            $('#editRecurringExpenseDebitDate').val(debitDate);
-            $('#editRecurringExpenseBillingFrequency').val(billingFrequency);
-            toggleRecurringEndDate('edit');
-        });
+			var modal = $(this);
+			modal.find('#editRecurringExpenseId').val(id);
+			modal.find('#editRecurringExpenseName').val(name);
+			modal.find('#editRecurringExpenseAmount').val(amount);
+			modal.find('#editRecurringExpenseStartMonth').val(start_month);
+			modal.find('#editRecurringExpenseStartYear').val(start_year);
+			modal.find('#editRecurringExpenseEndMonth').val(end_month);
+			modal.find('#editRecurringExpenseEndYear').val(end_year);
+			modal.find('#editRecurringExpenseUndetermined').prop('checked', undetermined);
+			modal.find('#editRecurringExpenseDebitDate').val(debit_date);
+			modal.find('#editRecurringExpenseBillingFrequency').val(billing_frequency);
+		});
 
         $('#editRecurringExpenseForm').submit(function(e) {
             e.preventDefault();

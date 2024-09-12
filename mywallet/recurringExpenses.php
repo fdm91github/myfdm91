@@ -3,17 +3,17 @@ session_start();
 require_once '../config.php';
 include 'retrieveData.php';
 
-$active_expenses = [];
-$expired_expenses = [];
+$activeExpenses = [];
+$expiredExpenses = [];
 
-$current_month = date('n');
-$current_year = date('Y');
+$currentMonth = date('n');
+$currentYear = date('Y');
 
 foreach ($recurringExpenses as $expense) {
-    if ($expense['undetermined'] == 1 || $expense['end_year'] > $current_year || ($expense['end_year'] == $current_year && $expense['end_month'] >= $current_month)) {
-        $active_expenses[] = $expense;
+    if ($expense['undetermined'] == 1 || $expense['end_year'] > $currentYear || ($expense['end_year'] == $currentYear && $expense['end_month'] >= $currentMonth)) {
+        $activeExpenses[] = $expense;
     } else {
-        $expired_expenses[] = $expense;
+        $expiredExpenses[] = $expense;
     }
 }
 
@@ -34,7 +34,7 @@ function compare_expenses($a, $b, $sort_by, $order) {
 $sort_by = $_GET['sort'] ?? 'next_debit_date';
 $order = $_GET['order'] ?? 'asc';
 
-usort($active_expenses, function($a, $b) use ($sort_by, $order) {
+usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
     return compare_expenses($a, $b, $sort_by, $order);
 });
 ?>
@@ -67,18 +67,25 @@ usort($active_expenses, function($a, $b) use ($sort_by, $order) {
                 </button>
             </div>
             <div class="card-body">
-                <?php if (!empty($active_expenses)): ?>
-                    <?php foreach ($active_expenses as $expense): ?>
+                <?php if (!empty($activeExpenses)): ?>
+                    <?php foreach ($activeExpenses as $expense): ?>
                         <div class="card mb-4">
                             <div class="card-body d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0"><?php echo htmlspecialchars($expense['name']); ?></h5>
                                 <div>
-                                    <button class="btn btn-warning" data-toggle="modal" data-target="#editRecurringExpenseModal" 
-                                        data-id="<?php echo $expense['id']; ?>" 
-                                        data-name="<?php echo htmlspecialchars($expense['name']); ?>" 
-                                        data-amount="<?php echo htmlspecialchars($expense['amount']); ?>">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
+									<button class="btn btn-warning" data-toggle="modal" data-target="#editRecurringExpenseModal"
+										data-id="<?php echo $expense['id']; ?>"
+										data-name="<?php echo htmlspecialchars($expense['name']); ?>"
+										data-amount="<?php echo htmlspecialchars($expense['amount']); ?>"
+										data-start-month="<?php echo $expense['start_month']; ?>"
+										data-start-year="<?php echo $expense['start_year']; ?>"
+										data-end-month="<?php echo $expense['end_month']; ?>"
+										data-end-year="<?php echo $expense['end_year']; ?>"
+										data-undetermined="<?php echo $expense['undetermined']; ?>"
+										data-debit-date="<?php echo $expense['debit_date']; ?>"
+										data-billing-frequency="<?php echo $expense['billing_frequency']; ?>">
+										<i class="bi bi-pencil"></i>
+									</button>
                                     <button class="btn btn-danger" data-toggle="modal" data-target="#deleteRecurringExpenseModal" 
                                         data-id="<?php echo $expense['id']; ?>">
                                         <i class="bi bi-trash"></i>
@@ -119,18 +126,25 @@ usort($active_expenses, function($a, $b) use ($sort_by, $order) {
                 </button>
             </div>
             <div id="expiredExpensesContent" class="collapse card-body">
-                <?php if (!empty($expired_expenses)): ?>
-                    <?php foreach ($expired_expenses as $expense): ?>
+                <?php if (!empty($expiredExpenses)): ?>
+                    <?php foreach ($expiredExpenses as $expense): ?>
                         <div class="card mb-4">
                             <div class="card-body d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0"><?php echo htmlspecialchars($expense['name']); ?></h5>
                                 <div>
-                                    <button class="btn btn-warning" data-toggle="modal" data-target="#editRecurringExpenseModal" 
-                                        data-id="<?php echo $expense['id']; ?>" 
-                                        data-name="<?php echo htmlspecialchars($expense['name']); ?>" 
-                                        data-amount="<?php echo htmlspecialchars($expense['amount']); ?>">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
+									<button class="btn btn-warning" data-toggle="modal" data-target="#editRecurringExpenseModal"
+										data-id="<?php echo $expense['id']; ?>"
+										data-name="<?php echo htmlspecialchars($expense['name']); ?>"
+										data-amount="<?php echo htmlspecialchars($expense['amount']); ?>"
+										data-start-month="<?php echo $expense['start_month']; ?>"
+										data-start-year="<?php echo $expense['start_year']; ?>"
+										data-end-month="<?php echo $expense['end_month']; ?>"
+										data-end-year="<?php echo $expense['end_year']; ?>"
+										data-undetermined="<?php echo $expense['undetermined']; ?>"
+										data-debit-date="<?php echo $expense['debit_date']; ?>"
+										data-billing-frequency="<?php echo $expense['billing_frequency']; ?>">
+										<i class="bi bi-pencil"></i>
+									</button>
                                     <button class="btn btn-danger" data-toggle="modal" data-target="#deleteRecurringExpenseModal" 
                                         data-id="<?php echo $expense['id']; ?>">
                                         <i class="bi bi-trash"></i>
@@ -168,40 +182,5 @@ usort($active_expenses, function($a, $b) use ($sort_by, $order) {
 	<?php include 'navbar.php'; ?>
     <?php include '../footer.php'; ?>
 
-    <script>
-        $('#editRecurringExpenseModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var id = button.data('id');
-            var name = button.data('name');
-            var amount = button.data('amount');
-            var start_month = button.data('start-month');
-            var start_year = button.data('start-year');
-            var end_month = button.data('end-month');
-            var end_year = button.data['end-year'];
-            var undetermined = button.data('undetermined');
-            var debit_date = button.data('debit-date');
-            var billing_frequency = button.data('billing-frequency');
-
-            var modal = $(this);
-            modal.find('#edit_expense_id').val(id);
-            modal.find('#edit_expense_name').val(name);
-            modal.find('#edit_expense_amount').val(amount);
-            modal.find('#edit_start_month').val(start_month);
-            modal.find('#edit_start_year').val(start_year);
-            modal.find('#edit_end_month').val(end_month);
-            modal.find('#edit_end_year').val(end_year);
-            modal.find('#edit_undetermined').prop('checked', undetermined);
-            modal.find('#edit_debit_date').val(debit_date);
-            modal.find('#edit_billing_frequency').val(billing_frequency);
-        });
-
-        $('#deleteRecurringExpenseModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var id = button.data('id');
-
-            var modal = $(this);
-            modal.find('#delete_expense_id').val(id);
-        });
-    </script>
 </body>
 </html>

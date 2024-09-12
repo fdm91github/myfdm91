@@ -102,29 +102,30 @@
 
     $(document).ready(function() {
         $('#editEstimatedExpenseModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var id = button.data('id');
-            var name = button.data('name');
-            var amount = button.data('amount');
-            var startMonth = button.data('start-month');
-            var startYear = button.data('start-year');
-            var endMonth = button.data('end-month');
-            var endYear = button.data('end-year');
-            var undetermined = button.data('undetermined');
-            var debitDate = button.data('debit-date');
-            var billingFrequency = button.data('billing-frequency');
-
-            $('#editEstimatedExpenseId').val(id);
-            $('#editEstimatedExpenseName').val(name);
-            $('#editEstimatedExpenseAmount').val(amount);
-            $('#editEstimatedExpenseStartMonth').val(startMonth);
-            $('#editEstimatedExpenseStartYear').val(startYear);
-            $('#editEstimatedExpenseEndMonth').val(endMonth);
-            $('#editEstimatedExpenseEndYear').val(endYear);
-            $('#editEstimatedExpenseUndetermined').prop('checked', undetermined);
-            $('#editEstimatedExpenseDebitDate').val(debitDate);
-            $('#editEstimatedExpenseBillingFrequency').val(billingFrequency);
-            toggleEstimatedEndDate('edit');
+			var button = $(event.relatedTarget);
+			
+			var id = button.data('id');
+			var name = button.data('name');
+			var amount = button.data('amount');
+			var start_month = button.data('start-month');
+			var start_year = button.data('start-year');
+			var end_month = button.data('end-month');
+			var end_year = button.data('end-year');
+			var undetermined = button.data('undetermined'); 
+			var debit_date = button.data('debit-date');
+			var billing_frequency = button.data('billing-frequency');
+			
+			var modal = $(this);
+			modal.find('#editEstimatedExpenseId').val(id);
+			modal.find('#editEstimatedExpenseName').val(name);
+			modal.find('#editEstimatedExpenseAmount').val(amount);
+			modal.find('#editEstimatedExpenseStartMonth').val(start_month);
+			modal.find('#editEstimatedExpenseStartYear').val(start_year);
+			modal.find('#editEstimatedExpenseEndMonth').val(end_month);
+			modal.find('#editEstimatedExpenseEndYear').val(end_year);
+			modal.find('#editEstimatedExpenseUndetermined').prop('checked', undetermined);
+			modal.find('#editEstimatedExpenseDebitDate').val(debit_date);
+			modal.find('#editEstimatedExpenseBillingFrequency').val(billing_frequency);
         });
 
         $('#editEstimatedExpenseForm').submit(function(e) {
