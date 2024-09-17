@@ -1,0 +1,3 @@
+Contact: mailto:admin@fdm91.net
+Canonical: .well-known/security.txt
+Preferred languages: en, it

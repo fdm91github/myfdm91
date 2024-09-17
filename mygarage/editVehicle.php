@@ -50,7 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 SET description = ?, buying_date = ?, plate_number = ?, chassis_number = ?, tax_month = ?, revision_month = ?, insurance_expiration_date = ? 
                 WHERE id = ? AND user_id = ?";
         if ($stmt = $link->prepare($sql)) {
-            $stmt->bind_param("ssssssiii", $description, $buying_date, $plate_number, $chassis_number, $tax_month, $revision_month, $insurance_expiration_date, $vehicle_id, $user_id);
+            $stmt->bind_param("sssssssii", $description, $buying_date, $plate_number, $chassis_number, $tax_month, $revision_month, $insurance_expiration_date, $vehicle_id, $user_id);
             if ($stmt->execute()) {
                 $success_message = "Veicolo modificato con successo. Reindirizzamento alla dashboard...";
                 header("refresh:3;url=dashboard.php");
