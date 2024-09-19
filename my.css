@@ -20,11 +20,11 @@ body, html {
 }
 
 .register-form {
-	min-height: 100vh;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 15px;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
 }
 
 p, .table th, .table td, .modal-body {
