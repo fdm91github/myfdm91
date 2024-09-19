@@ -1,4 +1,9 @@
 <?php
+// Impostazioni di sicurezza per la sessione
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1);
+ini_set('session.use_strict_mode', 1);
+
 require_once 'config.php';
 $error_message = '';
 $success_message = '';
@@ -66,16 +71,7 @@ if (isset($_GET['token']) && isset($_GET['email'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reimposta la password</title>
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <link href="my.css" rel="stylesheet">
-    <style>
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 450px;
-        }
-    </style>
+	<?php include "script.php" ?>
 </head>
 <body>
     <div class="container login-container">
@@ -109,11 +105,6 @@ if (isset($_GET['token']) && isset($_GET['email'])) {
             </div>
         </div>
     </div>
-
-    <!-- Bootstrap JS e dipendenze -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
 

@@ -1,4 +1,9 @@
 <?php
+// Impostazioni di sicurezza per la sessione
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1);
+ini_set('session.use_strict_mode', 1);
+
 session_start();
 
 if (!isset($_SESSION['username'])) {
@@ -130,9 +135,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <title>Profilo utente</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-	<!-- Custom CSS -->
-	<link href="../my.css" rel="stylesheet">
+    <?php include "../script.php" ?>
 	<style>
         body {
             padding-top: 56px;
@@ -156,53 +159,49 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
         ?>
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-            <div class="form-group">
+            <div class="mb-3">
                 <label for="name">Nome</label>
                 <input type="text" name="name" id="name" class="form-control" value="<?php echo htmlspecialchars($name); ?>" required>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label for="surname">Cognome</label>
                 <input type="text" name="surname" id="surname" class="form-control" value="<?php echo htmlspecialchars($surname); ?>" required>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label for="email">Email</label>
                 <input type="email" name="email" id="email" class="form-control" value="<?php echo htmlspecialchars($email); ?>" required>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label for="username">Nome utente</label>
                 <input type="text" name="username" id="username" class="form-control" value="<?php echo htmlspecialchars($username); ?>" readonly required>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label for="salary_date">Data di accredito dello stipendio</label>
                 <input type="number" name="salary_date" id="salary_date" class="form-control" value="<?php echo htmlspecialchars($salary_date); ?>">
             </div>
             <hr>
-            <div class="form-group">
+            <div class="mb-3">
                 <p>Se vuoi aggiornare la password, compila anche i campi sottostanti, altrimenti lasciali vuoti.</p>
                 <label for="current_password">Password corrente</label>
                 <input type="password" name="current_password" id="current_password" class="form-control" placeholder="Inserisci qui la tua password attuale">
                 <span class="text-danger"><?php echo $current_password_err; ?></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label for="new_password">Nuova password</label>
                 <input type="password" name="new_password" id="new_password" class="form-control" placeholder="Inserisci la nuova password">
                 <span class="text-danger"><?php echo $new_password_err; ?></span>
             </div>
-            <div class="form-group">
+            <div class="mb-3">
                 <label for="confirm_password">Conferma password</label>
                 <input type="password" name="confirm_password" id="confirm_password" class="form-control" placeholder="Conferma la nuova password">
                 <span class="text-danger"><?php echo $confirm_password_err; ?></span>
             </div>
-            <div class="form-group">
-                <button type="submit" class="btn btn-primary btn-block">Modifica Profilo</button>
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary w-100">Modifica Profilo</button>
             </div>
         </form>
         <p class="text-center">Hai cambiato idea? <a href="../">Torna alla Dashboard</a></p>
     </div>
 	<?php include '../footer.php'; ?>
-
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
