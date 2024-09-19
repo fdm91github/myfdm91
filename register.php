@@ -17,11 +17,6 @@ require_once 'config.php';
 $error_message = '';
 $success_message = '';
 
-// Generate a simple CAPTCHA (optional, since we're adding reCAPTCHA)
-$verification_num1 = rand(1, 10);
-$verification_num2 = rand(1, 10);
-$verification_answer = $verification_num1 + $verification_num2;
-
 // Generate CSRF token
 if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -34,37 +29,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $error_message = "Richiesta non valida. Per favore riprova.";
     } else {
         // Validate reCAPTCHA
-        if (!isset($_POST['g-recaptcha-response']) || empty($_POST['g-recaptcha-response'])) {
-            $error_message = "Per favore, verifica di non essere un robot.";
+        if (!isset($_POST['recaptcha_token']) || empty($_POST['recaptcha_token'])) {
+            $error_message = "Errore nella verifica reCAPTCHA. Per favore riprova.";
         } else {
             // Your secret key
-            $secret = '6LfGlkkqAAAAAD5Vxj0v69M1FRCv4sRAR-af3Qvd';
+            $secret = '6LfGlkkqAAAAAD5Vxj0v69M1FRCv4sRAR-af3Qvd'; // Replace with your Secret Key
 
             // Verify the reCAPTCHA response
-            $recaptcha_response = $_POST['g-recaptcha-response'];
+            $recaptcha_token = $_POST['recaptcha_token'];
             $remote_ip = $_SERVER['REMOTE_ADDR'];
 
-            // Make and decode POST request:
+            // Prepare the POST request to Google's API using cURL
             $recaptcha_url = 'https://www.google.com/recaptcha/api/siteverify';
             $recaptcha_data = [
                 'secret' => $secret,
-                'response' => $recaptcha_response,
+                'response' => $recaptcha_token,
                 'remoteip' => $remote_ip
             ];
 
-            $options = [
-                'http' => [
-                    'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
-                    'method'  => 'POST',
-                    'content' => http_build_query($recaptcha_data),
-                ],
-            ];
-            $context  = stream_context_create($options);
-            $verify = file_get_contents($recaptcha_url, false, $context);
-            $captcha_success = json_decode($verify);
+            $ch = curl_init($recaptcha_url);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($recaptcha_data));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $recaptcha_response = curl_exec($ch);
+            curl_close($ch);
 
-            if ($captcha_success->success != true) {
-                $error_message = "Errore nella verifica reCAPTCHA. Per favore riprova.";
+            $captcha_success = json_decode($recaptcha_response);
+
+            if ($captcha_success->success != true || $captcha_success->score < 0.5) { // Adjust score threshold as needed
+                $error_message = "La verifica reCAPTCHA non è riuscita. Per favore riprova.";
             } else {
                 // Sanitize and validate input data
                 $name = trim($_POST['name']);
@@ -73,17 +66,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $username = trim($_POST['username']);
                 $password = $_POST['password'];
                 $confirm_password = $_POST['confirm_password'];
-                $user_answer = trim($_POST['verification_answer']);
 
                 // Basic validation
-                if (empty($name) || empty($surname) || empty($email) || empty($username) || empty($password) || empty($confirm_password) || empty($user_answer)) {
+                if (empty($name) || empty($surname) || empty($email) || empty($username) || empty($password) || empty($confirm_password)) {
                     $error_message = "Tutti i campi sono obbligatori.";
                 } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                     $error_message = "Indirizzo email non valido.";
                 } elseif ($password !== $confirm_password) {
                     $error_message = "Le password non corrispondono.";
-                } elseif ((int)$user_answer !== $verification_answer) {
-                    $error_message = "Sei proprio sicuro di essere un umano?";
                 } else {
                     // Check if username or email already exists
                     $sql = "SELECT id FROM users WHERE username = ? OR email = ?";
@@ -125,7 +115,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Regenerate CSRF token after form submission
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
     }
-    
+
     $link->close();
 }
 ?>
@@ -136,15 +126,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrazione</title>
 	<?php include 'script.php' ?>
-    <!-- reCAPTCHA API -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <!-- reCAPTCHA v3 API -->
+    <script src="https://www.google.com/recaptcha/api.js?render=6LfGlkkqAAAAAN0IBdrheLb7z0yyDuN4IHW2Tia_"></script>
 </head>
 <body>
     <!-- Register Form -->
     <div class="container register-form">
-        <div class="card">
-            <div class="card-header text-center bg-primary text-white">
-                <h2>Registrati su MyFDM91</h2>
+        <div class="card register-card">
+            <div class="card-header text-center">
+                <h4>Registrati su MyFDM91</h4>
             </div>
             <div class="card-body">
                 <?php if (!empty($error_message)): ?>
@@ -210,25 +200,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             Conferma la tua password.
                         </div>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label for="verification_question" class="form-label">
-                            Verifica di essere un umano: quanto fa <?= $verification_num1 ?> + <?= $verification_num2 ?>?
-                        </label>
-                        <input type="number" name="verification_answer" id="verification_question" class="form-control" placeholder="La tua risposta" required>
-                        <div class="invalid-feedback">
-                            Rispondi alla domanda di verifica.
-                        </div>
-                    </div>
 
-                    <!-- Google reCAPTCHA Widget -->
-                    <div class="mb-3">
-                        <div class="g-recaptcha" data-sitekey="6LfGlkkqAAAAAN0IBdrheLb7z0yyDuN4IHW2Tia_"></div>
-                        <div class="invalid-feedback d-block" id="recaptcha-error" style="display: none;">
-                            Per favore, verifica di non essere un robot.
-                        </div>
-                    </div>
-                    
+                    <!-- Google reCAPTCHA v3 Token -->
+                    <input type="hidden" name="recaptcha_token" id="recaptcha_token">
+
                     <div class="mb-3">
                         <button type="submit" class="btn btn-primary w-100">Registrati</button>
                     </div>
@@ -238,32 +213,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
         </div>
     </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Google reCAPTCHA v3 Integration -->
     <script>
+        grecaptcha.ready(function() {
+            grecaptcha.execute('6LfGlkkqAAAAAN0IBdrheLb7z0yyDuN4IHW2Tia_', {action: 'register'}).then(function(token) {
+                // Add your logic to submit to your backend server here.
+                var recaptchaToken = document.getElementById('recaptcha_token');
+                recaptchaToken.value = token;
+            });
+        });
+
+        // Bootstrap form validation
         (function () {
             'use strict'
-            // Fetch all the forms we want to apply custom Bootstrap validation styles to
             var forms = document.querySelectorAll('form')
 
-            // Loop over them and prevent submission
             Array.prototype.slice.call(forms)
                 .forEach(function (form) {
                     form.addEventListener('submit', function (event) {
-                        // Check if reCAPTCHA is checked
-                        var recaptcha = grecaptcha.getResponse();
-                        if (recaptcha.length === 0) {
-                            // Not verified
-                            event.preventDefault()
-                            event.stopPropagation()
-                            document.getElementById('recaptcha-error').style.display = 'block';
-                        } else {
-                            document.getElementById('recaptcha-error').style.display = 'none';
-                        }
-
                         if (!form.checkValidity()) {
                             event.preventDefault()
                             event.stopPropagation()
                         }
-
                         form.classList.add('was-validated')
                     }, false)
                 })
