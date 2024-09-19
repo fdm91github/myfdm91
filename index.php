@@ -1,4 +1,9 @@
 <?php
+// Impostazioni di sicurezza per la sessione
+ini_set('session.cookie_httponly', 1);
+ini_set('session.cookie_secure', 1);
+ini_set('session.use_strict_mode', 1);
+
 session_start();
 if (!isset($_SESSION['username'])) {
     header("location: login.php");
@@ -15,12 +20,7 @@ if (!isset($_SESSION['username'])) {
     <meta name="theme-color" content="#007bff">
     <link rel="icon" href="icon-192x192.png">
     <title>Seleziona un servizio</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Lottie Web Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.7.6/lottie.min.js"></script>
-    <!-- Custom CSS -->
-    <link href="my.css" rel="stylesheet">
+	<?php include 'script.php' ?>
     <style>
         .card-text {
             white-space: nowrap;
@@ -28,8 +28,8 @@ if (!isset($_SESSION['username'])) {
             text-overflow: ellipsis;
         }
         .lottie-animation {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             margin: auto;
         }
     </style>
@@ -79,11 +79,6 @@ if (!isset($_SESSION['username'])) {
             </div>
         </div>
     </div>
-	
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var animations = document.querySelectorAll('.lottie-animation');
