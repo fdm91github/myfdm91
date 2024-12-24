@@ -24,6 +24,10 @@
                         <label for="addInsuranceBuyingDate">Data di acquisto</label>
                         <input type="date" name="buying_date" id="addInsuranceBuyingDate" class="form-control" required>
                     </div>
+                    <div class="form-group">
+                        <label for="addInsuranceEffectiveDate">Data di decorrenza</label>
+                        <input type="date" name="effective_date" id="addInsuranceEffectiveDate" class="form-control" required>
+                    </div>
                     <button type="submit" class="btn btn-primary btn-block">Aggiungi</button>
                 </form>
             </div>

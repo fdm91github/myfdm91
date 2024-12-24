@@ -12,7 +12,7 @@
                 <div id="editInsuranceStatus"></div>
                 <form id="editInsuranceForm">
                     <input type="hidden" name="id" id="editInsuranceId">
-                    <input type="hidden" name="vehicle_id" id="editInsuranceVehicleId"> <!-- Hidden vehicle_id -->
+                    <input type="hidden" name="vehicle_id" id="editInsuranceVehicleId">
                     <div class="form-group">
                         <label for="editInsuranceCompany">Compagnia assicurativa</label>
                         <input type="text" name="company" id="editInsuranceCompany" class="form-control" required>
@@ -25,6 +25,10 @@
                         <label for="editInsuranceBuyingDate">Data di acquisto</label>
                         <input type="date" name="buying_date" id="editInsuranceBuyingDate" class="form-control" required>
                     </div>
+                    <div class="form-group">
+                        <label for="editInsuranceEffectiiveDate">Decorrenza</label>
+                        <input type="date" name="effective_date" id="editInsuranceEffectiveDate" class="form-control" required>
+                    </div>
                     <button type="submit" class="btn btn-primary btn-block">Aggiorna</button>
                 </form>
             </div>
@@ -35,18 +39,20 @@
 <script>
     $(document).ready(function() {
         $('#editInsuranceModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget); // Button that triggered the modal
+            var button = $(event.relatedTarget);
             var id = button.data('id');
             var company = button.data('company');
             var amount = button.data('amount');
             var buying_date = button.data('buying-date');
-            var vehicleId = button.data('vehicle-id');  // Ensure vehicle_id is passed
+            var effective_date = button.data('effective-date');
+            var vehicleId = button.data('vehicle-id');
 
             $('#editInsuranceId').val(id);
             $('#editInsuranceCompany').val(company);
             $('#editInsuranceAmount').val(amount);
             $('#editInsuranceBuyingDate').val(buying_date);
-            $('#editInsuranceVehicleId').val(vehicleId);  // Set the hidden vehicle_id field
+            $('#editInsuranceEffectiveDate').val(effective_date);
+            $('#editInsuranceVehicleId').val(vehicleId);
         });
 
         $('#editInsuranceForm').submit(function(e) {

@@ -50,7 +50,7 @@ include 'retrieveData.php';
                                         <thead>
                                             <tr>
                                                 <th>Costo</th>
-                                                <th>Data di acquisto</th>
+						<th>Data del pagamento</th>
                                                 <th>Azioni</th>
                                             </tr>
                                         </thead>

@@ -59,7 +59,7 @@ function countMaintenancesLastYear($link, $user_id, $oneYearAgo, $today) {
 
 // Creo una funzione per calcolare il costo dell'ultima manutenzione
 function costOfLastMaintenance($link, $user_id) {
-    $sql = "SELECT amount FROM vehicle_services WHERE user_id = ? ORDER BY buying_date DESC LIMIT 1";
+    $sql = "SELECT amount FROM vehicle_services WHERE user_id = ? and amount>0 ORDER BY buying_date DESC LIMIT 1";
     $params = ["i", $user_id];
     $result = executeQuery($link, $sql, $params);
     return $result['amount'] ? $result['amount'] : 0;
@@ -135,7 +135,7 @@ foreach ($vehicleServiceParts as $part) {
 }
 
 // Recupero tutte le assicurazioni
-$vehicleInsurances = executeQuery($link, "SELECT id, vehicle_id, company, amount, buying_date FROM vehicle_insurances WHERE user_id = ? ORDER BY buying_date DESC", ["i", $user_id], false);
+$vehicleInsurances = executeQuery($link, "SELECT id, vehicle_id, company, amount, buying_date, effective_date FROM vehicle_insurances WHERE user_id = ? ORDER BY buying_date DESC", ["i", $user_id], false);
 
 // Recupero tutte le revisioni
 $vehicleRevisions = executeQuery($link, "SELECT id, vehicle_id, amount, buying_date FROM vehicle_revisions WHERE user_id = ? ORDER BY buying_date DESC", ["i", $user_id], false);

@@ -52,6 +52,7 @@ include 'retrieveData.php';
                                                 <th>Compagnia</th>
                                                 <th>Costo</th>
                                                 <th>Data di acquisto</th>
+						<th>Decorrenza </th>
                                                 <th>Azioni</th>
                                             </tr>
                                         </thead>
@@ -63,6 +64,7 @@ include 'retrieveData.php';
                                                 <td><?php echo htmlspecialchars($insurance['company']); ?></td>
                                                 <td><?php echo htmlspecialchars($insurance['amount']); ?></td>
                                                 <td><?php echo htmlspecialchars(formatDate($insurance['buying_date'])); ?></td>
+                                                <td><?php echo htmlspecialchars(formatDate($insurance['effective_date'])); ?></td>
                                                 <td>
                                                     <button class="btn btn-warning btn-sm"
                                                             data-toggle="modal"
@@ -70,7 +72,8 @@ include 'retrieveData.php';
                                                             data-id="<?php echo $insurance['id']; ?>"
                                                             data-company="<?php echo htmlspecialchars($insurance['company']); ?>"
                                                             data-amount="<?php echo htmlspecialchars($insurance['amount']); ?>"
-                                                            data-buying-date="<?php echo htmlspecialchars($insurance['buying_date']); ?>">
+                                                            data-buying-date="<?php echo htmlspecialchars($insurance['buying_date']); ?>"
+                                                            data-effective-date="<?php echo htmlspecialchars($insurance['effective_date']); ?>">
                                                         <i class="bi bi-pencil"></i>
                                                     </button>
                                                     <button class="btn btn-danger btn-sm"

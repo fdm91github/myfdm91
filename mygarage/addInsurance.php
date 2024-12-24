@@ -12,28 +12,29 @@ $response = ["status" => "error", "message" => ""];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user_id = $_SESSION['id'];
-    $vehicle_id = trim($_POST['vehicle_id']); // Get the vehicle_id from the POST data
+    $vehicle_id = trim($_POST['vehicle_id']);
     $company = trim($_POST["company"]);
     $amount = trim($_POST["amount"]);
     $buying_date = trim($_POST["buying_date"]);
+    $effective_date = trim($_POST["effective_date"]);
 
     // Convalido i dati
-    if (empty($vehicle_id) || empty($company) || empty($amount) || empty($buying_date)) {
-        $response["message"] = "Inserisci tutti i campi obbligatori.";
+    if (empty($vehicle_id) || empty($company) || empty($amount) || empty($buying_date) || empty($effective_date)) {
+        $response["message"] = "Tutti i campi sono obbligatori.";
     } else {
         // Verifico la presenza di duplicati
-        $check_sql = "SELECT id FROM vehicle_insurances WHERE user_id = ? AND vehicle_id = ? AND buying_date = ?";
+        $check_sql = "SELECT id FROM vehicle_insurances WHERE user_id = ? AND vehicle_id = ? AND buying_date = ? AND effective_date = ?";
         if ($check_stmt = $link->prepare($check_sql)) {
-            $check_stmt->bind_param("iis", $user_id, $vehicle_id, $buying_date);
+            $check_stmt->bind_param("iiss", $user_id, $vehicle_id, $buying_date, $effective_date);
             $check_stmt->execute();
             $check_stmt->store_result();
             
             if ($check_stmt->num_rows > 0) {
-                $response["message"] = "Il veicolo ha già un'assicurazione per la stessa data.";
+                $response["message"] = "Il veicolo è già assicurato per la data indicata.";
             } else {
-                $sql = "INSERT INTO vehicle_insurances (user_id, vehicle_id, company, amount, buying_date) VALUES (?, ?, ?, ?, ?)";
+                $sql = "INSERT INTO vehicle_insurances (user_id, vehicle_id, company, amount, buying_date, effective_date) VALUES (?, ?, ?, ?, ?, ?)";
                 if ($stmt = $link->prepare($sql)) {
-                    $stmt->bind_param("iisss", $user_id, $vehicle_id, $company, $amount, $buying_date);
+                    $stmt->bind_param("iissss", $user_id, $vehicle_id, $company, $amount, $buying_date, $effective_date);
                     if ($stmt->execute()) {
                         $response["status"] = "success";
                         $response["message"] = "Assicurazione aggiunta con successo!";
