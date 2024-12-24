@@ -46,9 +46,8 @@ include 'retrieveData.php';
                     <div class="col-12 col-md-6">
 						<h5>Prossime scadenze</h5><br/>
                         <p><b><?php echo isset($nearestTaxExpirationVehicle) ? "Il bollo del veicolo $nearestTaxExpirationVehicle scade il " . htmlspecialchars(formatDate($nearestTaxExpirationDate)) : "Nessuna scadenza impostata per il bollo"; ?></b></p>
-                        <p><b><?php echo isset($nearestServiceExpirationDate) ? "Il tagliando del veicolo $nearestServiceExpirationVehicle scade il  " . htmlspecialchars(formatDate($nearestServiceExpirationDate)) : "Nessuna scadenza impostata per il tagliando"; ?></b></p>
 						<p><b><?php echo isset($nearestRevisionExpirationDate) ? "La revisione del veicolo $nearestRevisionExpirationVehicle scade il " . htmlspecialchars(formatDate($nearestRevisionExpirationDate)) : "Nessuna scadenza impostata per la revisione"; ?></b></p>
-						<p><b><?php echo isset($nearestInsuranceExpirationDate) ? "L'assicurazione del veicolo $nearestInsuranceExpirationVehicle scade il " . htmlspecialchars(formatDate($nearestRevisionExpirationDate)) : "Nessuna scadenza impostata per l'assicurazione"; ?></b></p>
+						<p><b><?php echo isset($nearestInsuranceExpirationDate) ? "L'assicurazione del veicolo $nearestInsuranceExpirationVehicle scade il " . htmlspecialchars(formatDate($nearestInsuranceExpirationDate)) : "Nessuna scadenza impostata per l'assicurazione"; ?></b></p>
                     </div>
                 </div>
             </div>

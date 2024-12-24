@@ -84,7 +84,7 @@ function getNextExpirationDate($month) {
 }
 
 // Recupero i veicoli dell'utente corrente
-$vehiclesQuery = executeQuery($link, "SELECT id, description, buying_date, plate_number, chassis_number, tax_month, revision_month, insurance_expiration_date, deleted_at FROM vehicles WHERE user_id = ? ORDER BY id ASC", ["i", $user_id], false);
+$vehiclesQuery = executeQuery($link, "SELECT id, description, buying_date, plate_number, chassis_number, tax_month, revision_month, deleted_at FROM vehicles WHERE user_id = ? ORDER BY id ASC", ["i", $user_id], false);
 $vehicles = [];
 
 foreach ($vehiclesQuery as $vehicle) {
@@ -95,11 +95,28 @@ foreach ($vehiclesQuery as $vehicle) {
     $chassisNumber = $vehicle['chassis_number'];
     $taxMonth = $vehicle['tax_month'];
     $revisionMonth = $vehicle['revision_month'];
-    $insuranceExpirationDate = $vehicle['insurance_expiration_date'];
     $deletedAt = $vehicle['deleted_at'];
 
-	$nextTaxExpirationDate = getNextExpirationDate($taxMonth);
-	$nextRevisionExpirationDate = getNextExpirationDate($revisionMonth);
+    $nextTaxExpirationDate = getNextExpirationDate($taxMonth);
+    $nextRevisionExpirationDate = getNextExpirationDate($revisionMonth);
+
+    // Calcolo della prossima scadenza dell'assicurazione
+    $vehicleInsurance = executeQuery(
+        $link,
+        "SELECT effective_date FROM vehicle_insurances 
+         WHERE user_id = ? AND vehicle_id = ? 
+         ORDER BY effective_date DESC LIMIT 1",
+        ["ii", $user_id, $id]
+    );
+
+    if ($vehicleInsurance && isset($vehicleInsurance['effective_date'])) {
+        $effectiveDate = $vehicleInsurance['effective_date'];
+        $nextInsuranceExpirationDate = (new DateTime($effectiveDate))
+            ->modify('+1 year')
+            ->format('Y-m-d');
+    } else {
+        $nextInsuranceExpirationDate = null;
+    }
 
     $vehicles[] = [
         'id' => $id,
@@ -109,9 +126,9 @@ foreach ($vehiclesQuery as $vehicle) {
         'chassisNumber' => $chassisNumber,
         'nextTaxExpirationDate' => $nextTaxExpirationDate,
         'nextRevisionExpirationDate' => $nextRevisionExpirationDate,
-        'nextInsuranceExpirationDate' => $insuranceExpirationDate,
-		'taxMonth' => $taxMonth,
-		'revisionMonth' => $revisionMonth,
+        'nextInsuranceExpirationDate' => $nextInsuranceExpirationDate,
+        'taxMonth' => $taxMonth,
+        'revisionMonth' => $revisionMonth,
         'deletedAt' => $deletedAt
     ];
 }
