@@ -35,14 +35,6 @@
                         <label for="addVehicleTaxExpiryMonth">Mese di scadenza del bollo</label>
                         <input type="text" name="tax_expiry_month" id="addVehicleTaxExpiryMonth" class="form-control" placeholder="Mese di scadenza del bollo" required>
                     </div>
-                    <div class="form-group">
-                        <label for="addVehicleInspectionExpiryMonth">Mese di scadenza della revisione</label>
-                        <input type="text" name="inspection_expiry_month" id="addVehicleInspectionExpiryMonth" class="form-control" placeholder="Mese di scadenza della revisione" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="addVehicleInsuranceExpirationDate">Data di scadenza dell'assicurazione</label>
-                        <input type="date" name="insurance_expiry_date" id="addVehicleInsuranceExpirationDate" class="form-control" required>
-                    </div>
                     <button type="submit" class="btn btn-primary btn-block">Aggiungi</button>
                 </form>
             </div>

@@ -18,11 +18,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $plate_number = trim($_POST["plate"]);
     $chassis_number = trim($_POST["chassis_number"]);
     $tax_month = trim($_POST["tax_expiry_month"]);
-    $revision_month = trim($_POST["inspection_expiry_month"]);
-    $insurance_expiration_date = trim($_POST["insurance_expiry_date"]);
 
     // Convalido i dati
-    if (empty($description) || empty($buying_date) || empty($registration_date) || empty($plate_number) || empty($chassis_number) || empty($tax_month) || empty($revision_month) || empty($insurance_expiration_date)) {
+    if (empty($description) || empty($buying_date) || empty($registration_date) || empty($plate_number) || empty($chassis_number) || empty($tax_month)) {
         $response["message"] = "Inserisci tutti i campi obbligatori.";
     } else {
         // Verifico la presenza di duplicati
@@ -35,9 +33,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($check_stmt->num_rows > 0) {
                 $response["message"] = "Il veicolo che stai provando ad aggiungere esiste già.";
             } else {
-                $sql = "INSERT INTO vehicles (user_id, description, buying_date, registration_date, plate_number, chassis_number, tax_month, revision_month, insurance_expiration_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $sql = "INSERT INTO vehicles (user_id, description, buying_date, registration_date, plate_number, chassis_number, tax_month) VALUES (?, ?, ?, ?, ?, ?, ?)";
                 if ($stmt = $link->prepare($sql)) {
-                    $stmt->bind_param("issssssss", $user_id, $description, $buying_date, $registration_date, $plate_number, $chassis_number, $tax_month, $revision_month, $insurance_expiration_date);
+                    $stmt->bind_param("issssss", $user_id, $description, $buying_date, $registration_date, $plate_number, $chassis_number, $tax_month);
                     if ($stmt->execute()) {
                         $response["status"] = "success";
                         $response["message"] = "Veicolo aggiunto con successo!";

@@ -16,13 +16,13 @@ $success_message = '';
 
 if ($vehicle_id) {
     // Fetch existing vehicle details
-    $sql = "SELECT description, buying_date, registration_date, plate_number, chassis_number, tax_month, revision_month, insurance_expiration_date 
+    $sql = "SELECT description, buying_date, registration_date, plate_number, chassis_number, tax_month 
             FROM vehicles 
             WHERE id = ? AND user_id = ?";
     if ($stmt = $link->prepare($sql)) {
         $stmt->bind_param("ii", $vehicle_id, $user_id);
         $stmt->execute();
-        $stmt->bind_result($description, $buying_date, $registration_date, $plate_number, $chassis_number, $tax_month, $revision_month, $insurance_expiration_date);
+        $stmt->bind_result($description, $buying_date, $registration_date, $plate_number, $chassis_number, $tax_month);
         $stmt->fetch();
         $stmt->close();
     } else {
@@ -40,18 +40,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $plate_number = trim($_POST['plate_number']);
     $chassis_number = trim($_POST['chassis_number']);
     $tax_month = trim($_POST['tax_month']);
-    $revision_month = trim($_POST['revision_month']);
-    $insurance_expiration_date = trim($_POST['insurance_expiration_date']);
 
     // Validate inputs
-    if (empty($description) || empty($buying_date) || empty($registration_date) || empty($plate_number) || empty($chassis_number) || empty($tax_month) || empty($revision_month) || empty($insurance_expiration_date)) {
+    if (empty($description) || empty($buying_date) || empty($registration_date) || empty($plate_number) || empty($chassis_number) || empty($tax_month)) {
         $error_message = "Inserisci tutti i campi obbligatori.";
     } else {
         $sql = "UPDATE vehicles 
-                SET description = ?, buying_date = ?, registration_date = ?, plate_number = ?, chassis_number = ?, tax_month = ?, revision_month = ?, insurance_expiration_date = ? 
+                SET description = ?, buying_date = ?, registration_date = ?, plate_number = ?, chassis_number = ?, tax_month = ? 
                 WHERE id = ? AND user_id = ?";
         if ($stmt = $link->prepare($sql)) {
-            $stmt->bind_param("ssssssssii", $description, $buying_date, $registration_date, $plate_number, $chassis_number, $tax_month, $revision_month, $insurance_expiration_date, $vehicle_id, $user_id);
+            $stmt->bind_param("ssssssii", $description, $buying_date, $registration_date, $plate_number, $chassis_number, $tax_month, $vehicle_id, $user_id);
             if ($stmt->execute()) {
                 $success_message = "Veicolo modificato con successo. Reindirizzamento alla dashboard...";
                 header("refresh:3;url=dashboard.php");

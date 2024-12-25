@@ -125,7 +125,6 @@ foreach ($vehicles as $vehicle) {
 										data-plate-number="<?php echo htmlspecialchars($vehicle['plateNumber']); ?>"
 										data-chassis-number="<?php echo htmlspecialchars($vehicle['chassisNumber']); ?>"
 										data-tax-month="<?php echo htmlspecialchars($vehicle['taxMonth']); ?>"
-										data-revision-month="<?php echo htmlspecialchars($vehicle['revisionMonth']); ?>"
 										data-insurance-expiration-date="<?php echo htmlspecialchars($vehicle['nextInsuranceExpirationDate']); ?>">
 									<i class="bi bi-pencil"></i>
 								</button>

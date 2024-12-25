@@ -105,7 +105,7 @@ function getNextRevisionExpirationDate($link, $vehicleId, $registrationDate) {
 }
 
 // Recupero i veicoli dell'utente corrente
-$vehiclesQuery = executeQuery($link, "SELECT id, description, buying_date, registration_date, plate_number, chassis_number, tax_month, revision_month, deleted_at FROM vehicles WHERE user_id = ? ORDER BY id ASC", ["i", $user_id], false);
+$vehiclesQuery = executeQuery($link, "SELECT id, description, buying_date, registration_date, plate_number, chassis_number, tax_month, deleted_at FROM vehicles WHERE user_id = ? ORDER BY id ASC", ["i", $user_id], false);
 $vehicles = [];
 
 foreach ($vehiclesQuery as $vehicle) {
@@ -116,7 +116,6 @@ foreach ($vehiclesQuery as $vehicle) {
     $plateNumber = $vehicle['plate_number'];
     $chassisNumber = $vehicle['chassis_number'];
     $taxMonth = $vehicle['tax_month'];
-    $revisionMonth = $vehicle['revision_month'];
     $deletedAt = $vehicle['deleted_at'];
 
     $nextTaxExpirationDate = getNextTaxExpirationDate($taxMonth);
@@ -151,7 +150,6 @@ foreach ($vehiclesQuery as $vehicle) {
         'nextRevisionExpirationDate' => $nextRevisionExpirationDate,
         'nextInsuranceExpirationDate' => $nextInsuranceExpirationDate,
         'taxMonth' => $taxMonth,
-        'revisionMonth' => $revisionMonth,
         'deletedAt' => $deletedAt
     ];
 }

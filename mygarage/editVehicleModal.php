@@ -36,14 +36,6 @@
                         <label for="editVehicleTaxMonth">Mese di scadenza del bollo</label>
                         <input type="text" name="tax_month" id="editVehicleTaxMonth" class="form-control" required>
                     </div>
-                    <div class="form-group">
-                        <label for="editVehicleRevisionMonth">Mese di scadenza della revisione</label>
-                        <input type="text" name="revision_month" id="editVehicleRevisionMonth" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editVehicleInsuranceExpirationDate">Data di scadenza dell'assicurazione</label>
-                        <input type="date" name="insurance_expiration_date" id="editVehicleInsuranceExpirationDate" class="form-control" required>
-                    </div>
                     <button type="submit" class="btn btn-primary btn-block">Aggiorna</button>
                 </form>
             </div>
@@ -79,8 +71,6 @@
             var plateNumber = button.data('plate-number');
             var chassisNumber = button.data('chassis-number');
             var taxMonth = button.data('tax-month');
-            var revisionMonth = button.data('revision-month');
-            var insuranceExpirationDate = button.data('insurance-expiration-date');
 
             $('#editVehicleId').val(id);
             $('#editVehicleDescription').val(description);
@@ -89,8 +79,6 @@
             $('#editVehiclePlateNumber').val(plateNumber);
             $('#editVehicleChassisNumber').val(chassisNumber);
             $('#editVehicleTaxMonth').val(taxMonth);
-            $('#editVehicleRevisionMonth').val(revisionMonth);
-            $('#editVehicleInsuranceExpirationDate').val(insuranceExpirationDate);
         });
 
         $('#editVehicleForm').submit(function(e) {
