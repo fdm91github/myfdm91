@@ -65,8 +65,8 @@ function costOfLastMaintenance($link, $user_id) {
     return $result['amount'] ? $result['amount'] : 0;
 }
 
-// Creo una funzione per calcolare le scadenze di bollo e revisione
-function getNextExpirationDate($month) {
+// Creo una funzione per calcolare la prossima scadenza del bollo
+function getNextTaxExpirationDate($month) {
     $currentYear = date('Y');
     $currentMonth = date('n');
 
@@ -83,22 +83,44 @@ function getNextExpirationDate($month) {
     return $date->format('Y-m-d');
 }
 
+// Creo una funzione per calcolare la prossima scadenza della revisione
+function getNextRevisionExpirationDate($link, $vehicleId, $registrationDate) {
+    $sql = "SELECT buying_date FROM vehicle_revisions 
+            WHERE vehicle_id = ? 
+            ORDER BY buying_date DESC 
+            LIMIT 1";
+    $params = ["i", $vehicleId];
+    $revision = executeQuery($link, $sql, $params);
+
+    if ($revision && isset($revision['buying_date'])) {
+        $revisionDate = new DateTime($revision['buying_date']);
+        $revisionDate->modify('+2 years');
+    } else {
+        $revisionDate= new DateTime($registrationDate);
+        $revisionDate->modify('+4 years');
+    }
+
+    $revisionDate->modify('last day of this month');
+    return $revisionDate->format('Y-m-d');
+}
+
 // Recupero i veicoli dell'utente corrente
-$vehiclesQuery = executeQuery($link, "SELECT id, description, buying_date, plate_number, chassis_number, tax_month, revision_month, deleted_at FROM vehicles WHERE user_id = ? ORDER BY id ASC", ["i", $user_id], false);
+$vehiclesQuery = executeQuery($link, "SELECT id, description, buying_date, registration_date, plate_number, chassis_number, tax_month, revision_month, deleted_at FROM vehicles WHERE user_id = ? ORDER BY id ASC", ["i", $user_id], false);
 $vehicles = [];
 
 foreach ($vehiclesQuery as $vehicle) {
     $id = $vehicle['id'];
     $description = $vehicle['description'];
     $buyingDate = $vehicle['buying_date'];
+    $registrationDate = $vehicle['registration_date'];
     $plateNumber = $vehicle['plate_number'];
     $chassisNumber = $vehicle['chassis_number'];
     $taxMonth = $vehicle['tax_month'];
     $revisionMonth = $vehicle['revision_month'];
     $deletedAt = $vehicle['deleted_at'];
 
-    $nextTaxExpirationDate = getNextExpirationDate($taxMonth);
-    $nextRevisionExpirationDate = getNextExpirationDate($revisionMonth);
+    $nextTaxExpirationDate = getNextTaxExpirationDate($taxMonth);
+    $nextRevisionExpirationDate = getNextRevisionExpirationDate($link, $id, $registrationDate);
 
     // Calcolo della prossima scadenza dell'assicurazione
     $vehicleInsurance = executeQuery(
@@ -122,6 +144,7 @@ foreach ($vehiclesQuery as $vehicle) {
         'id' => $id,
         'description' => $description,
         'buyingDate' => $buyingDate,
+        'registrationDate' => $registrationDate,
         'plateNumber' => $plateNumber,
         'chassisNumber' => $chassisNumber,
         'nextTaxExpirationDate' => $nextTaxExpirationDate,

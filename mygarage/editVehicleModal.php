@@ -21,6 +21,10 @@
                         <input type="date" name="buying_date" id="editVehicleBuyingDate" class="form-control" required>
                     </div>
                     <div class="form-group">
+                        <label for="editVehicleRegistrationDate">Data di immatricolazione</label>
+                        <input type="date" name="registration_date" id="editVehicleRegistrationDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
                         <label for="editVehiclePlateNumber">Targa</label>
                         <input type="text" name="plate_number" id="editVehiclePlateNumber" class="form-control" required>
                     </div>
@@ -71,6 +75,7 @@
             var id = button.data('id');
             var description = button.data('description');
             var buyingDate = button.data('buying-date');
+            var registrationDate = button.data('registration-date');
             var plateNumber = button.data('plate-number');
             var chassisNumber = button.data('chassis-number');
             var taxMonth = button.data('tax-month');
@@ -80,6 +85,7 @@
             $('#editVehicleId').val(id);
             $('#editVehicleDescription').val(description);
             $('#editVehicleBuyingDate').val(buyingDate);
+            $('#editVehicleRegistrationDate').val(registrationDate);
             $('#editVehiclePlateNumber').val(plateNumber);
             $('#editVehicleChassisNumber').val(chassisNumber);
             $('#editVehicleTaxMonth').val(taxMonth);

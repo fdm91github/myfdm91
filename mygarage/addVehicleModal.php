@@ -20,6 +20,10 @@
                         <input type="date" name="buying_date" id="addVehicleBuyingDate" class="form-control" required>
                     </div>
                     <div class="form-group">
+                        <label for="addVehicleRegistrationDate">Data di immatricolazione</label>
+                        <input type="date" name="registration_date" id="addVehicleRegistrationDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
                         <label for="addVehiclePlateNumber">Targa</label>
                         <input type="text" name="plate" id="addVehiclePlateNumber" class="form-control" placeholder="Targa" required>
                     </div>

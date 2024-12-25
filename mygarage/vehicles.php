@@ -108,7 +108,8 @@ foreach ($vehicles as $vehicle) {
                                 <p class="card-text mt-3">
 									<h5>Dati veicolo</h5>
                                     <strong>Nr. di telaio:</strong> <?php echo htmlspecialchars($vehicle['chassisNumber']); ?><br>
-									<strong>Data di acquisto:</strong> <?php echo htmlspecialchars(formatDate($vehicle['buyingDate'])); ?><br>
+				    <strong>Data di acquisto:</strong> <?php echo htmlspecialchars(formatDate($vehicle['buyingDate'])); ?><br>
+				    <strong>Data di immatricolazione:</strong> <?php echo htmlspecialchars(formatDate($vehicle['registrationDate'])); ?><br>
 									<br/><h5>Scadenze</h5>
                                     <strong>Scadenza assicurazione:</strong> <?php echo htmlspecialchars(formatDate($vehicle['nextInsuranceExpirationDate'])); ?><br>
                                     <strong>Scadenza bollo:</strong> <?php echo htmlspecialchars(formatDate($vehicle['nextTaxExpirationDate'])); ?><br>
@@ -120,6 +121,7 @@ foreach ($vehicles as $vehicle) {
 										data-id="<?php echo $vehicle['id']; ?>"
 										data-description="<?php echo htmlspecialchars($vehicle['description']); ?>"
 										data-buying-date="<?php echo htmlspecialchars($vehicle['buyingDate']); ?>"
+										data-registration-date="<?php echo htmlspecialchars($vehicle['registrationDate']); ?>"
 										data-plate-number="<?php echo htmlspecialchars($vehicle['plateNumber']); ?>"
 										data-chassis-number="<?php echo htmlspecialchars($vehicle['chassisNumber']); ?>"
 										data-tax-month="<?php echo htmlspecialchars($vehicle['taxMonth']); ?>"
@@ -161,6 +163,7 @@ foreach ($vehicles as $vehicle) {
                                     </div>
                                 <p class="card-text mt-3">
                                     <strong>Data di acquisto:</strong> <?php echo htmlspecialchars($vehicle['buyingDate']); ?><br>
+                                    <strong>Data di immatricolazione:</strong> <?php echo htmlspecialchars($vehicle['registrationDate']); ?><br>
                                     <strong>Scadenza assicurazione:</strong> <?php echo htmlspecialchars($vehicle['nextInsuranceExpirationDate']); ?><br>
                                     <strong>Scadenza bollo:</strong> <?php echo htmlspecialchars($vehicle['nextTaxExpirationDate']); ?><br>
                                     <strong>Scadenza revisione:</strong> <?php echo htmlspecialchars($vehicle['nextRevisionExpirationDate']); ?><br>
