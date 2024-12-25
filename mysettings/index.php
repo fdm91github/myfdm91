@@ -192,7 +192,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		    <input type="email" name="email" id="email" class="form-control" value="<?php echo htmlspecialchars($email); ?>" required>
 		    <?php if ($verified === 0): ?>
 			<button type="button" class="input-group-text bg-warning text-white" onclick="openVerificationModal('<?php echo htmlspecialchars($email); ?>')">
-			    <i class="fa fa-exclamation-triangle"></i>
+			    <i alt="Verifica la tua mail" class="fa fa-exclamation-triangle"></i>
 			</button>
 		    <?php elseif ($verified === 1): ?>
 			<span class="input-group-text bg-success text-white">

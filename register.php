@@ -91,9 +91,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     $stmt_insert->bind_param("sssss", $name, $surname, $email, $username, $hashed_password);
                                     if ($stmt_insert->execute()) {
                                         $success_message = "Registrazione completata con successo! Ora puoi accedere.";
-                                        // Optionally, redirect to login page
-                                        // header("Location: login.php");
-                                        // exit;
+                                        header("Location: login.php");
                                     } else {
                                         $error_message = "Qualcosa è andato storto. Riprova più tardi.";
                                     }
