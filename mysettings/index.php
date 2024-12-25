@@ -32,9 +32,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($name) || empty($surname) || empty($email) || empty($username)) {
         $profile_err = "Tutti i campi del profilo sono obbligatori.";
     } else {
-        $sql = "UPDATE users SET name = ?, surname = ?, email = ?, username = ?, salary_date = ? WHERE id = ?";
-        if ($stmt = $link->prepare($sql)) {
-            $stmt->bind_param("sssssi", $name, $surname, $email, $username, $salary_date, $user_id);
+	// Ottieni l'email attuale dell'utente dal database
+	$current_email = "";
+	$sql = "SELECT email, verified FROM users WHERE id = ?";
+	if ($stmt = $link->prepare($sql)) {
+	    $stmt->bind_param("i", $user_id);
+	    if ($stmt->execute()) {
+	        $stmt->bind_result($current_email, $current_verified);
+	        $stmt->fetch();
+	    }
+	    $stmt->close();
+	}
+	
+	// Controllo se l'email è stata aggiornata
+	$is_email_updated = ($email !== $current_email);
+	
+	// Aggiorno le informazioni del profilo e resetto 'verified' se necessario
+	$sql = "UPDATE users SET name = ?, surname = ?, email = ?, username = ?, salary_date = ?, verified = ? WHERE id = ?";
+	if ($stmt = $link->prepare($sql)) {
+	    $updated_verified = $is_email_updated ? 0 : $current_verified;
+	    $stmt->bind_param("sssssii", $name, $surname, $email, $username, $salary_date, $updated_verified, $user_id);
+    
             if ($stmt->execute()) {
                 $success_message = "Profilo aggiornato con successo.";
             } else {
