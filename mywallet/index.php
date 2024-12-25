@@ -108,7 +108,6 @@ $monthlyPiggyBank = array_reverse($monthlyPiggyBank);
 <body>
     <?php include 'navbar.php'; ?>
     <div class="container mt-5">
-        <h2>MyWallet</h2>
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
                 <h4 class="mb-0">Panoramica</h4>

@@ -35,10 +35,13 @@ if (!isset($_SESSION['username'])) {
     </style>
 </head>
 <body>
+    <div align=center>
+	<img src="/images/logo.png">
+    </div>
     <div class="container login-container">
-        <div class="card">
+	<div class="card">
             <div class="card-header text-center">
-                <h4>Seleziona un servizio</h4>
+		<h4>Seleziona un servizio</h4>
             </div>
             <div class="card-body text-center">
                 <h2 class="mt-5">Bentornato, <?php echo htmlspecialchars($_SESSION['name']); ?>!</h2>

@@ -15,6 +15,7 @@ require_once '../config.php';
 
 $current_password_err = $new_password_err = $confirm_password_err = "";
 $current_password = $new_password = $confirm_password = "";
+$email_verified = isset($_GET['email_verified']) ? $_GET['email_verified'] : '';
 
 $user_id = $_SESSION['id'];
 $profile_err = "";
@@ -116,11 +117,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $link->close();
 } else {
     // Precarico le informazioni del profilo
-    $sql = "SELECT name, surname, email, username, salary_date FROM users WHERE id = ?";
+    $sql = "SELECT name, surname, email, username, salary_date, verified FROM users WHERE id = ?";
     if ($stmt = $link->prepare($sql)) {
         $stmt->bind_param("i", $user_id);
         if ($stmt->execute()) {
-            $stmt->bind_result($name, $surname, $email, $username, $salary_date);
+            $stmt->bind_result($name, $surname, $email, $username, $salary_date, $verified);
             $stmt->fetch();
         }
         $stmt->close();
@@ -167,12 +168,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <label for="surname">Cognome</label>
                 <input type="text" name="surname" id="surname" class="form-control" value="<?php echo htmlspecialchars($surname); ?>" required>
             </div>
+	    <div class="mb-3 position-relative">
+		<label for="email">Email</label>
+	        <div class="input-group">
+		    <input type="email" name="email" id="email" class="form-control" value="<?php echo htmlspecialchars($email); ?>" required>
+		    <?php if ($verified === 0): ?>
+			<button type="button" class="input-group-text bg-warning text-white" onclick="openVerificationModal('<?php echo htmlspecialchars($email); ?>')">
+			    <i class="fa fa-exclamation-triangle"></i>
+			</button>
+		    <?php elseif ($verified === 1): ?>
+			<span class="input-group-text bg-success text-white">
+			    <i class="fa fa-check-circle"></i>
+			</span>
+		    <?php endif; ?>
+		</div>
+	    </div>
             <div class="mb-3">
-                <label for="email">Email</label>
-                <input type="email" name="email" id="email" class="form-control" value="<?php echo htmlspecialchars($email); ?>" required>
-            </div>
-            <div class="mb-3">
-                <label for="username">Nome utente</label>
+	    <label for="username">Nome utente</label>
                 <input type="text" name="username" id="username" class="form-control" value="<?php echo htmlspecialchars($username); ?>" readonly required>
             </div>
             <div class="mb-3">
@@ -203,5 +215,79 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <p class="text-center">Hai cambiato idea? <a href="../">Torna alla Dashboard</a></p>
     </div>
 	<?php include '../footer.php'; ?>
+
+<!-- Modale di verifica -->
+<div class="modal fade" id="verificationModal" tabindex="-1" role="dialog" aria-labelledby="verificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="verificationModalLabel">Verifica Email</h5>
+            </div>
+            <div class="modal-body">
+                <p>Invieremo un'email al seguente indirizzo: <strong id="modalEmail"></strong></p>
+                <p>Sei sicuro di voler procedere?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Annulla</button>
+                <button type="button" class="btn btn-primary" onclick="sendVerificationEmail()">Conferma</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modale di conferma verifica -->
+<div class="modal fade" id="emailVerifiedModal" tabindex="-1" role="dialog" aria-labelledby="emailVerifiedModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="emailVerifiedModalLabel">Email Verificata</h5>
+            </div>
+            <div class="modal-body">
+                La tua email è stata verificata con successo!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Chiudi</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
+
+<script>
+function openVerificationModal(email) {
+    document.getElementById('modalEmail').textContent = email;
+    $('#verificationModal').modal('show');
+}
+
+function sendVerificationEmail() {
+    const email = document.getElementById('modalEmail').textContent;
+
+    fetch('send_verification_email.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert("L'email è stata inviata all'indirizzo indicato! Controlla la tua casella mail e clicca sul link per completare la verifica.");
+        } else {
+            alert('Errore durante l\'invio dell\'email.');
+        }
+        $('#verificationModal').modal('hide');
+    })
+    .catch(error => console.error('Errore:', error));
+}
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const emailVerified = "<?php echo $email_verified; ?>";
+        if (emailVerified === "1") {
+            $('#emailVerifiedModal').modal('show');
+        }
+    });
+</script>
+
