@@ -93,7 +93,7 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
                                 </div>
                             </div>
                             <div class="card-body">
-                                <p><strong>Totale:</strong> €<?php echo htmlspecialchars($expense['amount']); ?></p>
+								<p><strong>Totale:</strong> €<?php echo htmlspecialchars($expense['amount']); ?></p>
                                 <p><strong>Questo mese:</strong> €<?php echo htmlspecialchars($expense['monthly_debit']); ?></p>
                                 <p><strong>Prossimo addebito:</strong> <?php echo htmlspecialchars($expense['next_debit_date']); ?></p>
                                 <p><strong>Frequenza:</strong> 

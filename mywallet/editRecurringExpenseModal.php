@@ -103,8 +103,8 @@
     $(document).ready(function() {
 		$('#editRecurringExpenseModal').on('show.bs.modal', function (event) {
 			var button = $(event.relatedTarget);
-			
 			var id = button.data('id');
+			$('#editRecurringExpenseId').val(id);
 			var name = button.data('name');
 			var amount = button.data('amount');
 			var start_month = button.data('start-month');
@@ -130,7 +130,6 @@
 
         $('#editRecurringExpenseForm').submit(function(e) {
             e.preventDefault();
-
             var startMonth = parseInt($('#editRecurringExpenseStartMonth').val());
             var startYear = parseInt($('#editRecurringExpenseStartYear').val());
             var endMonth = parseInt($('#editRecurringExpenseEndMonth').val());

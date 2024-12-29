@@ -103,8 +103,8 @@
     $(document).ready(function() {
         $('#editEstimatedExpenseModal').on('show.bs.modal', function (event) {
 			var button = $(event.relatedTarget);
-			
 			var id = button.data('id');
+			$('#editEstimatedExpenseId').val(id);
 			var name = button.data('name');
 			var amount = button.data('amount');
 			var start_month = button.data('start-month');
@@ -129,8 +129,7 @@
         });
 
         $('#editEstimatedExpenseForm').submit(function(e) {
-            e.preventDefault();
-
+            e.preventDefault();			
             var startMonth = parseInt($('#editEstimatedExpenseStartMonth').val());
             var startYear = parseInt($('#editEstimatedExpenseStartYear').val());
             var endMonth = parseInt($('#editEstimatedExpenseEndMonth').val());
