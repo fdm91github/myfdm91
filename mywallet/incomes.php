@@ -50,7 +50,7 @@ include 'retrieveData.php';
                                 <tr>
 									<td><?php echo htmlspecialchars($entry['name']); ?></td>
                                     <td><?php echo htmlspecialchars($entry['amount']); ?></td>
-                                    <td><?php echo htmlspecialchars($entry['added_date']); ?></td>
+                                    <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($entry['added_date']))); ?></td>
                                     <td>
                                         <button class="btn btn-warning btn-sm"
                                                 data-toggle="modal"

@@ -69,7 +69,7 @@ foreach ($extraExpenses as $expense) {
                             </div>
                             <div class="card-body">
                                 <p><strong>Totale:</strong> €<?php echo htmlspecialchars($expense['amount']); ?></p>
-                                <p><strong>Data di addebito:</strong> <?php echo htmlspecialchars($expense['debit_date']); ?></p>
+                                <p><strong>Data di addebito:</strong> <?php echo htmlspecialchars(date('d/m/Y', strtotime($expense['debit_date']))); ?></p>
                             </div>
                         </div>
                     <?php endforeach; ?>
@@ -111,7 +111,7 @@ foreach ($extraExpenses as $expense) {
                         </div>
                         <div class="card-body">
                             <p><strong>Totale:</strong> €<?php echo htmlspecialchars($expense['amount']); ?></p>
-                            <p><strong>Data di addebito:</strong> <?php echo htmlspecialchars($expense['debit_date']); ?></p>
+                            <p><strong>Data di addebito:</strong> <?php echo htmlspecialchars(date('d/m/Y', strtotime($expense['debit_date']))); ?></p>
                         </div>
                     </div>
                 <?php endforeach; ?>
