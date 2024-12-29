@@ -179,7 +179,9 @@ function processExpenses($link, $user_id, $selectedDate, $salaryDate, &$expenses
                 $savings += $monthlyAmount * $currentInstallment;
             } else if ($billingFrequency == 1 && ($endDate > $selectedDate || $undetermined == 1)) {
                 $savings += $monthlyAmount;
-            }
+            } else {
+				$savings += $monthlyAmount;
+			}
 
 			$totalExpenses += $monthlyAmount;
 
