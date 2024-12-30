@@ -20,7 +20,7 @@ if (!isset($_SESSION['username'])) {
     <meta name="theme-color" content="#007bff">
     <link rel="icon" href="icon-192x192.png">
     <title>Seleziona un servizio</title>
-	<?php include 'script.php' ?>
+    <?php include 'script.php' ?>
     <style>
         .card-text {
             white-space: nowrap;

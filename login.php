@@ -102,10 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
-	<link href="my.css" rel="stylesheet">
+    <?php include 'script.php' ?>
     <style>
         .card {
             border-radius: 15px;
@@ -124,20 +121,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <div class="card-body">
                 <form action="login.php" method="post">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="username">Username</label>
                         <input type="text" name="username" id="username" class="form-control" placeholder="Inserisci qui il tuo nome utente :)" required>
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="password">Password</label>
                         <input type="password" name="password" id="password" class="form-control" placeholder="Ora inserisci la tua password!" required>
                     </div>
-                    <div class="form-group form-check">
-                        <input type="checkbox" name="remember_me" id="remember_me" class="form-check-input">
+		    <div class="mb-3 form-check">
+			<input type="checkbox" name="remember_me" id="remember_me" class="form-check-input">
                         <label for="remember_me" class="form-check-label">Ricordami per 30 giorni</label>
                     </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary btn-block">Accedi</button>
+                    <div class="mb-3">
+                        <button type="submit" class="btn btn-primary w-100">Accedi</button>
                     </div>
                     <p class="text-center">Non hai ancora un account? Cosa aspetti, <a href="register.php">registrati</a>!</p>
                     <p class="text-center"><a href="passwordReset.php">Ho dimenticato la password</a></p>
@@ -152,24 +149,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="errorModalLabel">Errore</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true"></span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <p id="errorMessage"></p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Chiudi</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function() {
             <?php if (!empty($error_message)): ?>
