@@ -44,7 +44,7 @@ if (!isset($_SESSION['username'])) {
 		<h4>Seleziona un servizio</h4>
             </div>
             <div class="card-body text-center">
-                <h2 class="mt-5">Bentornato, <?php echo htmlspecialchars($_SESSION['name']); ?>!</h2>
+                <h2 class="mt-5">Bentornato!</h2>
                 <p class="lead">Scegli cosa vuoi visualizzare:</p>
                 <div class="row">
                     <div class="col-md-4">
