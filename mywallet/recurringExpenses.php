@@ -58,6 +58,12 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
 </head>
 <body>
     <div class="container mt-5">
+        <div class="mb-3 d-flex justify-content-end">
+            <div class="col-md-4">
+                <input type="text" id="searchExpenses" class="form-control" placeholder="Cerca una spesa...">
+            </div>
+        </div>
+
         <!-- Spese ricorrenti attive -->
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -184,3 +190,17 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
 
 </body>
 </html>
+
+<script>
+    $(document).ready(function () {
+        $("#searchExpenses").on("keyup", function () {
+            var value = $(this).val().toLowerCase();
+
+            $(".card-body .card").each(function () {
+                var expenseName = $(this).find("h5").text().toLowerCase();
+                $(this).toggle(expenseName.includes(value));
+            });
+        });
+    });
+</script>
+
