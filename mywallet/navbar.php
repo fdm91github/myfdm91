@@ -6,25 +6,25 @@
     <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link" href=".">Dashboard</a>
+                <a class="nav-link" href="."><i class="bi bi-house-door-fill"></i> Dashboard</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="incomes.php">Entrate</a>
+                <a class="nav-link" href="incomes.php"><i class="bi bi-download"></i> Entrate</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="recurringExpenses.php">Spese ricorrenti</a>
+                <a class="nav-link" href="recurringExpenses.php"><i class="bi bi-credit-card-fill"></i> Spese ricorrenti</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="estimatedExpenses.php">Spese stimate</a>
+                <a class="nav-link" href="estimatedExpenses.php"><i class="bi bi-cart4"></i> Spese stimate</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="extraExpenses.php">Spese extra</a>
+                <a class="nav-link" href="extraExpenses.php"><i class="bi bi-bag-heart-fill"></i> Spese extra</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="piggyBank.php">Salvadanaio</a>
+                <a class="nav-link" href="piggyBank.php"><i class="bi bi-piggy-bank-fill"></i> Salvadanaio</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="../logout.php">Esci</a>
+                <a class="nav-link" href="../logout.php"><i class="bi bi-door-closed-fill"></i> Esci</a>
             </li>
         </ul>
     </div>

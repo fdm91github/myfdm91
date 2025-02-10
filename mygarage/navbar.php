@@ -6,25 +6,25 @@
     <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link" href=".">Dashboard</a>
+                <a class="nav-link" href="."><i class="bi bi-house-door-fill"></i> Dashboard</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="vehicles.php">I miei veicoli</a>
+                <a class="nav-link" href="vehicles.php"><i class="bi bi-car-front-fill"></i> I miei veicoli</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="services.php">Manutenzioni</a>
+                <a class="nav-link" href="services.php"><i class="bi bi-tools"></i> Manutenzioni</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="insurances.php">Assicurazioni</a>
+                <a class="nav-link" href="insurances.php"><i class="bi bi-bank2"></i> Assicurazioni</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="revisions.php">Revisioni</a>
+                <a class="nav-link" href="revisions.php"><i class="bi bi-clipboard2-check-fill"></i> Revisioni</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="taxes.php">Bolli</a>
+                <a class="nav-link" href="taxes.php"><i class="bi bi-cash-coin"></i> Bolli</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="../logout.php">Esci</a>
+                <a class="nav-link" href="../logout.php"><i class="bi bi-door-closed-fill"></i> Esci</a>
             </li>
         </ul>
     </div>
