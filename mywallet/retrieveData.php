@@ -223,7 +223,7 @@ $estimatedSavings = 0;
 processExpenses($link, $user_id, $selectedDate, $salaryDate, $estimatedExpenses, $thisMonthTotalEstimatedExpenses, $estimatedSavings, 'wallet_estimated_expenses');
 
 // Recupero le spese extra
-$extraExpenses = executeQuery($link, "SELECT id, name, amount, debit_date FROM wallet_extra_expenses WHERE user_id = ?", ["i", $user_id], false);
+$extraExpenses = executeQuery($link, "SELECT id, name, amount, debit_date FROM wallet_extra_expenses WHERE user_id = ? ORDER BY debit_date DESC", ["i", $user_id], false);
 
 // Recupero le spese extra relative al mese corrente
 $thismonthExtraExpenses = [];
