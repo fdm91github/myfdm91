@@ -78,7 +78,7 @@
                     </div>
                     <div class="form-group">
                         <label for="addEstimatedExpenseBillingFrequency">Frequenza di fatturazione (mesi)</label>
-                        <input type="number" name="billing_frequency" id="addEstimatedExpenseBillingFrequency" class="form-control" min="1" max="12" value="1" required>
+                        <input type="number" name="billing_frequency" id="addEstimatedExpenseBillingFrequency" class="form-control" min="1" value="1" required>
                     </div>
                     <button type="submit" class="btn btn-primary btn-block" id="addEstimatedExpenseSubmitButton">Aggiungi</button>
                 </form>
