@@ -64,7 +64,13 @@ $wallet_incomes_paginated = array_slice($wallet_incomes, $offset, $perPage);
                                     <td><?php echo htmlspecialchars($entry['amount']); ?></td>
                                     <td><?php echo htmlspecialchars(date('d/m/Y', strtotime($entry['added_date']))); ?></td>
                                     <td>
-                                        <button class="btn btn-warning btn-sm" data-toggle="modal" data-target="#editIncomeModal" data-id="<?php echo $entry['id']; ?>">
+					<button class="btn btn-warning btn-sm"
+					    data-toggle="modal"
+					    data-target="#editIncomeModal"
+					    data-id="<?php echo $entry['id']; ?>"
+					    data-name="<?php echo htmlspecialchars($entry['name']); ?>"
+					    data-amount="<?php echo htmlspecialchars($entry['amount']); ?>"
+					    data-date="<?php echo htmlspecialchars($entry['added_date']); ?>">
                                             <i class="bi bi-pencil"></i>
                                         </button>
                                         <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteIncomeModal" data-id="<?php echo $entry['id']; ?>">
