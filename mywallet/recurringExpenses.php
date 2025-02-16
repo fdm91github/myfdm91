@@ -58,11 +58,42 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
 </head>
 <body>
     <div class="container mt-5">
-        <div class="mb-3 d-flex justify-content-end">
-            <div class="col-md-4">
-                <input type="text" id="searchExpenses" class="form-control" placeholder="Cerca una spesa...">
-            </div>
-        </div>
+		<div class="card mb-4">
+			<div class="card-header d-flex justify-content-between align-items-center">
+				<h4 class="mb-0">Filtri</h4>
+				<button class="btn btn-primary toggle-content" data-toggle="collapse" data-target="#filterContent" aria-expanded="false" aria-controls="filterContent">
+					<i class="bi bi-funnel"></i>
+				</button>
+			</div>
+			<div id="filterContent" class="collapse card-body">
+				<div class="mb-3">
+					<div class="row mb-2">
+						<div class="col-md-6">
+							<label for="searchExpenses">Nome:</label>
+							<input type="text" id="searchExpenses" class="form-control" placeholder="Cerca una spesa...">
+						</div>
+						<div class="col-md-6">
+							<label for="expenseFilter">Tipo spesa:</label>
+							<select id="expenseFilter" class="form-control">
+								<option value="both" selected>Tutte</option>
+								<option value="active">Attive</option>
+								<option value="expired">Scadute</option>
+							</select>
+						</div>
+					</div>
+					<div class="row mb-2">
+						<div class="col-md-6">
+							<label for="minPrice">Min. Totale:</label>
+							<input type="number" id="minPrice" class="form-control" min="0" step="0.01">
+						</div>
+						<div class="col-md-6">
+							<label for="maxPrice">Max. Totale:</label>
+							<input type="number" id="maxPrice" class="form-control" min="0" step="0.01">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
         <!-- Spese ricorrenti attive -->
         <div class="card mb-4">
@@ -192,15 +223,40 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
 </html>
 
 <script>
-    $(document).ready(function () {
-        $("#searchExpenses").on("keyup", function () {
-            var value = $(this).val().toLowerCase();
+	$(document).ready(function () {
+		function filterExpenses() {
+			let searchValue = $("#searchExpenses").val().toLowerCase();
+			let minPrice = parseFloat($("#minPrice").val()) || 0;
+			let maxPrice = parseFloat($("#maxPrice").val()) || Infinity;
+			let expenseFilter = $("#expenseFilter").val();
 
-            $(".card-body .card").each(function () {
-                var expenseName = $(this).find("h5").text().toLowerCase();
-                $(this).toggle(expenseName.includes(value));
-            });
-        });
-    });
+			$(".card.mb-4").each(function () {
+				let isFilterCard = $(this).find("h4").text().includes("Filtri"); // Keep filter card visible
+				let isActive = $(this).find("h4").text().toLowerCase().includes("attive");
+				let isExpired = $(this).find("h4").text().toLowerCase().includes("scadute");
+
+				let matchesFilter = isFilterCard || (expenseFilter === "both") ||
+					(expenseFilter === "active" && isActive) ||
+					(expenseFilter === "expired" && isExpired);
+
+				$(this).toggle(matchesFilter);
+			});
+
+			$(".card-body .card").each(function () {
+				let expenseName = $(this).find("h5").text().toLowerCase();
+				let priceText = $(this).find("p:contains('Totale:')").text().replace('Totale:', '').replace('€', '').trim();
+				let price = parseFloat(priceText);
+
+				let matchesSearch = expenseName.includes(searchValue);
+				let matchesPrice = price >= minPrice && price <= maxPrice;
+
+				$(this).toggle(matchesSearch && matchesPrice);
+			});
+		}
+
+		$("#searchExpenses, #minPrice, #maxPrice, #expenseFilter").on("input change", function () {
+			filterExpenses();
+			$("#filterContent").collapse("show"); // Ensure filter remains visible
+		});
+	});
 </script>
-
