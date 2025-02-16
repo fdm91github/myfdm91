@@ -39,6 +39,48 @@ include 'retrieveData.php';
 <body>
     <div class="container mt-5">
         <h4>Manutenzioni</h4><br/>
+		
+		<!-- Filter Card -->
+		<div class="card mb-4">
+			<div class="card-header d-flex justify-content-between align-items-center">
+				<h4 class="mb-0">Filtri</h4>
+				<button class="btn btn-primary toggle-content" data-toggle="collapse" data-target="#filterContent" aria-expanded="false" aria-controls="filterContent">
+					<i class="bi bi-funnel"></i>
+				</button>
+			</div>
+			<div id="filterContent" class="collapse card-body">
+				<div class="mb-3">
+					<div class="row mb-2">
+						<div class="col-md-6">
+							<label for="searchName">Nome Manutenzione:</label>
+							<input type="text" id="searchName" class="form-control" placeholder="Cerca manutenzione...">
+						</div>
+						<div class="col-md-6">
+							<label for="vehicleFilter">Veicolo:</label>
+							<select id="vehicleFilter" class="form-control">
+								<option value="all" selected>Tutti i veicoli</option>
+								<?php foreach ($vehicles as $vehicle): ?>
+									<option value="<?php echo htmlspecialchars($vehicle['id']); ?>">
+										<?php echo htmlspecialchars($vehicle['description']) . " (" . htmlspecialchars($vehicle['plateNumber']) . ")"; ?>
+									</option>
+								<?php endforeach; ?>
+							</select>
+						</div>
+					</div>
+					<div class="row mb-2">
+						<div class="col-md-6">
+							<label for="minCost">Costo Minimo (€):</label>
+							<input type="number" id="minCost" class="form-control" min="0" step="0.01">
+						</div>
+						<div class="col-md-6">
+							<label for="maxCost">Costo Massimo (€):</label>
+							<input type="number" id="maxCost" class="form-control" min="0" step="0.01">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
         <?php foreach ($vehicles as $vehicle): ?>
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
@@ -149,3 +191,45 @@ include 'retrieveData.php';
 
 </body>
 </html>
+
+<script>
+$(document).ready(function () {
+    function filterServices() {
+        let searchName = $("#searchName").val().toLowerCase();
+        let selectedVehicle = $("#vehicleFilter").val();
+        let minCost = parseFloat($("#minCost").val()) || 0;
+        let maxCost = parseFloat($("#maxCost").val()) || Infinity;
+
+        $(".card.mb-4").each(function () {
+            let isFilterCard = $(this).find("h4").text().includes("Filtri");
+            let vehicleId = $(this).find(".add-service-btn").data("vehicle-id");
+            let matchesVehicle = selectedVehicle === "all" || selectedVehicle == vehicleId;
+
+            if (!isFilterCard) {
+                let showVehicle = false;
+
+                $(this).find(".card-body .card").each(function () {
+                    let serviceName = $(this).find(".card-title").text().toLowerCase();
+                    let costText = $(this).find("p:contains('Costo:')").text().replace('Costo:', '').replace('€', '').trim();
+                    let cost = parseFloat(costText) || 0;
+
+                    let matchesSearch = serviceName.includes(searchName);
+                    let matchesCost = cost >= minCost && cost <= maxCost;
+
+                    let showService = matchesSearch && matchesCost;
+                    $(this).toggle(showService);
+
+                    if (showService) showVehicle = true;
+                });
+
+                $(this).toggle(matchesVehicle && showVehicle);
+            }
+        });
+    }
+
+    $("#searchName, #vehicleFilter, #minCost, #maxCost").on("input change", function () {
+        filterServices();
+        $("#filterContent").collapse("show");
+    });
+});
+</script>
