@@ -79,7 +79,7 @@ include 'retrieveData.php';
                 </div>
             </div>
         </div>
-
+	
         <script>
             document.addEventListener("DOMContentLoaded", function() {
                 var ctx = document.getElementById('YearlyExpenseChart').getContext('2d');
@@ -234,5 +234,6 @@ include 'retrieveData.php';
             });
         </script>
     </div>
+    <?php include '../footer.php'; ?>
 </body>
 </html>

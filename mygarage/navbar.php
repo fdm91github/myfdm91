@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
   <div class="container-fluid">
     <a class="navbar-brand" href="../">
-      <img src="/images/logo.png" alt="Logo" height="30">
+      <img src="/images/logo.png" alt="Logo">
     </a>
     <!-- This toggler will trigger the offcanvas sidebar on small screens -->
     <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
