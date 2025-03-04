@@ -1,19 +1,17 @@
 <!-- Modale per l'il ripristino di un veicolo -->
-<div class="modal fade" id="restoreVehicleModal" tabindex="-1" role="dialog" aria-labelledby="restoreVehicleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="restoreVehicleModal" tabindex="-1" aria-labelledby="restoreVehicleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="restoreVehicleModalLabel">Ripristina veicolo</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="restoreVehicleStatus"></div>
                 <p>Sei sicuro di voler ripristinare questo veicolo?</p>
                 <form id="restoreVehicleForm" method="POST" action="restoreVehicle.php">
                     <input type="hidden" name="id" id="restoreVehicleId">
-                    <button type="submit" class="btn btn-primary btn-block">Ripristina</button>
+                    <button type="submit" class="btn btn-primary w-100">Ripristina</button>
                 </form>
             </div>
         </div>

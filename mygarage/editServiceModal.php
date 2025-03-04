@@ -1,11 +1,9 @@
-<div class="modal fade" id="editServiceModal" tabindex="-1" role="dialog" aria-labelledby="editServiceModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="editServiceModal" tabindex="-1" aria-labelledby="editServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editServiceModalLabel">Modifica Manutenzione</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="editServiceStatus"></div>
@@ -53,9 +51,9 @@
                         <div id="editPartsContainer">
                             <!-- Existing parts will be dynamically inserted here -->
                         </div>
-                        <button type="button" id="editAddPartBtn" class="btn btn-secondary btn-block">Aggiungi voce</button>
+                        <button type="button" id="editAddPartBtn" class="btn btn-secondary w-100">Aggiungi voce</button>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block mt-3">Aggiorna</button>
+                    <button type="submit" class="btn btn-primary w-100 mt-3">Aggiorna</button>
                 </form>
             </div>
         </div>

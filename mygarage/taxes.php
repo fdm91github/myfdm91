@@ -9,89 +9,74 @@ include 'retrieveData.php';
 <head>
     <meta charset="UTF-8">
     <title>Bolli</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Bootstrap JS e dipendenze varie -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <!-- Charts e grafici -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Centralized updated scripts (Bootstrap 5.3.3, jQuery, Popper, Chart.js, etc.) -->
+    <?php include '../script.php'; ?>
+    <!-- Bootstrap Icons (if not already included in /script.php) -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="../my.css" rel="stylesheet">
 </head>
 <body>
     <div class="container mt-5">
-		<h4>Bolli</h4><br/>
+        <h4>Bolli</h4><br/>
         <?php foreach ($vehicles as $vehicle): ?>
             <div class="card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-                    <h4 class="mb-0"><?php echo htmlspecialchars($vehicle['description']); ?> (<?php echo htmlspecialchars($vehicle['plateNumber']); ?>)</h4>
-                    <button class="btn btn-primary add-tax-btn" data-toggle="modal" data-target="#addTaxModal" data-vehicle-id="<?php echo $vehicle['id']; ?>">
+                    <h4 class="mb-0">
+                        <?php echo htmlspecialchars($vehicle['description']); ?> (<?php echo htmlspecialchars($vehicle['plateNumber']); ?>)
+                    </h4>
+                    <button class="btn btn-primary add-tax-btn" 
+                        data-bs-toggle="modal" data-bs-target="#addTaxModal" 
+                        data-vehicle-id="<?php echo $vehicle['id']; ?>">
                         <i class="bi bi-plus"></i>
                     </button>
                 </div>
                 <div class="card-body">
                     <?php 
                     $hasTaxes = false;
-                    if (isset($vehicleTaxes) && !empty($vehicleTaxes)): 
+                    if (isset($vehicleTaxes) && !empty($vehicleTaxes)):
                         foreach ($vehicleTaxes as $tax):
                             if ($tax['vehicle_id'] == $vehicle['id']):
-                                if (!$hasTaxes): 
-                                    $hasTaxes = true; 
+                                $hasTaxes = true;
                     ?>
-                                <div class="table-responsive">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Costo</th>
-						<th>Data del pagamento</th>
-                                                <th>Azioni</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                    <?php 
-                                endif; 
-                    ?>
-                                            <tr>
-                                                <td><?php echo htmlspecialchars($tax['amount']); ?></td>
-                                                <td><?php echo htmlspecialchars(formatDate($tax['buying_date'])); ?></td>
-                                                <td>
-                                                    <button class="btn btn-warning btn-sm"
-                                                            data-toggle="modal"
-                                                            data-target="#editTaxModal"
-                                                            data-id="<?php echo $tax['id']; ?>"
-                                                            data-amount="<?php echo htmlspecialchars($tax['amount']); ?>"
-                                                            data-buying-date="<?php echo htmlspecialchars($tax['buying_date']); ?>">
-                                                        <i class="bi bi-pencil"></i>
-                                                    </button>
-                                                    <button class="btn btn-danger btn-sm"
-                                                            data-toggle="modal"
-                                                            data-target="#deleteTaxModal"
-                                                            data-id="<?php echo $tax['id']; ?>">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
+                                <div class="card mb-3">
+                                    <div class="card-body">
+                                        <div class="row align-items-center">
+                                            <div class="col">
+                                                <p class="card-text mb-0">
+                                                    <strong>Costo:</strong> <?php echo htmlspecialchars($tax['amount']); ?><br>
+                                                    <strong>Data del pagamento:</strong> <?php echo htmlspecialchars(formatDate($tax['buying_date'])); ?>
+                                                </p>
+                                            </div>
+                                            <div class="col-auto">
+                                                <button class="btn btn-warning btn-sm me-2"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#editTaxModal"
+                                                        data-id="<?php echo $tax['id']; ?>"
+                                                        data-amount="<?php echo htmlspecialchars($tax['amount']); ?>"
+                                                        data-buying-date="<?php echo htmlspecialchars($tax['buying_date']); ?>">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm"
+                                                        data-bs-toggle="modal"
+                                                        data-bs-target="#deleteTaxModal"
+                                                        data-id="<?php echo $tax['id']; ?>">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                     <?php 
                             endif;
-                        endforeach; 
-                    endif; 
+                        endforeach;
+                    endif;
                     ?>
-
-                    <?php if ($hasTaxes): ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                    <?php else: ?>
-                                <div class="alert" role="alert">
-                                    Nessun bollo registrato per questo veicolo
-                                </div>
+                    <?php if (!$hasTaxes): ?>
+                        <div class="alert" role="alert">
+                            Nessun bollo registrato per questo veicolo
+                        </div>
                     <?php endif; ?>
                 </div>
             </div>
@@ -101,7 +86,6 @@ include 'retrieveData.php';
     <?php include 'editTaxModal.php'; ?>
     <?php include 'deleteTaxModal.php'; ?>
     <?php include 'navbar.php'; ?>
-	<?php include '../footer.php'; ?>
-	
+    <?php include '../footer.php'; ?>
 </body>
 </html>

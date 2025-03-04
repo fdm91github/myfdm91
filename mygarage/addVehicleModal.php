@@ -1,12 +1,10 @@
 <!-- Modale per l'aggiunta di un veicolo -->
-<div class="modal fade" id="addVehicleModal" tabindex="-1" role="dialog" aria-labelledby="addVehicleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="addVehicleModal" tabindex="-1" aria-labelledby="addVehicleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addVehicleModalLabel">Aggiungi un veicolo</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="addVehicleStatus"></div>
@@ -35,7 +33,7 @@
                         <label for="addVehicleTaxExpiryMonth">Mese di scadenza del bollo</label>
                         <input type="text" name="tax_expiry_month" id="addVehicleTaxExpiryMonth" class="form-control" placeholder="Mese di scadenza del bollo" required>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">Aggiungi</button>
+                    <button type="submit" class="btn btn-primary w-100">Aggiungi</button>
                 </form>
             </div>
         </div>

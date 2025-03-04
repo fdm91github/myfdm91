@@ -19,24 +19,15 @@ foreach ($vehicles as $vehicle) {
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <title>I miei veicoli</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Bootstrap JS e dipendenze varie -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <!-- Charts e grafici -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Centralized updated scripts (Bootstrap 5.3.3, jQuery, Popper, Chart.js, etc.) -->
+    <?php include '../script.php'; ?>
+    <!-- Bootstrap Icons (if not included in /script.php) -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="../my.css" rel="stylesheet">
@@ -53,7 +44,6 @@ foreach ($vehicles as $vehicle) {
             text-align: center;
             line-height: 40px;
         }
-
         .plate::before, .plate::after {
             content: '';
             position: absolute;
@@ -62,7 +52,6 @@ foreach ($vehicles as $vehicle) {
             height: 100%;
             background-color: #003399;
         }
-
         .plate::before {
             left: 0;
             background-image: url('path_to_left_flag_image'); /* Add your country flag image */
@@ -70,11 +59,9 @@ foreach ($vehicles as $vehicle) {
             background-repeat: no-repeat;
             background-position: center;
         }
-
         .plate::after {
             right: 0;
         }
-
         .plate-number {
             display: inline-block;
             width: calc(100% - 40px);
@@ -92,7 +79,7 @@ foreach ($vehicles as $vehicle) {
         <div class="mb-4">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <h4 class="mb-0">I miei veicoli</h4>
-                <button class="btn btn-primary" data-toggle="modal" data-target="#addVehicleModal">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addVehicleModal">
                     <i class="bi bi-plus"></i>
                 </button>
             </div>
@@ -106,31 +93,31 @@ foreach ($vehicles as $vehicle) {
                                     <span class="plate-number"><?php echo htmlspecialchars($vehicle['plateNumber']); ?></span>
                                 </div>
                                 <p class="card-text mt-3">
-									<h5>Dati veicolo</h5>
+                                    <h5>Dati veicolo</h5>
                                     <strong>Nr. di telaio:</strong> <?php echo htmlspecialchars($vehicle['chassisNumber']); ?><br>
-				    <strong>Data di acquisto:</strong> <?php echo htmlspecialchars(formatDate($vehicle['buyingDate'])); ?><br>
-				    <strong>Data di immatricolazione:</strong> <?php echo htmlspecialchars(formatDate($vehicle['registrationDate'])); ?><br>
-									<br/><h5>Scadenze</h5>
+                                    <strong>Data di acquisto:</strong> <?php echo htmlspecialchars(formatDate($vehicle['buyingDate'])); ?><br>
+                                    <strong>Data di immatricolazione:</strong> <?php echo htmlspecialchars(formatDate($vehicle['registrationDate'])); ?><br>
+                                    <br/><h5>Scadenze</h5>
                                     <strong>Scadenza assicurazione:</strong> <?php echo htmlspecialchars(formatDate($vehicle['nextInsuranceExpirationDate'])); ?><br>
                                     <strong>Scadenza bollo:</strong> <?php echo htmlspecialchars(formatDate($vehicle['nextTaxExpirationDate'])); ?><br>
                                     <strong>Scadenza revisione:</strong> <?php echo htmlspecialchars(formatDate($vehicle['nextRevisionExpirationDate'])); ?><br>
                                 </p>
                                 <button class="btn btn-warning btn-sm"
-										data-toggle="modal"
-										data-target="#editVehicleModal"
-										data-id="<?php echo $vehicle['id']; ?>"
-										data-description="<?php echo htmlspecialchars($vehicle['description']); ?>"
-										data-buying-date="<?php echo htmlspecialchars($vehicle['buyingDate']); ?>"
-										data-registration-date="<?php echo htmlspecialchars($vehicle['registrationDate']); ?>"
-										data-plate-number="<?php echo htmlspecialchars($vehicle['plateNumber']); ?>"
-										data-chassis-number="<?php echo htmlspecialchars($vehicle['chassisNumber']); ?>"
-										data-tax-month="<?php echo htmlspecialchars($vehicle['taxMonth']); ?>"
-										data-insurance-expiration-date="<?php echo htmlspecialchars($vehicle['nextInsuranceExpirationDate']); ?>">
-									<i class="bi bi-pencil"></i>
-								</button>
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#editVehicleModal"
+                                        data-id="<?php echo $vehicle['id']; ?>"
+                                        data-description="<?php echo htmlspecialchars($vehicle['description']); ?>"
+                                        data-buying-date="<?php echo htmlspecialchars($vehicle['buyingDate']); ?>"
+                                        data-registration-date="<?php echo htmlspecialchars($vehicle['registrationDate']); ?>"
+                                        data-plate-number="<?php echo htmlspecialchars($vehicle['plateNumber']); ?>"
+                                        data-chassis-number="<?php echo htmlspecialchars($vehicle['chassisNumber']); ?>"
+                                        data-tax-month="<?php echo htmlspecialchars($vehicle['taxMonth']); ?>"
+                                        data-insurance-expiration-date="<?php echo htmlspecialchars($vehicle['nextInsuranceExpirationDate']); ?>">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
                                 <button class="btn btn-danger btn-sm"
-                                        data-toggle="modal"
-                                        data-target="#deleteVehicleModal"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteVehicleModal"
                                         data-id="<?php echo $vehicle['id']; ?>">
                                     <i class="bi bi-trash"></i>
                                 </button>
@@ -146,7 +133,7 @@ foreach ($vehicles as $vehicle) {
         <div class="mb-4">
             <div class="d-flex justify-content-between align-items-center flex-wrap">
                 <h4 class="mb-0">Veicoli non più attivi</h4>
-                <button style="color:white" class="btn btn-primary" data-toggle="collapse" data-target="#inactiveVehiclesContent" aria-expanded="false" aria-controls="inactiveVehiclesContent">
+                <button style="color:white" class="btn btn-primary" data-bs-toggle="collapse" data-bs-target="#inactiveVehiclesContent" aria-expanded="false" aria-controls="inactiveVehiclesContent">
                     <i class="bi bi-eye"></i>
                 </button>
             </div>
@@ -160,23 +147,23 @@ foreach ($vehicles as $vehicle) {
                                     <div class="plate">
                                         <span class="plate-number"><?php echo htmlspecialchars($vehicle['plateNumber']); ?></span>
                                     </div>
-                                <p class="card-text mt-3">
-                                    <strong>Data di acquisto:</strong> <?php echo htmlspecialchars($vehicle['buyingDate']); ?><br>
-                                    <strong>Data di immatricolazione:</strong> <?php echo htmlspecialchars($vehicle['registrationDate']); ?><br>
-                                    <strong>Scadenza assicurazione:</strong> <?php echo htmlspecialchars($vehicle['nextInsuranceExpirationDate']); ?><br>
-                                    <strong>Scadenza bollo:</strong> <?php echo htmlspecialchars($vehicle['nextTaxExpirationDate']); ?><br>
-                                    <strong>Scadenza revisione:</strong> <?php echo htmlspecialchars($vehicle['nextRevisionExpirationDate']); ?><br>
-									<strong>Data eliminazione:</strong> <?php echo htmlspecialchars(formatDate($vehicle['deletedAt'])); ?><br>
-                                </p>
+                                    <p class="card-text mt-3">
+                                        <strong>Data di acquisto:</strong> <?php echo htmlspecialchars($vehicle['buyingDate']); ?><br>
+                                        <strong>Data di immatricolazione:</strong> <?php echo htmlspecialchars($vehicle['registrationDate']); ?><br>
+                                        <strong>Scadenza assicurazione:</strong> <?php echo htmlspecialchars($vehicle['nextInsuranceExpirationDate']); ?><br>
+                                        <strong>Scadenza bollo:</strong> <?php echo htmlspecialchars($vehicle['nextTaxExpirationDate']); ?><br>
+                                        <strong>Scadenza revisione:</strong> <?php echo htmlspecialchars($vehicle['nextRevisionExpirationDate']); ?><br>
+                                        <strong>Data eliminazione:</strong> <?php echo htmlspecialchars(formatDate($vehicle['deletedAt'])); ?><br>
+                                    </p>
                                     <button class="btn btn-success btn-sm"
-                                            data-toggle="modal"
-                                            data-target="#restoreVehicleModal"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#restoreVehicleModal"
                                             data-id="<?php echo $vehicle['id']; ?>">
                                         <i class="bi bi-arrow-counterclockwise"></i>
                                     </button>
                                     <button class="btn btn-danger btn-sm"
-                                            data-toggle="modal"
-                                            data-target="#permanentlyDeleteVehicleModal"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#permanentlyDeleteVehicleModal"
                                             data-id="<?php echo $vehicle['id']; ?>">
                                         <i class="bi bi-trash"></i>
                                     </button>
@@ -192,10 +179,9 @@ foreach ($vehicles as $vehicle) {
     <?php include 'addVehicleModal.php'; ?>
     <?php include 'editVehicleModal.php'; ?>
     <?php include 'deleteVehicleModal.php'; ?>
-	<?php include 'permanentlyDeleteVehicleModal.php'; ?>
-	<?php include 'restoreVehicleModal.php'; ?>
+    <?php include 'permanentlyDeleteVehicleModal.php'; ?>
+    <?php include 'restoreVehicleModal.php'; ?>
     <?php include 'navbar.php'; ?>
-	<?php include '../footer.php'; ?>
-	
+    <?php include '../footer.php'; ?>
 </body>
 </html>

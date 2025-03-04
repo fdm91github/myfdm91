@@ -1,12 +1,10 @@
 <!-- Modale per la modifica di un veicolo -->
-<div class="modal fade" id="editVehicleModal" tabindex="-1" role="dialog" aria-labelledby="editVehicleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="editVehicleModal" tabindex="-1" aria-labelledby="editVehicleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editVehicleModalLabel">Modifica veicolo</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="editVehicleStatus"></div>
@@ -36,7 +34,7 @@
                         <label for="editVehicleTaxMonth">Mese di scadenza del bollo</label>
                         <input type="text" name="tax_month" id="editVehicleTaxMonth" class="form-control" required>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">Aggiorna</button>
+                    <button type="submit" class="btn btn-primary w-100">Aggiorna</button>
                 </form>
             </div>
         </div>

@@ -1,12 +1,10 @@
 <!-- Modale per aggiungere una nuova manutenzione -->
-<div class="modal fade" id="addServiceModal" tabindex="-1" role="dialog" aria-labelledby="addServiceModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="addServiceModal" tabindex="-1" aria-labelledby="addServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addServiceModalLabel">Aggiungi Manutenzione</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="addServiceStatus"></div>
@@ -40,10 +38,10 @@
                         <div id="addPartsContainer">
                             <!-- New parts will be dynamically inserted here -->
                         </div>
-                        <button type="button" id="addNewPartBtn" class="btn btn-secondary btn-block">Aggiungi voce</button>
+                        <button type="button" id="addNewPartBtn" class="btn btn-secondary w-100">Aggiungi voce</button>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-block mt-3">Aggiungi</button>
+                    <button type="submit" class="btn btn-primary w-100 mt-3">Aggiungi</button>
                 </form>
             </div>
         </div>

@@ -1,19 +1,17 @@
 <!-- Modale per l'eliminazione di una voce dei bolli -->
-<div class="modal fade" id="deleteTaxModal" tabindex="-1" role="dialog" aria-labelledby="deleteTaxModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="deleteTaxModal" tabindex="-1" aria-labelledby="deleteTaxModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="deleteTaxModalLabel">Elimina bollo</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="deleteTaxStatus"></div>
                 <p>Sei sicuro di voler eliminare questo bollo?</p>
                 <form id="deleteTaxForm" method="POST" action="deleteTax.php">
                     <input type="hidden" name="id" id="deleteTaxId">
-                    <button type="submit" class="btn btn-danger btn-block">Elimina</button>
+                    <button type="submit" class="btn btn-danger w-100">Elimina</button>
                 </form>
             </div>
         </div>

@@ -1,19 +1,17 @@
 <!-- Modale per l'eliminazione di una spesa extra -->
-<div class="modal fade" id="permanentlyDeleteVehicleModal" tabindex="-1" role="dialog" aria-labelledby="permanentlyDeleteVehicleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="permanentlyDeleteVehicleModal" tabindex="-1" aria-labelledby="permanentlyDeleteVehicleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="permanentlyDeleteVehicleModalLabel">Elimina veicolo</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="permanentlyDeleteVehicleStatus"></div>
                 <p>Sei sicuro di voler eliminare DEFINITIVAMENTE questo veicolo?</p>
                 <form id="permanentlyDeleteVehicleForm" method="POST" action="permanentlyDeleteVehicle.php">
                     <input type="hidden" name="id" id="permanentlyDeleteVehicleId">
-                    <button type="submit" class="btn btn-danger btn-block">Elimina</button>
+                    <button type="submit" class="btn btn-danger w-100">Elimina</button>
                 </form>
             </div>
         </div>

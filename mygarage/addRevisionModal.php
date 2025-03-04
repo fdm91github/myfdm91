@@ -1,12 +1,10 @@
 <!-- Modale per l'aggiunta di una voce in Revisioni -->
-<div class="modal fade" id="addRevisionModal" tabindex="-1" role="dialog" aria-labelledby="addRevisionModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="addRevisionModal" tabindex="-1" aria-labelledby="addRevisionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addRevisionModalLabel">Aggiungi una revisione</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="addRevisionStatus"></div>
@@ -20,7 +18,7 @@
                         <label for="addRevisionBuyingDate">Data di acquisto</label>
                         <input type="date" name="buying_date" id="addRevisionBuyingDate" class="form-control" required>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">Aggiungi</button>
+                    <button type="submit" class="btn btn-primary w-100">Aggiungi</button>
                 </form>
             </div>
         </div>

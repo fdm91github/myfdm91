@@ -1,12 +1,10 @@
 <!-- Modale per la modifica di un'assicurazione -->
-<div class="modal fade" id="editInsuranceModal" tabindex="-1" role="dialog" aria-labelledby="editInsuranceModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="editInsuranceModal" tabindex="-1" aria-labelledby="editInsuranceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editInsuranceModalLabel">Modifica Assicurazione</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="editInsuranceStatus"></div>
@@ -29,7 +27,7 @@
                         <label for="editInsuranceEffectiiveDate">Decorrenza</label>
                         <input type="date" name="effective_date" id="editInsuranceEffectiveDate" class="form-control" required>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">Aggiorna</button>
+                    <button type="submit" class="btn btn-primary w-100">Aggiorna</button>
                 </form>
             </div>
         </div>

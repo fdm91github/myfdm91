@@ -1,12 +1,10 @@
 <!-- Modale per la modifica di un bollo -->
-<div class="modal fade" id="editTaxModal" tabindex="-1" role="dialog" aria-labelledby="editTaxModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="editTaxModal" tabindex="-1" aria-labelledby="editTaxModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editTaxModalLabel">Modifica Bollo</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="editTaxStatus"></div>
@@ -21,7 +19,7 @@
                         <label for="editTaxBuyingDate">Data di acquisto</label>
                         <input type="date" name="buying_date" id="editTaxBuyingDate" class="form-control" required>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">Aggiorna</button>
+                    <button type="submit" class="btn btn-primary w-100">Aggiorna</button>
                 </form>
             </div>
         </div>

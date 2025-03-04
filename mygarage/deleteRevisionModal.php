@@ -1,19 +1,17 @@
 <!-- Modale per l'eliminazione di una voce delle revisioni -->
-<div class="modal fade" id="deleteRevisionModal" tabindex="-1" role="dialog" aria-labelledby="deleteRevisionModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<div class="modal fade" id="deleteRevisionModal" tabindex="-1" aria-labelledby="deleteRevisionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="deleteRevisionModalLabel">Elimina revisione</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="deleteRevisionStatus"></div>
                 <p>Sei sicuro di voler eliminare questa revisione?</p>
                 <form id="deleteRevisionForm" method="POST" action="deleteRevision.php">
                     <input type="hidden" name="id" id="deleteRevisionId">
-                    <button type="submit" class="btn btn-danger btn-block">Elimina</button>
+                    <button type="submit" class="btn btn-danger w-100">Elimina</button>
                 </form>
             </div>
         </div>
