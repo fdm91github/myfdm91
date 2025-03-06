@@ -1,6 +1,8 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
   <div class="container-fluid">
-    <a class="navbar-brand" href="../"><img src="/images/logo.png" alt="Logo" height="30"></a>
+    <a class="navbar-brand" href="../">
+      <img src="/images/logo.png" alt="Logo" height="30">
+    </a>
     <!-- Toggler for offcanvas sidebar on small screens -->
     <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
       aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
@@ -35,7 +37,7 @@
     </div>
 
     <!-- Offcanvas sidebar for small screens -->
-    <div class="offcanvas offcanvas-end d-lg-none text-bg-dark" tabindex="-1" id="offcanvasNavbar"
+    <div class="offcanvas offcanvas-end d-lg-none text-bg-dark custom-offcanvas" tabindex="-1" id="offcanvasNavbar"
       aria-labelledby="offcanvasNavbarLabel">
       <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>
@@ -70,6 +72,27 @@
     </div>
   </div>
 </nav>
+
+<!-- Custom CSS to adjust offcanvas -->
+<style>
+
+  .custom-offcanvas {
+    width: auto;
+    max-width: 220px;
+  }
+
+  .custom-offcanvas .nav-link {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: right;
+  }
+
+  .custom-offcanvas .nav-link > i {
+    order: 2;
+  }
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
