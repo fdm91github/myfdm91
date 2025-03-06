@@ -1,12 +1,10 @@
 <!-- Modale per la modifica di una spesa extra -->
-<div class="modal fade" id="editExtraExpenseModal" tabindex="-1" role="dialog" aria-labelledby="editExtraExpenseModalLabel" aria-hidden="true">
+<div class="modal fade" id="editExtraExpenseModal" tabindex="-1" aria-labelledby="editExtraExpenseModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editExtraExpenseModalLabel">Modifica spesa extra</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="editExtraExpenseStatus"></div>
@@ -24,7 +22,7 @@
                         <label for="editExtraExpenseDate">Data</label>
                         <input type="date" name="debit_date" id="editExtraExpenseDate" class="form-control" required>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">Aggiorna</button>
+                    <button type="submit" class="btn btn-primary w-100">Aggiorna</button>
                 </form>
             </div>
         </div>

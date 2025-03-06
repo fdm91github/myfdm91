@@ -1,19 +1,17 @@
 <!-- Modale per l'eliminazione dello stipendio -->
-<div class="modal fade" id="deleteIncomeModal" tabindex="-1" role="dialog" aria-labelledby="deleteIncomeModalLabel" aria-hidden="true">
+<div class="modal fade" id="deleteIncomeModal" tabindex="-1" aria-labelledby="deleteIncomeModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="deleteIncomeModalLabel">Elimina entrata</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="deleteIncomeStatus"></div>
                 <form id="deleteIncomeForm" method="POST">
                     <input type="hidden" id="delete_income_id" name="income_id">
                     <p>Sei sicuro di voler eliminare questa entrata?</p>
-                    <button id="deleteIncomeSubmitButton" type="submit" class="btn btn-danger btn-block">Elimina</button>
+                    <button id="deleteIncomeSubmitButton" type="submit" class="btn btn-danger w-100">Elimina</button>
                 </form>
             </div>
         </div>

@@ -1,8 +1,6 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
   <div class="container-fluid">
-    <a class="navbar-brand" href="../">
-      <img src="/images/logo.png" alt="Logo">
-    </a>
+    <a class="navbar-brand" href="../"><img src="/images/logo.png" alt="Logo"></a>
     <!-- This toggler will trigger the offcanvas sidebar on small screens -->
     <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar"
       aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
@@ -37,7 +35,7 @@
     </div>
 
     <!-- Offcanvas sidebar for small screens -->
-    <div class="offcanvas offcanvas-start d-lg-none text-bg-dark" tabindex="-1" id="offcanvasNavbar"
+    <div class="offcanvas offcanvas-end d-lg-none text-bg-dark" tabindex="-1" id="offcanvasNavbar"
       aria-labelledby="offcanvasNavbarLabel">
       <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Menu</h5>

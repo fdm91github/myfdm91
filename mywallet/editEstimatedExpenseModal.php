@@ -1,12 +1,10 @@
 <!-- Modale per la modifica di una spesa stimata -->
-<div class="modal fade" id="editEstimatedExpenseModal" tabindex="-1" role="dialog" aria-labelledby="editEstimatedExpenseModalLabel" aria-hidden="true">
+<div class="modal fade" id="editEstimatedExpenseModal" tabindex="-1" aria-labelledby="editEstimatedExpenseModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editEstimatedExpenseModalLabel">Modifica spesa stimata</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="editEstimatedExpenseStatus"></div>
@@ -80,7 +78,7 @@
                         <label for="editEstimatedExpenseBillingFrequency">Frequenza di fatturazione (mesi)</label>
                         <input type="number" name="billing_frequency" id="editEstimatedExpenseBillingFrequency" class="form-control" min="1" required>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">Aggiorna</button>
+                    <button type="submit" class="btn btn-primary w-100">Aggiorna</button>
                 </form>
             </div>
         </div>

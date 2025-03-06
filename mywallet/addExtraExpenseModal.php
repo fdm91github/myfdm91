@@ -1,12 +1,10 @@
 <!-- Modale per l'aggiunta di una spesa extra -->
-<div class="modal fade" id="addExtraExpenseModal" tabindex="-1" role="dialog" aria-labelledby="addExtraExpenseModalLabel" aria-hidden="true">
+<div class="modal fade" id="addExtraExpenseModal" tabindex="-1" aria-labelledby="addExtraExpenseModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addExtraExpenseModalLabel">Aggiungi spesa extra</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="addExtraExpenseStatus"></div>
@@ -23,7 +21,7 @@
                         <label for="addExtraExpenseDate">Data</label>
                         <input type="date" name="debit_date" id="addExtraExpenseDate" class="form-control" required>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">Aggiungi</button>
+                    <button type="submit" class="btn btn-primary w-100">Aggiungi</button>
                 </form>
             </div>
         </div>

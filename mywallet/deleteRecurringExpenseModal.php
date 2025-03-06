@@ -1,19 +1,17 @@
 <!-- Modale per l'eliminazione di una spesa ricorrente -->
-<div class="modal fade" id="deleteRecurringExpenseModal" tabindex="-1" role="dialog" aria-labelledby="deleteRecurringExpenseModalLabel" aria-hidden="true">
+<div class="modal fade" id="deleteRecurringExpenseModal" tabindex="-1" aria-labelledby="deleteRecurringExpenseModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="deleteRecurringExpenseModalLabel">Elimina spesa ricorrente</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="deleteRecurringExpenseStatus"></div>
                 <p>Sei sicuro di voler eliminare questa voce?</p>
                 <form id="deleteRecurringExpenseForm">
                     <input type="hidden" name="id" id="deleteRecurringExpenseId">
-                    <button type="submit" class="btn btn-danger btn-block">Elimina</button>
+                    <button type="submit" class="btn btn-danger w-100">Elimina</button>
                 </form>
             </div>
         </div>

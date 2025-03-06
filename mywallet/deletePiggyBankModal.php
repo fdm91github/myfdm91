@@ -1,19 +1,17 @@
 <!-- Modale per l'eliminazione di una voce al salvadanaio -->
-<div class="modal fade" id="deletePiggyBankModal" tabindex="-1" role="dialog" aria-labelledby="deletePiggyBankModalLabel" aria-hidden="true">
+<div class="modal fade" id="deletePiggyBankModal" tabindex="-1" aria-labelledby="deletePiggyBankModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="deletePiggyBankModalLabel">Elimina dal salvadanaio</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="deletePiggyBankStatus"></div>
                 <p>Sei sicuro di voler eliminare questa voce?</p>
                 <form id="deletePiggyBankForm">
                     <input type="hidden" name="id" id="deletePiggyBankId">
-                    <button type="submit" class="btn btn-danger btn-block">Elimina</button>
+                    <button type="submit" class="btn btn-danger w-100">Elimina</button>
                 </form>
             </div>
         </div>

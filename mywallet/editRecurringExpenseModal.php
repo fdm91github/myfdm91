@@ -1,12 +1,10 @@
 <!-- Modale per la modifica di una spesa ricorrente -->
-<div class="modal fade" id="editRecurringExpenseModal" tabindex="-1" role="dialog" aria-labelledby="editRecurringExpenseModalLabel" aria-hidden="true">
+<div class="modal fade" id="editRecurringExpenseModal" tabindex="-1" aria-labelledby="editRecurringExpenseModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editRecurringExpenseModalLabel">Modifica spesa ricorrente</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="editRecurringExpenseStatus"></div>
@@ -80,7 +78,7 @@
                         <label for="editRecurringExpenseBillingFrequency">Frequenza di fatturazione (mesi)</label>
                         <input type="number" name="billing_frequency" id="editRecurringExpenseBillingFrequency" class="form-control" min="1" required>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">Aggiorna</button>
+                    <button type="submit" class="btn btn-primary w-100">Aggiorna</button>
                 </form>
             </div>
         </div>

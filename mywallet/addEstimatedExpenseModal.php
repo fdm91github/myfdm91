@@ -1,12 +1,10 @@
 <!-- Modale per l'aggiunta di una spesa stimata -->
-<div class="modal fade" id="addEstimatedExpenseModal" tabindex="-1" role="dialog" aria-labelledby="addEstimatedExpenseModalLabel" aria-hidden="true">
+<div class="modal fade" id="addEstimatedExpenseModal" tabindex="-1" aria-labelledby="addEstimatedExpenseModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addEstimatedExpenseModalLabel">Aggiungi spesa stimata</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="addEstimatedExpenseStatus"></div>
@@ -80,7 +78,7 @@
                         <label for="addEstimatedExpenseBillingFrequency">Frequenza di fatturazione (mesi)</label>
                         <input type="number" name="billing_frequency" id="addEstimatedExpenseBillingFrequency" class="form-control" min="1" value="1" required>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block" id="addEstimatedExpenseSubmitButton">Aggiungi</button>
+                    <button type="submit" class="btn btn-primary w-100" id="addEstimatedExpenseSubmitButton">Aggiungi</button>
                 </form>
             </div>
         </div>

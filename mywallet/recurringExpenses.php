@@ -27,7 +27,6 @@ function compare_expenses($a, $b, $sort_by, $order) {
     } else {
         $result = strcmp($a[$sort_by], $b[$sort_by]);
     }
-
     return $order === 'desc' ? -$result : $result;
 }
 
@@ -38,68 +37,64 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
     return compare_expenses($a, $b, $sort_by, $order);
 });
 ?>
-
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <title>Spese ricorrenti</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Centralized updated scripts (Bootstrap 5.3.3, jQuery, Popper, etc.) -->
+    <?php include '../script.php'; ?>
+    <!-- Bootstrap Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="../my.css" rel="stylesheet">
 </head>
 <body>
     <div class="container mt-5">
-		<div class="card mb-4">
-			<div class="card-header d-flex justify-content-between align-items-center">
-				<h4 class="mb-0">Filtri</h4>
-				<button class="btn btn-primary toggle-content" data-toggle="collapse" data-target="#filterContent" aria-expanded="false" aria-controls="filterContent">
-					<i class="bi bi-funnel"></i>
-				</button>
-			</div>
-			<div id="filterContent" class="collapse card-body">
-				<div class="mb-3">
-					<div class="row mb-2">
-						<div class="col-md-6">
-							<label for="searchExpenses">Nome:</label>
-							<input type="text" id="searchExpenses" class="form-control" placeholder="Cerca una spesa...">
-						</div>
-						<div class="col-md-6">
-							<label for="expenseFilter">Tipo spesa:</label>
-							<select id="expenseFilter" class="form-control">
-								<option value="both" selected>Tutte</option>
-								<option value="active">Attive</option>
-								<option value="expired">Scadute</option>
-							</select>
-						</div>
-					</div>
-					<div class="row mb-2">
-						<div class="col-md-6">
-							<label for="minPrice">Min. Totale:</label>
-							<input type="number" id="minPrice" class="form-control" min="0" step="0.01">
-						</div>
-						<div class="col-md-6">
-							<label for="maxPrice">Max. Totale:</label>
-							<input type="number" id="maxPrice" class="form-control" min="0" step="0.01">
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
+        <!-- Filter Card -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">Filtri</h4>
+                <button class="btn btn-primary toggle-content" data-bs-toggle="collapse" data-bs-target="#filterContent" aria-expanded="false" aria-controls="filterContent">
+                    <i class="bi bi-funnel"></i>
+                </button>
+            </div>
+            <div id="filterContent" class="collapse card-body">
+                <div class="mb-3">
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <label for="searchExpenses">Nome:</label>
+                            <input type="text" id="searchExpenses" class="form-control" placeholder="Cerca una spesa...">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="expenseFilter">Tipo spesa:</label>
+                            <select id="expenseFilter" class="form-control">
+                                <option value="both" selected>Tutte</option>
+                                <option value="active">Attive</option>
+                                <option value="expired">Scadute</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-2">
+                        <div class="col-md-6">
+                            <label for="minPrice">Min. Totale:</label>
+                            <input type="number" id="minPrice" class="form-control" min="0" step="0.01">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="maxPrice">Max. Totale:</label>
+                            <input type="number" id="maxPrice" class="form-control" min="0" step="0.01">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Spese ricorrenti attive -->
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">Spese ricorrenti attive</h4>
-                <button class="btn btn-primary" data-toggle="modal" data-target="#addRecurringExpenseModal">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRecurringExpenseModal">
                     <i class="bi bi-plus"></i>
                 </button>
             </div>
@@ -110,20 +105,20 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
                             <div class="card-body d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0"><?php echo htmlspecialchars($expense['name']); ?></h5>
                                 <div>
-									<button class="btn btn-warning" data-toggle="modal" data-target="#editRecurringExpenseModal"
-										data-id="<?php echo $expense['id']; ?>"
-										data-name="<?php echo htmlspecialchars($expense['name']); ?>"
-										data-amount="<?php echo htmlspecialchars($expense['amount']); ?>"
-										data-start-month="<?php echo $expense['start_month']; ?>"
-										data-start-year="<?php echo $expense['start_year']; ?>"
-										data-end-month="<?php echo $expense['end_month']; ?>"
-										data-end-year="<?php echo $expense['end_year']; ?>"
-										data-undetermined="<?php echo $expense['undetermined']; ?>"
-										data-debit-date="<?php echo $expense['debit_date']; ?>"
-										data-billing-frequency="<?php echo $expense['billing_frequency']; ?>">
-										<i class="bi bi-pencil"></i>
-									</button>
-                                    <button class="btn btn-danger" data-toggle="modal" data-target="#deleteRecurringExpenseModal" 
+                                    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editRecurringExpenseModal"
+                                        data-id="<?php echo $expense['id']; ?>"
+                                        data-name="<?php echo htmlspecialchars($expense['name']); ?>"
+                                        data-amount="<?php echo htmlspecialchars($expense['amount']); ?>"
+                                        data-start-month="<?php echo $expense['start_month']; ?>"
+                                        data-start-year="<?php echo $expense['start_year']; ?>"
+                                        data-end-month="<?php echo $expense['end_month']; ?>"
+                                        data-end-year="<?php echo $expense['end_year']; ?>"
+                                        data-undetermined="<?php echo $expense['undetermined']; ?>"
+                                        data-debit-date="<?php echo $expense['debit_date']; ?>"
+                                        data-billing-frequency="<?php echo $expense['billing_frequency']; ?>">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteRecurringExpenseModal" 
                                         data-id="<?php echo $expense['id']; ?>">
                                         <i class="bi bi-trash"></i>
                                     </button>
@@ -133,7 +128,7 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
                                 <p><strong>Totale:</strong> €<?php echo htmlspecialchars($expense['amount']); ?></p>
                                 <p><strong>Questo mese:</strong> €<?php echo htmlspecialchars($expense['monthly_debit']); ?></p>
                                 <p><strong>Prossimo addebito:</strong> <?php echo htmlspecialchars($expense['next_debit_date']); ?></p>
-                                <p><strong>Frequenza:</strong> 
+                                <p><strong>Frequenza:</strong>
                                     <?php 
                                     if ($expense['billing_frequency'] > 1) {
                                         echo 'Ogni ' . htmlspecialchars($expense['billing_frequency']) . ' mesi';
@@ -158,7 +153,7 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="mb-0">Spese ricorrenti scadute</h4>
-                <button class="btn btn-primary toggle-content" data-toggle="collapse" data-target="#expiredExpensesContent" aria-expanded="false" aria-controls="expiredExpensesContent">
+                <button class="btn btn-primary toggle-content" data-bs-toggle="collapse" data-bs-target="#expiredExpensesContent" aria-expanded="false" aria-controls="expiredExpensesContent">
                     <i class="bi bi-eye"></i>
                 </button>
             </div>
@@ -169,20 +164,20 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
                             <div class="card-body d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0"><?php echo htmlspecialchars($expense['name']); ?></h5>
                                 <div>
-									<button class="btn btn-warning" data-toggle="modal" data-target="#editRecurringExpenseModal"
-										data-id="<?php echo $expense['id']; ?>"
-										data-name="<?php echo htmlspecialchars($expense['name']); ?>"
-										data-amount="<?php echo htmlspecialchars($expense['amount']); ?>"
-										data-start-month="<?php echo $expense['start_month']; ?>"
-										data-start-year="<?php echo $expense['start_year']; ?>"
-										data-end-month="<?php echo $expense['end_month']; ?>"
-										data-end-year="<?php echo $expense['end_year']; ?>"
-										data-undetermined="<?php echo $expense['undetermined']; ?>"
-										data-debit-date="<?php echo $expense['debit_date']; ?>"
-										data-billing-frequency="<?php echo $expense['billing_frequency']; ?>">
-										<i class="bi bi-pencil"></i>
-									</button>
-                                    <button class="btn btn-danger" data-toggle="modal" data-target="#deleteRecurringExpenseModal" 
+                                    <button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editRecurringExpenseModal"
+                                        data-id="<?php echo $expense['id']; ?>"
+                                        data-name="<?php echo htmlspecialchars($expense['name']); ?>"
+                                        data-amount="<?php echo htmlspecialchars($expense['amount']); ?>"
+                                        data-start-month="<?php echo $expense['start_month']; ?>"
+                                        data-start-year="<?php echo $expense['start_year']; ?>"
+                                        data-end-month="<?php echo $expense['end_month']; ?>"
+                                        data-end-year="<?php echo $expense['end_year']; ?>"
+                                        data-undetermined="<?php echo $expense['undetermined']; ?>"
+                                        data-debit-date="<?php echo $expense['debit_date']; ?>"
+                                        data-billing-frequency="<?php echo $expense['billing_frequency']; ?>">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteRecurringExpenseModal" 
                                         data-id="<?php echo $expense['id']; ?>">
                                         <i class="bi bi-trash"></i>
                                     </button>
@@ -191,7 +186,7 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
                             <div class="card-body">
                                 <p><strong>Totale:</strong> €<?php echo htmlspecialchars($expense['amount']); ?></p>
                                 <p><strong>Ultimo addebito:</strong> <?php echo htmlspecialchars($expense['last_debit_date']); ?></p>
-                                <p><strong>Frequenza:</strong> 
+                                <p><strong>Frequenza:</strong>
                                     <?php 
                                     if ($expense['billing_frequency'] > 1) {
                                         echo 'Ogni ' . htmlspecialchars($expense['billing_frequency']) . ' mesi';
@@ -216,47 +211,49 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
     <?php include 'addRecurringExpenseModal.php'; ?>
     <?php include 'editRecurringExpenseModal.php'; ?>
     <?php include 'deleteRecurringExpenseModal.php'; ?>
-	<?php include 'navbar.php'; ?>
+    <?php include 'navbar.php'; ?>
     <?php include '../footer.php'; ?>
-
 </body>
 </html>
 
 <script>
-	$(document).ready(function () {
-		function filterExpenses() {
-			let searchValue = $("#searchExpenses").val().toLowerCase();
-			let minPrice = parseFloat($("#minPrice").val()) || 0;
-			let maxPrice = parseFloat($("#maxPrice").val()) || Infinity;
-			let expenseFilter = $("#expenseFilter").val();
+    $(document).ready(function () {
+        function filterExpenses() {
+            let searchValue = $("#searchExpenses").val().toLowerCase();
+            let minPrice = parseFloat($("#minPrice").val()) || 0;
+            let maxPrice = parseFloat($("#maxPrice").val()) || Infinity;
+            let expenseFilter = $("#expenseFilter").val();
 
-			$(".card.mb-4").each(function () {
-				let isFilterCard = $(this).find("h4").text().includes("Filtri"); // Keep filter card visible
-				let isActive = $(this).find("h4").text().toLowerCase().includes("attive");
-				let isExpired = $(this).find("h4").text().toLowerCase().includes("scadute");
+            $(".card.mb-4").each(function () {
+                let isFilterCard = $(this).find("h4").text().includes("Filtri"); // Keep filter card visible
+                let isActive = $(this).find("h4").text().toLowerCase().includes("attive");
+                let isExpired = $(this).find("h4").text().toLowerCase().includes("scadute");
 
-				let matchesFilter = isFilterCard || (expenseFilter === "both") ||
-					(expenseFilter === "active" && isActive) ||
-					(expenseFilter === "expired" && isExpired);
+                let matchesFilter = isFilterCard || (expenseFilter === "both") ||
+                    (expenseFilter === "active" && isActive) ||
+                    (expenseFilter === "expired" && isExpired);
 
-				$(this).toggle(matchesFilter);
-			});
+                $(this).toggle(matchesFilter);
+            });
 
-			$(".card-body .card").each(function () {
-				let expenseName = $(this).find("h5").text().toLowerCase();
-				let priceText = $(this).find("p:contains('Totale:')").text().replace('Totale:', '').replace('€', '').trim();
-				let price = parseFloat(priceText);
+            $(".card-body .card").each(function () {
+                let expenseName = $(this).find("h5").text().toLowerCase();
+                let priceText = $(this).find("p:contains('Totale:')").text().replace('Totale:', '').replace('€', '').trim();
+                let price = parseFloat(priceText);
 
-				let matchesSearch = expenseName.includes(searchValue);
-				let matchesPrice = price >= minPrice && price <= maxPrice;
+                let matchesSearch = expenseName.includes(searchValue);
+                let matchesPrice = price >= minPrice && price <= maxPrice;
 
-				$(this).toggle(matchesSearch && matchesPrice);
-			});
-		}
+                $(this).toggle(matchesSearch && matchesPrice);
+            });
+        }
 
-		$("#searchExpenses, #minPrice, #maxPrice, #expenseFilter").on("input change", function () {
-			filterExpenses();
-			$("#filterContent").collapse("show"); // Ensure filter remains visible
-		});
-	});
+        $("#searchExpenses, #minPrice, #maxPrice, #expenseFilter").on("input change", function () {
+            filterExpenses();
+            // Use Bootstrap 5 Collapse instance to show filter content
+            var collapseEl = document.getElementById("filterContent");
+            var bsCollapse = new bootstrap.Collapse(collapseEl, {toggle: false});
+            bsCollapse.show();
+        });
+    });
 </script>

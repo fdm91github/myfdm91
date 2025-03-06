@@ -2,86 +2,6 @@
 session_start();
 require_once '../config.php';
 include 'retrieveData.php';
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['month']) && isset($_POST['year'])) {
-    $selectedMonth = $_POST['month'];
-    $selectedYear = $_POST['year'];
-} else {
-    $selectedMonth = date('m');
-    $selectedYear = date('Y');
-}
-
-if ($salaryDate) {
-    $currentDate = DateTime::createFromFormat('Y-m-d', "$selectedYear-$selectedMonth-$salaryDate");
-    $next_date = clone $currentDate;
-    $next_date->modify('+1 month')->modify('-1 day');
-} else {
-    $currentDate = DateTime::createFromFormat('Y-m-d', "$selectedYear-$selectedMonth-01");
-    $next_date = clone $currentDate;
-    $next_date->modify('+1 month')->modify('-1 day');
-}
-
-$currentSelected = $currentDate->format('d/m/Y');
-$next_selected = $next_date->format('d/m/Y');
-
-// Recupero gli ultimi 12 mesi
-$last_12_months = [];
-$last_12_monthlyIncomes = [];
-$last_12_monthlyExpenses = [];
-$monthlyPiggyBank = []; // Aggiungo questa riga per tenere traccia delle somme nel salvadanaio
-
-$endDate = new DateTime("$selectedYear-$selectedMonth-01");
-$endDate->modify('+1 month'); // Imposta a inizio del mese successivo
-
-for ($i = 0; $i < 12; $i++) {
-    $endDate->modify('-1 month');
-    $month_year = $endDate->format('Y-m');
-    $last_12_months[] = $endDate->format('F Y');
-
-    // Recupero entrate per il mese corrente
-    $monthlyIncome = executeQuery($link, "SELECT SUM(amount) as monthly_wallet_incomes FROM wallet_incomes WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $month_year])['monthly_wallet_incomes'];
-    $last_12_monthlyIncomes[] = $monthlyIncome ?: 0;
-
-    // Recupero uscite per il mese corrente
-    $monthlyExpense = 0;
-
-    // Spese ricorrenti
-    $rows = executeQuery($link, "SELECT amount, billing_frequency FROM wallet_recurring_expenses WHERE user_id = ? AND (start_year < ? OR (start_year = ? AND start_month <= ?)) AND (end_year IS NULL OR end_year > ? OR (end_year = ? AND end_month >= ?))", ["iiiiiii", $user_id, $endDate->format('Y'), $endDate->format('Y'), $endDate->format('m'), $endDate->format('Y'), $endDate->format('Y'), $endDate->format('m')], false);
-    foreach ($rows as $row) {
-        $monthlyExpense += $row['amount'] / $row['billing_frequency'];
-    }
-
-    // Spese stimate
-    $rows = executeQuery($link, "SELECT amount, billing_frequency FROM wallet_estimated_expenses WHERE user_id = ? AND (start_year < ? OR (start_year = ? AND start_month <= ?)) AND (end_year IS NULL OR end_year > ? OR (end_year = ? AND end_month >= ?))", ["iiiiiii", $user_id, $endDate->format('Y'), $endDate->format('Y'), $endDate->format('m'), $endDate->format('Y'), $endDate->format('Y'), $endDate->format('m')], false);
-    foreach ($rows as $row) {
-        $monthlyExpense += $row['amount'] / $row['billing_frequency'];
-    }
-
-    // Spese extra
-    if ($salaryDate) {
-        // Salary date non nullo
-        $startDate = (clone $endDate)->modify('first day of this month')->setDate($endDate->format('Y'), $endDate->format('m'), $salaryDate);
-        $endDateTemp = (clone $startDate)->modify('+1 month')->modify('-1 day');
-        $extraRow = executeQuery($link, "SELECT SUM(amount) as total_extra FROM wallet_extra_expenses WHERE user_id = ? AND debit_date BETWEEN ? AND ?", ["iss", $user_id, $startDate->format('Y-m-d'), $endDateTemp->format('Y-m-d')]);
-        $monthlyExpense += $extraRow['total_extra'] ?: 0;
-    } else {
-        // Salary date nullo, considero il mese normalmente
-        $extraRow = executeQuery($link, "SELECT SUM(amount) as total_extra FROM wallet_extra_expenses WHERE user_id = ? AND MONTH(debit_date) = ? AND YEAR(debit_date) = ?", ["iis", $user_id, $endDate->format('m'), $endDate->format('Y')]);
-        $monthlyExpense += $extraRow['total_extra'] ?: 0;
-    }
-
-    $last_12_monthlyExpenses[] = $monthlyExpense;
-
-    // Recupero l'importo salvadanaio per il mese corrente
-    $monthly_piggy = executeQuery($link, "SELECT SUM(amount) as monthly_wallet_piggy_bank FROM wallet_piggy_bank WHERE user_id = ? AND DATE_FORMAT(added_date, '%Y-%m') = ?", ["is", $user_id, $month_year])['monthly_wallet_piggy_bank'];
-    $monthlyPiggyBank[] = $monthly_piggy ?: 0;
-}
-
-// Inverto gli array per avere i mesi in ordine cronologico
-$last_12_months = array_reverse($last_12_months);
-$last_12_monthlyIncomes = array_reverse($last_12_monthlyIncomes);
-$last_12_monthlyExpenses = array_reverse($last_12_monthlyExpenses);
-$monthlyPiggyBank = array_reverse($monthlyPiggyBank);
 ?>
 
 <!DOCTYPE html>
@@ -89,18 +9,10 @@ $monthlyPiggyBank = array_reverse($monthlyPiggyBank);
 <head>
     <meta charset="UTF-8">
     <title>Dashboard</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Bootstrap JS e dipendenze varie -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <!-- Charts e grafici -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Bootstrap CSS -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Centralized updated scripts (Bootstrap 5.3.3, jQuery, Popper, Chart.js, etc.) -->
+    <?php include '../script.php'; ?>
+    <!-- Bootstrap Icons (if not already included in /script.php) -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="../my.css" rel="stylesheet">
@@ -111,8 +23,8 @@ $monthlyPiggyBank = array_reverse($monthlyPiggyBank);
         <div class="card mb-4">
             <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
                 <h4 class="mb-0">Panoramica</h4>
-                <form method="POST" action="" class="form-inline">
-                    <label for="month">Mese:</label>
+                <form method="POST" action="" class="d-flex align-items-center">
+                    <label for="month" class="me-2">Mese:</label>
                     <select name="month" id="month" class="form-control mx-2">
                         <?php
                         $months = [
@@ -129,7 +41,7 @@ $monthlyPiggyBank = array_reverse($monthlyPiggyBank);
                         }
                         ?>
                     </select>
-                    <label for="year">Anno:</label>
+                    <label for="year" class="me-2">Anno:</label>
                     <select name="year" id="year" class="form-control mx-2">
                         <?php
                         for ($y = 2020; $y <= 2099; $y++) {
@@ -137,24 +49,25 @@ $monthlyPiggyBank = array_reverse($monthlyPiggyBank);
                         }
                         ?>
                     </select>
-                    <button type="submit" class="btn btn-primary ml-2">Visualizza</button>
+                    <button type="submit" class="btn btn-primary ms-2">Visualizza</button>
                 </form>
             </div>
 
             <div class="card-body">
                 <div class="row">
                     <div class="col-12 col-md-6">
-                        <p><b>Entrate totali</b> per il periodo <?php echo $currentSelected . ' - ' . $next_selected; ?>: <b><?php echo isset($thisMonthIncomes) ? $thisMonthIncomes : '0'; ?> euro</b></p>
-                        <p><b>Totale spese ricorrenti</b> per il periodo <?php echo $currentSelected . ' - ' . $next_selected; ?>: <b><?php echo $thisMonthTotalRecurringExpenses; ?> euro</b></p>
-                        <p><b>Totale spese stimate</b> per il periodo <?php echo $currentSelected . ' - ' . $next_selected; ?>: <b><?php echo $thisMonthTotalEstimatedExpenses; ?> euro</b></p>
-                        <p><b>Totale spese extra</b> per il periodo <?php echo $currentSelected . ' - ' . $next_selected; ?>: <b><?php echo $thisMonthTotalExtraExpenses; ?> euro</b></p>
-                        <p><b>Spese totali</b> per il periodo <?php echo $currentSelected . ' - ' . $next_selected; ?>: <b><?php echo $totalExpenses; ?> euro</b></p>
-                        <p><b>Stipendio rimanente</b> per il periodo <?php echo $currentSelected . ' - ' . $next_selected; ?>: <b><?php echo $leftIncomes; ?> euro</b></p>
+                        <p><b>Entrate totali</b> per il mese <?php echo $selectedMonth . '/' . $selectedYear; ?>: <b><?php echo isset($thisMonthIncomes) ? $thisMonthIncomes : '0'; ?>&euro;</b></p>
+                        <p><b>Totale spese ricorrenti</b> per il mese <?php echo $selectedMonth . '/' . $selectedYear; ?>: <b><?php echo $thisMonthTotalRecurringExpenses; ?>&euro;</b></p>
+                        <p><b>Totale spese stimate</b> per il mese <?php echo $selectedMonth . '/' . $selectedYear; ?>: <b><?php echo $thisMonthTotalEstimatedExpenses; ?>&euro;</b></p>
+                        <p><b>Totale spese extra</b> per il mese <?php echo $selectedMonth . '/' . $selectedYear; ?>: <b><?php echo $thisMonthTotalExtraExpenses; ?>&euro;</b></p>
+                        <p><b>Spese totali</b> per il mese <?php echo $selectedMonth . '/' . $selectedYear; ?>: <b><?php echo $totalExpenses; ?>&euro;</b></p>
+                        <p><b>Stipendio rimanente</b> per il mese <?php echo $selectedMonth . '/' . $selectedYear; ?>: <b><?php echo $leftIncomes; ?>&euro;</b></p>
                     </div>
                     <div class="col-12 col-md-6">
-                        <p><b>Totale nel salvadanaio:</b> <b><?php if($totalPiggyBank > 0) {echo $totalPiggyBank;} else {echo '0';} ?> euro</b> di cui <b><?php if($thisMonthPiggyBank > 0) {echo $thisMonthPiggyBank;} else {echo '0';} ?> euro</b> aggiunti nel periodo <?php echo $currentSelected . ' - ' . $next_selected; ?></p>
-                        <p>Sul salvadanaio delle Spese Ricorrenti dovresti avere <b><?php echo $recurringSavings; ?> euro</b></p>
-                        <p>Sul salvadanaio delle Spese Stimate dovresti avere <b><?php echo $estimatedSavings; ?> euro</b></p>
+                        <p><b>Totale nel salvadanaio:</b> <b><?php echo ($totalPiggyBank > 0 ? $totalPiggyBank : '0'); ?>&euro;</b></p>
+						<p>Aggiunti nel <b>Salvadanaio</b> nel mese selezionato: <b><?php echo ($thisMonthPiggyBank > 0 ? $thisMonthPiggyBank : '0'); ?>&euro;</b></p>
+                        <p>Sul salvadanaio delle <b>Spese Ricorrenti</b> dovresti avere <b><?php echo $recurringSavings; ?>&euro;</b></p>
+                        <p>Sul salvadanaio delle <b>Spese Stimate</b> dovresti avere <b><?php echo $estimatedSavings; ?>&euro;</b></p>
                     </div>
                 </div>
             </div>
@@ -200,20 +113,13 @@ $monthlyPiggyBank = array_reverse($monthlyPiggyBank);
                                 <?php echo $leftIncomes; ?>
                             ],
                             backgroundColor: [
-                                'rgba(255, 99, 132, 1)',
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(153, 102, 255, 1)'
+                                'rgba(255, 132, 18, 1)',
+                                'rgba(247, 60, 60, 1)',
+                                'rgba(155, 41, 242, 1)',
+                                'rgba(69, 122, 255, 1)',
+                                'rgba(68, 179, 54, 1)'
                             ],
-                            borderColor: [
-                                'rgba(255, 99, 132, 1)',
-                                'rgba(54, 162, 235, 1)',
-                                'rgba(255, 206, 86, 1)',
-                                'rgba(75, 192, 192, 1)',
-                                'rgba(153, 102, 255, 1)'
-                            ],
-                            borderWidth: 1
+                            borderWidth: 0
                         }]
                     },
                     options: {
@@ -222,7 +128,7 @@ $monthlyPiggyBank = array_reverse($monthlyPiggyBank);
                         plugins: {
                             legend: {
                                 labels: {
-                                    color: '#ecf0f1' // Colore del testo della legenda
+                                    color: '#ecf0f1'
                                 }
                             }
                         }
@@ -234,22 +140,19 @@ $monthlyPiggyBank = array_reverse($monthlyPiggyBank);
                     datasets: [{
                         label: 'Entrate',
                         data: [<?php echo implode(", ", $last_12_monthlyIncomes); ?>],
-                        backgroundColor: 'rgba(75, 192, 192, 1)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(68, 179, 54, 1)',
                         borderWidth: 1
                     },
                     {
                         label: 'Uscite',
                         data: [<?php echo implode(", ", $last_12_monthlyExpenses); ?>],
-                        backgroundColor: 'rgba(255, 99, 132, 1)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: 'rgba(247, 60, 60, 1)',
                         borderWidth: 1
                     },
                     {
                         label: 'Salvadanaio',
                         data: [<?php echo implode(", ", $monthlyPiggyBank); ?>],
-                        backgroundColor: 'rgba(153, 102, 255, 1)',
-                        borderColor: 'rgba(153, 102, 255, 1)',
+                        backgroundColor: 'rgba(69, 122, 255, 1)',
                         borderWidth: 1
                     }]
                 };
@@ -265,19 +168,19 @@ $monthlyPiggyBank = array_reverse($monthlyPiggyBank);
                             y: {
                                 beginAtZero: true,
                                 ticks: {
-                                    color: '#ecf0f1' // Colore del testo dell'asse Y
+                                    color: '#ecf0f1'
                                 }
                             },
                             x: {
                                 ticks: {
-                                    color: '#ecf0f1' // Colore del testo dell'asse X
+                                    color: '#ecf0f1'
                                 }
                             }
                         },
                         plugins: {
                             legend: {
                                 labels: {
-                                    color: '#ecf0f1' // Colore del testo della legenda
+                                    color: '#ecf0f1'
                                 }
                             }
                         }
@@ -286,6 +189,6 @@ $monthlyPiggyBank = array_reverse($monthlyPiggyBank);
             });
         </script>
     </div>
-	<?php include '../footer.php'; ?>
+    <?php include '../footer.php'; ?>
 </body>
 </html>

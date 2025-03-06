@@ -28,7 +28,7 @@ body, html {
 }
 
 p, .table th, .table td, .modal-body {
-    color: #ecf0f1; /* Testo bianco */
+    color: #ecf0f1;
 }
 
 .modal-body .form-group {
@@ -132,5 +132,16 @@ p, .table th, .table td, .modal-body {
     .table th, .table td {
         padding: 0.5rem; /* Riduci il padding */
     }
+
+	/* Impostazioni della navbar/sidebar */
+	.navbar-toggler {
+	  font-size: 1.25rem;
+	  padding: 0.75rem 1.25rem;
+	}
+
+	.offcanvas .nav-link {
+	  font-size: 1.1rem;
+	  padding: 0.75rem 1.25rem;
+	}
 
 }

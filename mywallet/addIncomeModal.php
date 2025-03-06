@@ -1,12 +1,10 @@
 <!-- Modale per l'aggiunta di una voce alle entrate -->
-<div class="modal fade" id="addIncomeModal" tabindex="-1" role="dialog" aria-labelledby="addIncomeModalLabel" aria-hidden="true">
+<div class="modal fade" id="addIncomeModal" tabindex="-1" aria-labelledby="addIncomeModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addIncomeModalLabel">Aggiungi alle entrate</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div id="addIncomeStatus"></div>
@@ -23,7 +21,7 @@
                         <label for="addIncomeDate">Data</label>
                         <input type="date" name="added_date" id="addIncomeDate" class="form-control" required>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-block">Aggiungi</button>
+                    <button type="submit" class="btn btn-primary w-100">Aggiungi</button>
                 </form>
             </div>
         </div>

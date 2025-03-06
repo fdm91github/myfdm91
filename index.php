@@ -12,7 +12,7 @@ if (!isset($_SESSION['username'])) {
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -97,6 +97,7 @@ if (!isset($_SESSION['username'])) {
             });
         });
     </script>
+    <?php include 'footer.php'; ?>
 </body>
 </html>
 
