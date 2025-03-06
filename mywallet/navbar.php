@@ -75,10 +75,9 @@
 
 <!-- Custom CSS to adjust offcanvas -->
 <style>
-
   .custom-offcanvas {
     width: auto;
-    max-width: 220px;
+    max-width: 250px;
   }
 
   .custom-offcanvas .nav-link {
@@ -92,6 +91,19 @@
   .custom-offcanvas .nav-link > i {
     order: 2;
   }
+  
+  /* Impostazioni della navbar/sidebar */
+  @media (max-width: 768px) {
+	.navbar-toggler {
+	  font-size: 1rem;
+	  padding: 0.75rem 1.25rem;
+	}
+
+	.offcanvas .nav-link {
+	  font-size: 1.5rem;
+	  padding: 0.75rem 1.25rem;
+	}
+}
 </style>
 
 <script>

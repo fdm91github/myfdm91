@@ -126,22 +126,10 @@ p, .table th, .table td, .modal-body {
 @media (max-width: 768px) {
     body, html {
         padding-top: 10px;
-        font-size: 0.9rem; /* Riduci la dimensione del testo */
+        font-size: 0.9rem;
     }
 
     .table th, .table td {
-        padding: 0.5rem; /* Riduci il padding */
+        padding: 0.5rem;
     }
-
-	/* Impostazioni della navbar/sidebar */
-	.navbar-toggler {
-	  font-size: 1.25rem;
-	  padding: 0.75rem 1.25rem;
-	}
-
-	.offcanvas .nav-link {
-	  font-size: 1.1rem;
-	  padding: 0.75rem 1.25rem;
-	}
-
 }
