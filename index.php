@@ -28,8 +28,8 @@ if (!isset($_SESSION['username'])) {
             text-overflow: ellipsis;
         }
         .lottie-animation {
-            width: 120px;
-            height: 120px;
+            width: 90px;
+            height: 90px;
             margin: auto;
         }
     </style>
@@ -44,8 +44,6 @@ if (!isset($_SESSION['username'])) {
 		<h4>Seleziona un servizio</h4>
             </div>
             <div class="card-body text-center">
-                <h2 class="mt-5">Bentornato!</h2>
-                <p class="lead">Scegli cosa vuoi visualizzare:</p>
                 <div class="row">
                     <div class="col-md-4">
                         <div class="card mb-4 shadow-sm">

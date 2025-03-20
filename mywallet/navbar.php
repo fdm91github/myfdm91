@@ -89,7 +89,7 @@
 <style>
   .custom-offcanvas {
     width: auto;
-    max-width: 220px;
+    max-width: 250px;
   }
 
   .custom-offcanvas .nav-link {
