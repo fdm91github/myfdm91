@@ -1,6 +1,6 @@
 <!-- Modale per la modifica di un'entrata -->
 <div class="modal fade" id="editIncomeModal" tabindex="-1" aria-labelledby="editIncomeModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editIncomeModalLabel">Modifica entrata</h5>

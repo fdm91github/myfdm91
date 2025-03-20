@@ -11,7 +11,7 @@ require_once '../config.php';
 $response = ['status' => '', 'message' => ''];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $salary_id = trim($_POST['income_id']);
+    $income_id = trim($_POST['income_id']);
     $user_id = $_SESSION['id'];
 
     if (empty($income_id)) {

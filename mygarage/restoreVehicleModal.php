@@ -1,6 +1,6 @@
 <!-- Modale per l'il ripristino di un veicolo -->
 <div class="modal fade" id="restoreVehicleModal" tabindex="-1" aria-labelledby="restoreVehicleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="restoreVehicleModalLabel">Ripristina veicolo</h5>

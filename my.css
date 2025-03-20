@@ -38,6 +38,12 @@ p, .table th, .table td, .modal-body {
     color: #ecf0f1;
 }
 
+small {
+	display: inline-block;
+	padding-top: 15px;
+	padding-bottom: 20px;
+}
+
 .modal-body .form-group {
     margin-bottom: 1rem;
     position: relative;

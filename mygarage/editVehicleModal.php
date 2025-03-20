@@ -1,6 +1,6 @@
 <!-- Modale per la modifica di un veicolo -->
 <div class="modal fade" id="editVehicleModal" tabindex="-1" aria-labelledby="editVehicleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="editVehicleModalLabel">Modifica veicolo</h5>

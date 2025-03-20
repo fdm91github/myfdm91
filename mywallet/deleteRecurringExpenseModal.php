@@ -1,6 +1,6 @@
 <!-- Modale per l'eliminazione di una spesa ricorrente -->
 <div class="modal fade" id="deleteRecurringExpenseModal" tabindex="-1" aria-labelledby="deleteRecurringExpenseModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="deleteRecurringExpenseModalLabel">Elimina spesa ricorrente</h5>

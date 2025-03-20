@@ -1,6 +1,6 @@
 <!-- Modale per l'aggiunta di una voce in Assicurazioni -->
 <div class="modal fade" id="addInsuranceModal" tabindex="-1" aria-labelledby="addInsuranceModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addInsuranceModalLabel">Aggiungi un'assicurazione</h5>

@@ -28,6 +28,12 @@
           <a class="nav-link" href="extraExpenses.php"><i class="bi bi-bag-heart-fill"></i> Spese extra</a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" href="wallets.php"><i class="bi bi-wallet-fill"></i> Gestione Portafogli</a>
+        </li>
+		<li class="nav-item">
+          <a class="nav-link" href="walletData.php"><i class="bi bi-cash-coin"></i> Portafogli</a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" href="piggyBank.php"><i class="bi bi-piggy-bank-fill"></i> Salvadanaio</a>
         </li>
         <li class="nav-item">
@@ -60,6 +66,12 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href="extraExpenses.php"><i class="bi bi-bag-heart-fill"></i> Spese extra</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="wallets.php"><i class="bi bi-wallet-fill"></i> Gestione Portafogli</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="walletData.php"><i class="bi bi-cash-coin"></i> Portafogli</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="piggyBank.php"><i class="bi bi-piggy-bank-fill"></i> Salvadanaio</a>

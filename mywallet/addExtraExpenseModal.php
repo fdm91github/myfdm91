@@ -1,6 +1,6 @@
 <!-- Modale per l'aggiunta di una spesa extra -->
 <div class="modal fade" id="addExtraExpenseModal" tabindex="-1" aria-labelledby="addExtraExpenseModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addExtraExpenseModalLabel">Aggiungi spesa extra</h5>

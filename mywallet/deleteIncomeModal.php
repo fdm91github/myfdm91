@@ -1,6 +1,6 @@
 <!-- Modale per l'eliminazione dello stipendio -->
 <div class="modal fade" id="deleteIncomeModal" tabindex="-1" aria-labelledby="deleteIncomeModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="deleteIncomeModalLabel">Elimina entrata</h5>
@@ -40,6 +40,11 @@
                 }
             });
         });
+		$('#deleteIncomeModal').on('show.bs.modal', function (event) {
+			var button = $(event.relatedTarget); // Button that triggered the modal
+			var incomeId = button.data('id'); // Extract info from data-* attributes
+			var modal = $(this);
+			modal.find('#delete_income_id').val(incomeId);
+		});
     });
 </script>
-

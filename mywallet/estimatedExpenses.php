@@ -43,11 +43,7 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
     <meta charset="UTF-8">
     <title>Spese stimate</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Centralized updated scripts (Bootstrap 5.3.3, jQuery, Popper, Chart.js, etc.) -->
     <?php include '../script.php'; ?>
-    <!-- Bootstrap Icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
-    <!-- Custom CSS -->
     <link href="../my.css" rel="stylesheet">
 </head>
 <body>
@@ -65,8 +61,8 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
 					<div class="mb-3">
 						<div class="row mb-2">
 							<div class="col-md-6">
-								<label for="searchExpenses">Nome:</label>
-								<input type="text" id="searchExpenses" class="form-control" placeholder="Cerca una spesa...">
+								<label for="searchExpenses">Descrizione:</label>
+								<input type="text" id="searchExpenses" class="form-control" placeholder="Cerca un elemento...">
 							</div>
 							<div class="col-md-6">
 								<label for="expenseFilter">Tipo spesa:</label>
@@ -106,7 +102,7 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
 								<div class="card-body d-flex justify-content-between align-items-center">
 									<h5 class="mb-0"><?php echo htmlspecialchars($expense['name']); ?></h5>
 									<div>
-										<button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editEstimatedExpenseModal" 
+										<button class="btn btn-warning btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editEstimatedExpenseModal" 
 											data-id="<?php echo $expense['id']; ?>"
 											data-name="<?php echo htmlspecialchars($expense['name']); ?>"
 											data-amount="<?php echo htmlspecialchars($expense['amount']); ?>"
@@ -119,7 +115,7 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
 											data-billing-frequency="<?php echo $expense['billing_frequency']; ?>">
 											<i class="bi bi-pencil"></i>
 										</button>
-										<button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteEstimatedExpenseModal" 
+										<button class="btn btn-danger btn-sm me-2" data-bs-toggle="modal" data-bs-target="#deleteEstimatedExpenseModal" 
 											data-id="<?php echo $expense['id']; ?>">
 											<i class="bi bi-trash"></i>
 										</button>
@@ -165,7 +161,7 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
 								<div class="card-body d-flex justify-content-between align-items-center">
 									<h5 class="mb-0"><?php echo htmlspecialchars($expense['name']); ?></h5>
 									<div>
-										<button class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editEstimatedExpenseModal" 
+										<button class="btn btn-warning btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editEstimatedExpenseModal" 
 											data-id="<?php echo $expense['id']; ?>"
 											data-name="<?php echo htmlspecialchars($expense['name']); ?>"
 											data-amount="<?php echo htmlspecialchars($expense['amount']); ?>"
@@ -178,7 +174,7 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
 											data-billing-frequency="<?php echo $expense['billing_frequency']; ?>">
 											<i class="bi bi-pencil"></i>
 										</button>
-										<button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteEstimatedExpenseModal" 
+										<button class="btn btn-danger btn-sm me-2" data-bs-toggle="modal" data-bs-target="#deleteEstimatedExpenseModal" 
 											data-id="<?php echo $expense['id']; ?>">
 											<i class="bi bi-trash"></i>
 										</button>
@@ -256,6 +252,20 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
             var collapseEl = document.getElementById("filterContent");
             var bsCollapse = new bootstrap.Collapse(collapseEl, {toggle: false});
             bsCollapse.show();
+        });
+		
+		// Select the collapse element and its toggle button
+        var expiredCollapse = $('#expiredExpensesContent');
+        var toggleButton = $('button[data-bs-target="#expiredExpensesContent"]');
+
+        // When the collapse is shown, change the icon to bi-eye-slash
+        expiredCollapse.on('shown.bs.collapse', function () {
+            toggleButton.find('i').removeClass('bi-eye').addClass('bi-eye-slash');
+        });
+
+        // When the collapse is hidden, revert the icon to bi-eye
+        expiredCollapse.on('hidden.bs.collapse', function () {
+            toggleButton.find('i').removeClass('bi-eye-slash').addClass('bi-eye');
         });
     });
 </script>

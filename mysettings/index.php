@@ -236,7 +236,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!-- Modale di verifica -->
 <div class="modal fade" id="verificationModal" tabindex="-1" role="dialog" aria-labelledby="verificationModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="verificationModalLabel">Verifica Email</h5>
@@ -255,7 +255,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!-- Modale di conferma verifica -->
 <div class="modal fade" id="emailVerifiedModal" tabindex="-1" role="dialog" aria-labelledby="emailVerifiedModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+    <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="emailVerifiedModalLabel">Email Verificata</h5>
