@@ -18,7 +18,7 @@ include 'retrieveData.php';
 		<div class="container mt-5">
 			<div class="card mb-4">
 				<div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-					<h4 class="mb-0">Panoramica</h4>
+					<h4 class="mb-0">Panoramica <?php echo $selectedMonth . '/' . $selectedYear; ?></h4>
 					<form method="POST" action="" class="d-flex align-items-center">
 						<label for="month" class="me-2">Mese:</label>
 						<select name="month" id="month" class="form-control mx-2">
@@ -52,23 +52,23 @@ include 'retrieveData.php';
 				<div class="card-body">
 					<div class="row">
 						<div class="col-12 col-md-6">
-							<p><b>Entrate totali</b> per il mese <?php echo $selectedMonth . '/' . $selectedYear; ?>: <b><?php echo isset($thisMonthIncomes) ? $thisMonthIncomes : '0'; ?>€</b></p>
-							<p><b>Totale spese ricorrenti</b> per il mese <?php echo $selectedMonth . '/' . $selectedYear; ?>: <b><?php echo $thisMonthTotalRecurringExpenses; ?>€</b></p>
-							<p><b>Totale spese stimate</b> per il mese <?php echo $selectedMonth . '/' . $selectedYear; ?>: <b><?php echo $thisMonthTotalEstimatedExpenses; ?>€</b></p>
-							<p><b>Totale spese extra</b> per il mese <?php echo $selectedMonth . '/' . $selectedYear; ?>: <b><?php echo $thisMonthTotalExtraExpenses; ?>€</b></p>
+							<p><b>Entrate totali: <?php echo isset($thisMonthIncomes) ? $thisMonthIncomes : '0'; ?>€</b></p>
+							<p><b>Totale spese ricorrenti: <?php echo $thisMonthTotalRecurringExpenses; ?>€</b></p>
+							<p><b>Totale spese stimate: <?php echo $thisMonthTotalEstimatedExpenses; ?>€</b></p>
+							<p><b>Totale spese extra: <?php echo $thisMonthTotalExtraExpenses; ?>€</b></p>
 							<?php if (!empty($walletDashboardExpenses)): ?>
 								<?php foreach ($walletDashboardExpenses as $wallet_name => $total): ?>
-									<p><b>Totale <?php echo $wallet_name; ?></b> per il mese <?php echo $selectedMonth . '/' . $selectedYear; ?>: <b><?php echo $total; ?>€</b></p>
+									<p><b>Totale <?php echo $wallet_name; ?>: <?php echo $total; ?>€</b></p>
 								<?php endforeach; ?>
 							<?php endif; ?>
-							<p><b>Spese totali</b> per il mese <?php echo $selectedMonth . '/' . $selectedYear; ?>: <b><?php echo $totalExpenses; ?>€</b></p>
+							<p><b>Spese totali: <?php echo $totalExpenses; ?>€</b></p>
 						</div>
 						<div class="col-12 col-md-6">
-							<p><b>Stipendio rimanente</b> per il mese <?php echo $selectedMonth . '/' . $selectedYear; ?>: <b><?php echo $leftIncomes; ?>€</b></p>
-							<p><b>Totale nel salvadanaio:</b> <b><?php echo ($totalPiggyBank > 0 ? $totalPiggyBank : '0'); ?>€</b></p>
-							<p>Aggiunti nel <b>Salvadanaio</b> nel mese selezionato: <b><?php echo ($thisMonthPiggyBank > 0 ? $thisMonthPiggyBank : '0'); ?>€</b></p>
-							<p>Sul salvadanaio delle <b>Spese Ricorrenti</b> dovresti avere <b><?php echo $recurringSavings; ?>€</b></p>
-							<p>Sul salvadanaio delle <b>Spese Stimate</b> dovresti avere <b><?php echo $estimatedSavings; ?>€</b></p>
+							<p><b>Stipendio rimanente: <?php echo $leftIncomes; ?>€</b></p>
+							<p><b>Totale nel salvadanaio: <?php echo ($totalPiggyBank > 0 ? $totalPiggyBank : '0'); ?>€</b></p>
+							<p>Aggiunti nel <b>Salvadanaio: <?php echo ($thisMonthPiggyBank > 0 ? $thisMonthPiggyBank : '0'); ?>€</b></p>
+							<p>Tot. su Salvadanaio <b>Spese Ricorrenti: <?php echo $recurringSavings; ?>€</b></p>
+							<p>Tot. su Salvadanaio <b>Spese Stimate: <?php echo $estimatedSavings; ?>€</b></p>
 						</div>
 					</div>
 				</div>
