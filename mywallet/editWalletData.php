@@ -102,7 +102,7 @@ if ($wallet_data_id) {
                 // Commit transaction
                 $link->commit();
 
-                $success_message = "Manutenzione e parti correlate modificate con successo.";
+                $success_message = "Spesa e prodotti correlati modificati con successo.";
                 header("refresh:3;url=dashboard.php");
             } catch (Exception $e) {
                 // Rollback transaction on error

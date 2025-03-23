@@ -1,4 +1,4 @@
-<!-- Modale per aggiungere una nuova manutenzione -->
+<!-- Modale per aggiungere una nuova spesa -->
 <div class="modal fade" id="addWalletDataModal" tabindex="-1" aria-labelledby="addWalletDataModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
