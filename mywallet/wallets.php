@@ -65,7 +65,9 @@ function displaySharedInfo($shared_json) {
 													data-bs-toggle="modal"
 													data-bs-target="#editWalletModal"
 													data-id="<?php echo $wallet['id']; ?>"
-													data-description="<?php echo htmlspecialchars($wallet['description']); ?>">
+													data-description="<?php echo htmlspecialchars($wallet['description']); ?>"
+													data-icon="<?php echo htmlspecialchars($wallet['icon']); ?>"
+													data-show_in_dashboard="<?php echo htmlspecialchars($wallet['show_in_dashboard']); ?>">
 												<i class="bi bi-pencil"></i>
 											</button>
 											<button class="btn btn-info btn-sm me-2"

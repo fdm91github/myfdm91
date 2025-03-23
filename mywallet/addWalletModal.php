@@ -14,7 +14,6 @@
                         <input type="text" name="description" id="addWalletDescription" class="form-control" placeholder="Descrizione" required>
                     </div>
 
-                    <!-- Icon selection using clickable icons -->
                     <div class="form-group mb-3">
                         <label>Icona</label>
                         <div class="d-flex flex-wrap" id="iconSelection">
@@ -49,11 +48,9 @@
                             <div class="m-2 icon-item" data-icon="person-fill"><i class="bi bi-person-fill" style="font-size: 2rem;"></i></div>
                             <div class="m-2 icon-item" data-icon="ticket-perforated-fill"><i class="bi bi-ticket-perforated-fill" style="font-size: 2rem;"></i></div>
                         </div>
-                        <!-- Hidden input to store the selected icon value -->
                         <input type="hidden" name="icon" id="selectedIcon" required>
                     </div>
 
-					<!-- Show in dashboard flag -->
 					<div class="form-group form-check mb-3">
 						<input type="checkbox" name="show_in_dashboard" class="form-check-input" id="showInDashboard" <?php echo $disableDashboard; ?>>
 						<label class="form-check-label <?php echo $dashboardLabelClass; ?>" for="showInDashboard">
@@ -71,7 +68,6 @@
     </div>
 </div>
 
-<!-- Style for clickable icon items -->
 <style>
     .icon-item {
         cursor: pointer;

@@ -11,46 +11,45 @@ require_once '../config.php';
 $user_id = $_SESSION['id'];
 $wallet_id = $_GET['id'] ?? null;
 
-$error_message = '';
-$success_message = '';
+$response = ["status" => "error", "message" => ""];
 
-if ($wallet_id) {
-    $sql = "SELECT description FROM wallets WHERE id = ? AND user_id = ?";
-    if ($stmt = $link->prepare($sql)) {
-        $stmt->bind_param("ii", $wallet_id, $user_id);
-        $stmt->execute();
-        $stmt->bind_result($description);
-        $stmt->fetch();
-        $stmt->close();
-    } else {
-        $error_message = "Qualcosa è andato storto. Riprova più tardi.";
-        exit;
-    }
-} else {
-    $error_message = "Richiesta non valida a causa di wallet_id non fornito.";
+if (!$wallet_id) {
+    $response["message"] = "Richiesta non valida a causa di wallet_id non fornito.";
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit;
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $description = trim($_POST['description']);
+    $icon = isset($_POST['icon']) ? trim($_POST['icon']) : "";
+    $show_in_dashboard = isset($_POST['show_in_dashboard']) ? 1 : 0;
 
-    // Validate inputs
-    if (empty($description)) {
-        $error_message = "Inserisci tutti i campi obbligatori.";
-    } else {
-        $sql = "UPDATE wallets SET description = ? WHERE id = ? AND user_id = ?";
-        if ($stmt = $link->prepare($sql)) {
-            $stmt->bind_param("sii", $description, $wallet_id, $user_id);
-            if ($stmt->execute()) {
-                $success_message = "Portafogli modificato con successo. Reindirizzamento alla dashboard...";
-                header("refresh:3;url=dashboard.php");
-            } else {
-                $error_message = "Qualcosa è andato storto. Riprova più tardi.";
-            }
-            $stmt->close();
-        } else {
-            $error_message = "Qualcosa è andato storto. Riprova più tardi.";
-        }
+    // Validazione dei campi obbligatori
+    if (empty($description) || empty($icon)) {
+        $response["message"] = "Inserisci tutti i campi obbligatori.";
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        exit;
     }
+
+    $sql = "UPDATE wallets SET description = ?, icon = ?, show_in_dashboard = ? WHERE id = ? AND user_id = ?";
+    if ($stmt = $link->prepare($sql)) {
+        $stmt->bind_param("ssiii", $description, $icon, $show_in_dashboard, $wallet_id, $user_id);
+        if ($stmt->execute()) {
+            $response["status"] = "success";
+            $response["message"] = "Portafoglio aggiornato con successo!";
+        } else {
+            $response["message"] = "Qualcosa è andato storto. Riprova più tardi.";
+        }
+        $stmt->close();
+    } else {
+        $response["message"] = "Qualcosa è andato storto. Riprova più tardi.";
+    }
+
     $link->close();
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit;
 }
 ?>
