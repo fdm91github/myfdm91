@@ -48,10 +48,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         try {
                             // SMTP server configuration
                             $mail->isSMTP();
-                            $mail->Host = 'smtp.fdm91.net';  // SMTP server
-                            $mail->Port = 25;  // SMTP port
-                            $mail->SMTPAuth = false;  // No SMTP authentication
-                            $mail->SMTPSecure = false;  // No SSL/TLS
+                            $mail->Host = '192.168.0.206';
+                            $mail->Port = 25;
+                            $mail->SMTPAuth = false;
+			    $mail->SMTPAutoTLS = false;
+			        $mail->SMTPOptions = array(
+      				  'ssl' => array(
+			            'verify_peer'       => false,
+			            'verify_peer_name'  => false,
+			            'allow_self_signed' => true
+			        )
+			    );
 
                             // Sender info
                             $mail->setFrom('no-reply@fdm91.net', 'MyFDM91');
