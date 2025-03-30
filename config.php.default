@@ -1,15 +1,36 @@
 <?php
-// config.php
+// MySQL configuration settings
 define('DB_SERVER', 'hostname');
-define('DB_USERNAME', 'db_username');
-define('DB_PASSWORD', 'db_password');
-define('DB_NAME', 'db_name');
+define('DB_USERNAME', 'username');
+define('DB_PASSWORD', 'password');
+define('DB_NAME', 'database');
 
-/* Connessione al database */
+// Connection to the SQL database
 $link = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
-
-// Verifica la connessione
 if($link === false){
     die("ERROR: Could not connect. " . $link->connect_error);
 }
+
+// Mailserver configuration settings
+$config = [
+	'smtp' => [
+		'host'    => 'hostname',
+		'port'    => port,
+		'auth'    => true/false,
+		'autoTLS' => true/false,
+		'options' => [
+			'ssl' => [
+				'verify_peer'       => true/false,
+				'verify_peer_name'  => true/false,
+				'allow_self_signed' => true/false,
+            ],
+        ],
+    ],
+	'email' => [
+		'from_address' => 'email@mydomain.com',
+		'from_name'    => 'MyFDM91'
+    ],
+    'host_base' => 'https://my.domain.com'
+];
+
 ?>

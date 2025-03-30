@@ -545,7 +545,7 @@ $last_12_monthlyExpenses = [];
 $monthlyPiggyBank = []; // Aggiungo questa riga per tenere traccia delle somme nel salvadanaio
 
 for ($i = 0; $i < 12; $i++) {
-    $date = new DateTime();
+    $date = new DateTime('first day of this month');
     $date->modify("-$i months");
     $month_year = $date->format('Y-m');
     $last_12_months[] = $date->format('F Y');

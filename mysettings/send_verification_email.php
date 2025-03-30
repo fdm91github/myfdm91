@@ -35,11 +35,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     $stmt->bind_param("issi", $user_id, $email, $token, $expires);
                     if ($stmt->execute()) {
                         // Create the verification link
-                        $verification_link = "https://my.fdm91.net/mysettings/verify_email.php?token=$token";
+                        $verification_link = $config['host_base'] . "/mysettings/verify_email.php?token=$token";
 
                         // Email content
                         $subject = "Verifica la tua email";
-                        $message = "Clicca su questo link per verificare il tuo indirizzo email: 
+                        $message = "<p>Clicca su questo link per verificare il tuo indirizzo email:</p>
                                     <a href='" . htmlspecialchars($verification_link) . "'>Verifica Email</a>";
 
                         // Use PHPMailer to send the email
@@ -47,21 +47,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                         try {
                             // SMTP server configuration
-                            $mail->isSMTP();
-                            $mail->Host = '192.168.0.206';
-                            $mail->Port = 25;
-                            $mail->SMTPAuth = false;
-			    $mail->SMTPAutoTLS = false;
-			        $mail->SMTPOptions = array(
-      				  'ssl' => array(
-			            'verify_peer'       => false,
-			            'verify_peer_name'  => false,
-			            'allow_self_signed' => true
-			        )
-			    );
+							$mail->isSMTP();
+							$mail->Host = $config['smtp']['host'];
+							$mail->Port = $config['smtp']['port'];
+							$mail->SMTPAuth = $config['smtp']['auth'];
+							$mail->SMTPAutoTLS = $config['smtp']['autoTLS'];
+							$mail->SMTPOptions = $config['smtp']['options'];
 
                             // Sender info
-                            $mail->setFrom('no-reply@fdm91.net', 'MyFDM91');
+                            $mail->setFrom($config['email']['from_address'], $config['email']['from_name']);
 
                             // Recipient
                             $mail->addAddress($email);

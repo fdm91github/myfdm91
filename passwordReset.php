@@ -1,11 +1,10 @@
 <?php
-// Impostazioni di sicurezza per la sessione
 ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_secure', 1);
 ini_set('session.use_strict_mode', 1);
 
 require_once 'config.php';
-require 'vendor/autoload.php'; // Include PHPMailer
+require 'vendor/autoload.php';
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -38,42 +37,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 }
 
                 // Send a reset email using PHPMailer
-                $reset_link = "https://my.fdm91.net/reset.php?token=$token&email=$email";
+                $reset_link = $config['host_base'] . "/reset.php?token=$token&email=$email";
                 $subject = "Richiesta di reimpostazione della password";
-                $message = "Clicca su questo link per reimpostare la tua password: <a href='" . htmlspecialchars($reset_link) . "'>Reimposta Password</a>";
+                $message = "
+							<p>Clicca sul seguente link per reimpostare la tua password:</p>
+							<a href='" . htmlspecialchars($reset_link) . "'>Reimposta Password</a>
+							<p>Se non hai richiesto questo reset, ignora semplicemente questa mail. Non preoccuparti, nessuno ha accesso al tuo account!</p>
+							<p>Non riesci a visualizzare correttamente il link? Copia e incolla in un browser il link di seguito:<p>
+							<a href='" . htmlspecialchars($reset_link) . "'>$reset_link</a>
+							";
 
                 // Create a PHPMailer instance
                 $mail = new PHPMailer(true);
 
                 try {
                     // SMTP server configuration
-                    $mail->isSMTP();
-                    $mail->Host = '192.168.0.206';
-                    $mail->Port = 25;
-		    $mail->SMTPAuth = false;
-		    $mail->SMTPAutoTLS = false; // Disable auto TLS if it's interfering
-		    $mail->SMTPOptions = array(
-		        'ssl' => array(
-		            'verify_peer'       => false,
-		            'verify_peer_name'  => false,
-		            'allow_self_signed' => true
-		        )
-		    );
+					$mail->isSMTP();
+					$mail->Host = $config['smtp']['host'];
+					$mail->Port = $config['smtp']['port'];
+					$mail->SMTPAuth = $config['smtp']['auth'];
+					$mail->SMTPAutoTLS = $config['smtp']['autoTLS'];
+					$mail->SMTPOptions = $config['smtp']['options'];
 
-                    // Sender info
-                    $mail->setFrom('noreply@fdm91.net', 'Reset Password fdm91');
-
-                    // Recipient
-                    $mail->addAddress($email);  // User's email
-
-                    // Email content
-                    $mail->isHTML(true);  // Enable HTML format
-                    $mail->Subject = $subject;
-                    $mail->Body = $message;
-
-                    // Send the email
-                    $mail->send();
-                    $success_message = "Le istruzioni per reimpostare la password sono state inviate alla tua email.";
+					// Sender info
+					$mail->setFrom($config['email']['from_address'], $config['email']['from_name']);
+	
+					// Recipient
+					$mail->addAddress($email);  // User's email
+	
+					// Email content
+					$mail->isHTML(true);  // Enable HTML format
+					$mail->Subject = $subject;
+					$mail->Body = $message;
+	
+					// Send the email
+					$mail->send();
+					$success_message = "Le istruzioni per reimpostare la password sono state inviate alla tua email.";
                 } catch (Exception $e) {
                     // Handle errors
                     $error_message = "Errore nell'invio dell'email: " . htmlspecialchars($mail->ErrorInfo);

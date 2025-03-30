@@ -134,7 +134,9 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
 										}
 										?>
 									</p>
-									<p><strong>Rata corrente:</strong> <?php echo htmlspecialchars($expense['current_installment']) . ' di ' . htmlspecialchars($expense['total_installments']); ?></p>
+									<?php if ($expense['total_installments']>1): ?>
+										<p><strong>Rata corrente:</strong> <?php echo htmlspecialchars($expense['current_installment']) . ' di ' . htmlspecialchars($expense['total_installments']); ?></p>
+									<?php endif; ?>
 								</div>
 							</div>
 						<?php endforeach; ?>
@@ -182,16 +184,6 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
 								</div>
 								<div class="card-body">
 									<p><strong>Totale:</strong> €<?php echo htmlspecialchars($expense['amount']); ?></p>
-									<p><strong>Ultimo addebito:</strong> <?php echo htmlspecialchars($expense['last_debit_date']); ?></p>
-									<p><strong>Frequenza:</strong>
-										<?php 
-										if ($expense['billing_frequency'] > 1) {
-											echo 'Ogni ' . htmlspecialchars($expense['billing_frequency']) . ' mesi';
-										} else {
-											echo 'Ogni mese';
-										}
-										?>
-									</p>
 								</div>
 							</div>
 						<?php endforeach; ?>
