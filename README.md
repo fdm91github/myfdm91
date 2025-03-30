@@ -260,4 +260,4 @@
 	  CONSTRAINT `fk_vehicles_id_taxes` FOREIGN KEY (`vehicle_id`) REFERENCES `vehicles` (`id`)
 	) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-- Copy the config.php.default to config.php and edit it according to your needs. DO NOT forget the HOST_BASE (your URI) and the 
+- Copy the config.php.default to config.php and edit it according to your needs. DO NOT forget the mailserver settings and specifically the 'from_address' (your email service address) and the 'host_base' (your URI) in order to get the notifications and reset password features working :)
