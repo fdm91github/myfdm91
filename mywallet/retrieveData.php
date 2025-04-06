@@ -466,48 +466,6 @@ $thisMonthTotalEstimatedExpenses = 0;
 $estimatedSavings = 0;
 processExpenses($link, $user_id, $selectedDate, $salaryDate, $estimatedExpenses, $thisMonthTotalEstimatedExpenses, $estimatedSavings, 'wallet_estimated_expenses');
 
-// Recupero le spese extra
-$extraExpenses = executeQuery(
-	$link,
-	"SELECT id, name, amount, debit_date
-	 FROM wallet_extra_expenses
-	 WHERE user_id = ?
-	 ORDER BY debit_date DESC",
-	["i", $user_id],
-	false
-);
-
-// Recupero le spese extra relative al mese corrente
-$thismonthExtraExpenses = [];
-
-if ($salaryDate) {
-    // Salary date non nullo
-    $startDate = (new DateTime())->setDate($selectedYear, $selectedMonth, $salaryDate);
-    $endDate = (clone $startDate)->modify('+1 month')->modify('-1 day');
-    $thismonthExtraExpenses = executeQuery(
-		$link,
-		"SELECT id, name, amount, debit_date
-		 FROM wallet_extra_expenses
-		 WHERE user_id = ?
-		 AND debit_date BETWEEN ? AND ?",
-		["iss", $user_id, $startDate->format('Y-m-d'),
-		$endDate->format('Y-m-d')],
-		false
-	);
-} else {
-    // Salary date nullo, considero il mese normalmente
-    $thismonthExtraExpenses = executeQuery(
-		$link,
-		"SELECT id, name, amount, debit_date
-		 FROM wallet_extra_expenses
-		 WHERE user_id = ?
-		 AND MONTH(debit_date) = ?
-		 AND YEAR(debit_date) = ?",
-		["iis", $user_id, $selectedMonth, $selectedYear],
-		false
-	);
-}
-
 // Recupero le spese relative al mese corrente per i portafogli da mostrare in dashboard
 $walletDashboardExpenses = [];
 $thisMonthTotalCustomWallets = 0;
@@ -529,11 +487,8 @@ foreach ($dashboardWallets as $wallet) {
 $walletLabels = array_keys($walletDashboardExpenses);
 $walletValues = array_values($walletDashboardExpenses);
 
-// Calcolo il totale delle spese extra del mese in corso
-$thisMonthTotalExtraExpenses = array_sum(array_column($thismonthExtraExpenses, 'amount'));
-
-// Calcolo le spese totali come somma di quelle ricorrenti, stimate, extra e la somma messa nel salvadanaio per il mese corrente
-$totalExpenses = round($thisMonthTotalRecurringExpenses + $thisMonthTotalEstimatedExpenses + $thisMonthTotalExtraExpenses + $thisMonthTotalCustomWallets, 2);
+// Calcolo le spese totali come somma di quelle ricorrenti, stimate e la somma messa nel salvadanaio per il mese corrente
+$totalExpenses = round($thisMonthTotalRecurringExpenses + $thisMonthTotalEstimatedExpenses + $thisMonthTotalCustomWallets, 2);
 
 // Calcolo lo stipendio rimanente
 $leftIncomes = round($thisMonthIncomes - $totalExpenses - $thisMonthPiggyBank, 2);
@@ -592,34 +547,6 @@ for ($i = 0; $i < 12; $i++) {
 	);
     foreach ($rows as $row) {
         $monthlyExpense += $row['amount'] / $row['billing_frequency'];
-    }
-
-    // Spese extra
-    if ($salaryDate) {
-        // Salary date non nullo
-        $startDate = (clone $date)->setDate($date->format('Y'), $date->format('m'), $salaryDate);
-        $endDate = (clone $startDate)->modify('+1 month')->modify('-1 day');
-        $extraRow = executeQuery(
-			$link,
-			"SELECT SUM(amount) as total_extra
-			 FROM wallet_extra_expenses
-			 WHERE user_id = ?
-			 AND debit_date BETWEEN ? AND ?",
-			["iss", $user_id, $startDate->format('Y-m-d'), $endDate->format('Y-m-d')]
-		);
-        $monthlyExpense += $extraRow['total_extra'] ?: 0;
-    } else {
-        // Salary date nullo, considero il mese normalmente
-        $extraRow = executeQuery(
-			$link,
-			"SELECT SUM(amount) as total_extra
-			 FROM wallet_extra_expenses
-			 WHERE user_id = ?
-			 AND MONTH(debit_date) = ?
-			 AND YEAR(debit_date) = ?",
-			["iis", $user_id, $date->format('m'), $date->format('Y')]
-		);
-        $monthlyExpense += $extraRow['total_extra'] ?: 0;
     }
 
 	// Recupero le spese per i portafogli abilitati alla dashboard

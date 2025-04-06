@@ -25,9 +25,6 @@
           <a class="nav-link" href="estimatedExpenses.php"><i class="bi bi-cart4"></i> Spese stimate</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="extraExpenses.php"><i class="bi bi-bag-heart-fill"></i> Spese extra</a>
-        </li>
-        <li class="nav-item">
           <a class="nav-link" href="wallets.php"><i class="bi bi-wallet-fill"></i> Gestione Portafogli</a>
         </li>
 		<li class="nav-item">
@@ -63,9 +60,6 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href="estimatedExpenses.php"><i class="bi bi-cart4"></i> Spese stimate</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="extraExpenses.php"><i class="bi bi-bag-heart-fill"></i> Spese extra</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="wallets.php"><i class="bi bi-wallet-fill"></i> Gestione Portafogli</a>

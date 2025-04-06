@@ -2,6 +2,14 @@
 session_start();
 require_once '../config.php';
 include 'retrieveData.php';
+
+$months = [
+	'01' => 'Gennaio', '02' => 'Febbraio', '03' => 'Marzo',
+	'04' => 'Aprile', '05' => 'Maggio', '06' => 'Giugno',
+	'07' => 'Luglio', '08' => 'Agosto', '09' => 'Settembre',
+	'10' => 'Ottobre', '11' => 'Novembre', '12' => 'Dicembre'
+];
+
 ?>
 
 <!DOCTYPE html>
@@ -18,18 +26,11 @@ include 'retrieveData.php';
 		<div class="container mt-5">
 			<div class="card mb-4">
 				<div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-					<h4 class="mb-0">Panoramica <?php echo $selectedMonth . '/' . $selectedYear; ?></h4>
+					<h4 class="mb-0">Panoramica <?php echo $months[$selectedMonth] . ' ' . $selectedYear; ?></h4>
 					<form method="POST" action="" class="d-flex align-items-center">
 						<label for="month" class="me-2">Mese:</label>
 						<select name="month" id="month" class="form-control mx-2">
 							<?php
-							$months = [
-								'01' => 'Gennaio', '02' => 'Febbraio', '03' => 'Marzo',
-								'04' => 'Aprile', '05' => 'Maggio', '06' => 'Giugno',
-								'07' => 'Luglio', '08' => 'Agosto', '09' => 'Settembre',
-								'10' => 'Ottobre', '11' => 'Novembre', '12' => 'Dicembre'
-							];
-
 							for ($m = 1; $m <= 12; $m++) {
 								$month = str_pad($m, 2, '0', STR_PAD_LEFT);
 								$month_name = $months[$month];
@@ -55,7 +56,6 @@ include 'retrieveData.php';
 							<p><b>Entrate totali: <?php echo isset($thisMonthIncomes) ? $thisMonthIncomes : '0'; ?>€</b></p>
 							<p><b>Totale spese ricorrenti: <?php echo $thisMonthTotalRecurringExpenses; ?>€</b></p>
 							<p><b>Totale spese stimate: <?php echo $thisMonthTotalEstimatedExpenses; ?>€</b></p>
-							<p><b>Totale spese extra: <?php echo $thisMonthTotalExtraExpenses; ?>€</b></p>
 							<?php if (!empty($walletDashboardExpenses)): ?>
 								<?php foreach ($walletDashboardExpenses as $wallet_name => $total): ?>
 									<p><b>Totale <?php echo $wallet_name; ?>: <?php echo $total; ?>€</b></p>
@@ -109,21 +109,18 @@ include 'retrieveData.php';
         var expenseChartLabels = [
             'Tot. spese ricorrenti',
             'Tot. spese stimate',
-            'Tot. spese extra',
             'Salvadanaio',
             'Stipendio rimanente'
         ];
         var expenseChartData = [
             <?php echo $thisMonthTotalRecurringExpenses; ?>,
             <?php echo $thisMonthTotalEstimatedExpenses; ?>,
-            <?php echo $thisMonthTotalExtraExpenses; ?>,
             <?php echo $thisMonthPiggyBank; ?>,
             <?php echo $leftIncomes; ?>
         ];
         var expenseColors = [
             'rgba(255, 132, 18, 1)',
             'rgba(247, 60, 60, 1)',
-            'rgba(155, 41, 242, 1)',
             'rgba(69, 122, 255, 1)',
             'rgba(68, 179, 54, 1)'
         ];
