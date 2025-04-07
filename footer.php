@@ -12,7 +12,7 @@
 
                 if ($version) {
                     // Link alla release GitHub
-                    $githubUrl = "https://github.com/fdm91github/myfdm91/releases/tag/" . $version;
+                    $githubUrl = "https://github.com/fdm91github/myfdm91/releases/" . $version;
                     echo ' - v' . $version . ' (<a style="color:white;" href="' . $githubUrl . '" target="_blank" rel="noopener">Note di rilascio</a>)';
                 }
             ?>
