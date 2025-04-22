@@ -1,19 +1,8 @@
 <?php
 session_start();
 require_once '../config.php';
-include 'retrieveData.php';
-
-// Pagination settings
-$perPageOptions = [15, 25, 50, 100];
-$perPage = isset($_GET['per_page']) && in_array($_GET['per_page'], $perPageOptions) ? $_GET['per_page'] : 15;
-$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-$offset = ($page - 1) * $perPage;
-
-// Retrieve paginated data
-$totalEntries = count($piggyBankEntries);
-$totalPages = ceil($totalEntries / $perPage);
-$piggyBankEntriesPaginated = array_slice($piggyBankEntries, $offset, $perPage);
 ?>
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -24,7 +13,23 @@ $piggyBankEntriesPaginated = array_slice($piggyBankEntries, $offset, $perPage);
     <link href="../my.css" rel="stylesheet">
 </head>
 <body>
-    <?php include 'navbar.php'; ?>
+	<?php
+		session_start();
+		require_once '../config.php';
+		include 'retrieveData.php';
+		include 'navbar.php';
+
+		// Pagination settings
+		$perPageOptions = [15, 25, 50, 100];
+		$perPage = isset($_GET['per_page']) && in_array($_GET['per_page'], $perPageOptions) ? $_GET['per_page'] : 15;
+		$page = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+		$offset = ($page - 1) * $perPage;
+
+		// Retrieve paginated data
+		$totalEntries = count($piggyBankEntries);
+		$totalPages = ceil($totalEntries / $perPage);
+		$piggyBankEntriesPaginated = array_slice($piggyBankEntries, $offset, $perPage);
+	?>
 	<div class="content-wrapper">
 		<div class="container mt-5">
             <!-- Filter Section -->

@@ -42,7 +42,7 @@
                             <input type="number" name="start_year" id="editEstimatedExpenseStartYear" class="form-control" min="1900" max="2100" required>
                         </div>
                     </div>
-                    <div class="form-row">
+                    <div id="editEstimatedExpenseEndDateFields" class="form-row">
                         <div class="form-group col-md-6">
                             <label for="editEstimatedExpenseEndMonth">Mese di fine</label>
                             <select name="end_month" id="editEstimatedExpenseEndMonth" class="form-control">
@@ -67,7 +67,7 @@
                         </div>
                     </div>
                     <div class="form-group form-check">
-                        <input type="checkbox" name="undetermined" id="editEstimatedExpenseUndetermined" class="form-check-input" onclick="toggleEstimatedEndDate('edit')">
+                        <input type="checkbox" name="undetermined" id="editEstimatedExpenseUndetermined" class="form-check-input">
                         <label class="form-check-label" for="editEstimatedExpenseUndetermined">Indeterminato</label>
                     </div>
                     <div class="form-group">
@@ -86,20 +86,37 @@
 </div>
 
 <script>
-    function toggleEstimatedEndDate(action) {
-        var endMonth = document.getElementById(action + 'EstimatedExpenseEndMonth');
-        var endYear = document.getElementById(action + 'EstimatedExpenseEndYear');
-        if (document.getElementById(action + 'EstimatedExpenseUndetermined').checked) {
-            endMonth.disabled = true;
-            endYear.disabled = true;
-        } else {
-            endMonth.disabled = false;
-            endYear.disabled = false;
-        }
+  $(function() {
+    // Funzione che toggla wrapper + disable campi
+    function toggleEndDate() {
+      var checked = $('#editEstimatedExpenseUndetermined').is(':checked');
+      $('#editEstimatedExpenseEndDateFields')
+        .toggleClass('d-none', checked)
+        .find('select, input').prop('disabled', checked);
     }
 
+    // Imposta date di default
+    (function setDefaults(){
+      var today = new Date();
+      var m = today.getMonth() + 1, y = today.getFullYear();
+      $('#editEstimatedExpenseStartMonth').val(m);
+      $('#editEstimatedExpenseStartYear').val(y);
+      $('#editEstimatedExpenseEndMonth').val(m);
+      $('#editEstimatedExpenseEndYear').val(y);
+    })();
+
+    // All’apertura del modal: sincronizza subito lo stato
+    $('#editEstimatedExpenseModal').on('shown.bs.modal', toggleEndDate);
+
+    // Al cambio del checkbox
+    $('#editEstimatedExpenseUndetermined').on('change', toggleEndDate);
+
+    // Inizializza anche al caricamento della pagina (utile se il checkbox fosse pre-spuntato)
+    toggleEndDate();
+  });
+
     $(document).ready(function() {
-        $('#editEstimatedExpenseModal').on('show.bs.modal', function (event) {
+		$('#editEstimatedExpenseModal').on('show.bs.modal', function (event) {
 			var button = $(event.relatedTarget);
 			var id = button.data('id');
 			$('#editEstimatedExpenseId').val(id);
@@ -112,7 +129,7 @@
 			var undetermined = button.data('undetermined'); 
 			var debit_date = button.data('debit-date');
 			var billing_frequency = button.data('billing-frequency');
-			
+
 			var modal = $(this);
 			modal.find('#editEstimatedExpenseId').val(id);
 			modal.find('#editEstimatedExpenseName').val(name);
@@ -124,10 +141,10 @@
 			modal.find('#editEstimatedExpenseUndetermined').prop('checked', undetermined);
 			modal.find('#editEstimatedExpenseDebitDate').val(debit_date);
 			modal.find('#editEstimatedExpenseBillingFrequency').val(billing_frequency);
-        });
+		});
 
         $('#editEstimatedExpenseForm').submit(function(e) {
-            e.preventDefault();			
+            e.preventDefault();
             var startMonth = parseInt($('#editEstimatedExpenseStartMonth').val());
             var startYear = parseInt($('#editEstimatedExpenseStartYear').val());
             var endMonth = parseInt($('#editEstimatedExpenseEndMonth').val());

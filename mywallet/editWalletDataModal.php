@@ -9,7 +9,14 @@
                 <div id="editWalletDataStatus"></div>
                 <form id="editWalletDataForm" enctype="multipart/form-data">
                     <input type="hidden" name="id" id="editWalletDataId">
-                    <input type="hidden" name="wallet_id" id="editWalletDataWalletId">
+
+                    <div class="form-group">
+                        <label for="editWalletDataWalletId">Portafoglio</label>
+                        <select name="wallet_id" id="editWalletDataWalletId" class="form-control" required>
+                            <option value="">Seleziona portafoglio...</option>
+                        </select>
+                    </div>
+
                     <div class="form-group">
                         <label for="editWalletDataDescription">Descrizione</label>
                         <input type="text" name="description" id="editWalletDataDescription" class="form-control" required>
@@ -40,45 +47,63 @@
 
         let partsToDelete = [];
 
-        // When the edit modal is shown, load the expense data and existing parts
-        $('#editWalletDataModal').on('show.bs.modal', function (event) {
-            partsToDelete = []; // Reset deletion tracker
-            var button = $(event.relatedTarget);
-            var id = button.data('id');
-            var description = button.data('description');
-            var amount = button.data('amount');
-            var buying_date = button.data('buying-date');
-            var walletId = button.data('wallet-id');
-
-            $('#editWalletDataId').val(id);
-            $('#editWalletDataDescription').val(description);
-            $('#editWalletDataAmount').val(amount);
-            $('#editWalletDataBuyingDate').val(buying_date);
-            $('#editWalletDataWalletId').val(walletId);
-
-            // Load existing parts
-            $('#editPartsContainer').empty();
+        function loadWallets(selectedId) {
             $.ajax({
-                url: 'fetchParts.php',
+                url: 'fetchWallets.php',
                 type: 'GET',
-                data: { wallet_data_id: id },
                 success: function(response) {
-                    response.parts.forEach(function(part) {
-                        addPartRow('editPartsContainer', part.part_name, part.part_cost, part.id);
+                    var $select = $('#editWalletDataWalletId').empty().append('<option value="">Seleziona portafoglio...</option>');
+                    response.wallets.forEach(function(w) {
+                        var sel = (w.id == selectedId) ? ' selected' : '';
+                        $select.append(`<option value="${w.id}"${sel}>${w.name}</option>`);
                     });
                 }
             });
-        });
+        }
 
-        // When the modal is hidden, reset the form and clear parts
+        $('#editWalletDataModal').on('show.bs.modal', function(event) {
+			partsToDelete = [];
+			const button = $(event.relatedTarget);
+			const id = button.data('id');
+
+			// Chiamata unica per tutto
+			$.ajax({
+			  url: 'retrieveData.php',
+			  type: 'GET',
+			  dataType: 'json',
+			  data: { id: id },
+			  success: function(resp) {
+				// 1) Popolo i campi base
+				$('#editWalletDataId').val(resp.wallet_data.id);
+				$('#editWalletDataDescription').val(resp.wallet_data.description);
+				$('#editWalletDataAmount').val(resp.wallet_data.amount);
+				$('#editWalletDataBuyingDate').val(resp.wallet_data.buying_date);
+
+				// 2) Popolo il dropdown portafogli
+				const $sel = $('#editWalletDataWalletId')
+								.empty()
+								.append('<option value=\"\">Seleziona portafoglio...</option>');
+				resp.wallets.forEach(w => {
+				  const sel = (w.id == resp.wallet_data.wallet_id) ? ' selected' : '';
+				  $sel.append(`<option value=\"${w.id}\"${sel}>${w.name}</option>`);
+				});
+
+				// 3) Popolo le parti
+				$('#editPartsContainer').empty();
+				resp.parts.forEach(function(p) {
+				  addPartRow('editPartsContainer', p.part_name, p.part_cost, p.id);
+				});
+			  }
+			});
+		});
+
+
         $('#editWalletDataModal').on('hidden.bs.modal', function () {
             $('#editWalletDataForm')[0].reset();
             $('#editPartsContainer').empty();
-            $('#fileNameDisplay').val('');
             partsToDelete = [];
         });
 
-        // Function to dynamically add a new part row
         function addPartRow(containerId, partName = '', partCost = '', partId = '') {
             var partRow = `
                 <div class="form-row align-items-end mb-2" data-part-id="${partId}">
@@ -96,27 +121,21 @@
             $('#' + containerId).append(partRow);
         }
 
-        // Add new part row when the "Aggiungi Prodotto" button is clicked
         $('#editAddPartBtn').click(function() {
             addPartRow('editPartsContainer');
         });
 
-        // Handle removal of parts and track them for deletion if needed
         $(document).on('click', '.removePartBtn', function() {
             var partRow = $(this).closest('.form-row');
             var partId = partRow.data('part-id');
-            if (partId) {
-                partsToDelete.push(partId);
-            }
+            if (partId) partsToDelete.push(partId);
             partRow.remove();
         });
 
-        // Submit the edit form with validation on the sum of parts cost
         $('#editWalletDataForm').submit(function(e) {
             e.preventDefault();
             $('button[type="submit"]').prop('disabled', true);
 
-            // Validate that the sum of parts cost does not exceed the total expense cost
             var totalExpense = parseFloat($('#editWalletDataAmount').val()) || 0;
             var partsSum = 0;
             $('input[name="part_cost[]"]').each(function() {
@@ -129,7 +148,6 @@
                 return;
             }
 
-            // Append partsToDelete to the form data
             $('<input>').attr({
                 type: 'hidden',
                 name: 'parts_to_delete',
@@ -154,5 +172,6 @@
                 }
             });
         });
+
     });
 </script>

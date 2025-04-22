@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once '../config.php';
-include 'retrieveData.php';
+
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -22,6 +22,10 @@ include 'retrieveData.php';
     </script>
 </head>
 <body>
+	<?php
+		include 'retrieveData.php';
+	?>
+	
 	<div class="content-wrapper">
 		<div class="container mt-5">
 			

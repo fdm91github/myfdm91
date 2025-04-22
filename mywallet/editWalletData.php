@@ -35,9 +35,10 @@ if ($wallet_data_id) {
             try {
                 // Update the wallet_data details
                 $sql = "UPDATE wallet_data 
-                        SET description = ?, amount = ?, buying_date = ? WHERE id = ? AND user_id = ?";
+                        SET wallet_id = ?, description = ?, amount = ?, buying_date = ?
+						WHERE id = ? AND user_id = ?";
                 if ($stmt = $link->prepare($sql)) {
-                    $stmt->bind_param("sssii", $description, $amount, $buying_date, $wallet_data_id, $user_id);
+                    $stmt->bind_param("isssii", $wallet_id, $description, $amount, $buying_date, $wallet_data_id, $user_id);
                     $stmt->execute();
                     $stmt->close();
                 } else {
@@ -47,7 +48,9 @@ if ($wallet_data_id) {
                 // Delete parts marked for deletion
                 if (!empty($parts_to_delete)) {
                     $placeholders = implode(',', array_fill(0, count($parts_to_delete), '?'));
-                    $sql = "DELETE FROM wallet_data_parts WHERE id IN ($placeholders) AND user_id = ?";
+                    $sql = "DELETE FROM wallet_data_parts
+							WHERE id IN ($placeholders)
+							AND user_id = ?";
                     if ($stmt = $link->prepare($sql)) {
                         $types = str_repeat('i', count($parts_to_delete)) . 'i';
                         $params = array_merge($parts_to_delete, [$user_id]);
@@ -68,7 +71,8 @@ if ($wallet_data_id) {
 						// Update existing part
 						$sql = "UPDATE wallet_data_parts
 								SET part_name = ?, part_cost = ? 
-								WHERE id = ? AND user_id = ?";
+								WHERE id = ?
+								AND user_id = ?";
 						if ($stmt = $link->prepare($sql)) {
 							$stmt->bind_param("ssii", $part_name, $part_cost, $part_id, $user_id);
 							$stmt->execute();

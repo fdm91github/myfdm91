@@ -1,35 +1,8 @@
 <?php
 session_start();
 require_once '../config.php';
-include 'retrieveData.php';
-
-// Split owned wallets into active and inactive
-$activeWallets = [];
-$inactiveWallets = [];
-foreach ($wallets as $wallet) {
-    if (!$wallet['deleted_at']) {
-        $activeWallets[] = $wallet;
-    } else {
-        $inactiveWallets[] = $wallet;
-    }
-}
-
-// Helper function to display sharing info
-function displaySharedInfo($shared_json) {
-    $shared = json_decode($shared_json, true);
-    if (!is_array($shared) || count($shared) === 0) {
-        return "Non condiviso";
-    } else {
-        $names = array();
-        foreach ($shared as $entry) {
-            if (isset($entry['username'])) {
-                $names[] = htmlspecialchars($entry['username']);
-            }
-        }
-        return "Condiviso con " . implode(", ", $names);
-    }
-}
 ?>
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -40,6 +13,36 @@ function displaySharedInfo($shared_json) {
     <link href="../my.css" rel="stylesheet">
 </head>
 <body>
+	<?php
+		include 'retrieveData.php';
+
+		// Split owned wallets into active and inactive
+		$activeWallets = [];
+		$inactiveWallets = [];
+		foreach ($wallets as $wallet) {
+			if (!$wallet['deleted_at']) {
+				$activeWallets[] = $wallet;
+			} else {
+				$inactiveWallets[] = $wallet;
+			}
+		}
+
+		// Helper function to display sharing info
+		function displaySharedInfo($shared_json) {
+			$shared = json_decode($shared_json, true);
+			if (!is_array($shared) || count($shared) === 0) {
+				return "Non condiviso";
+			} else {
+				$names = array();
+				foreach ($shared as $entry) {
+					if (isset($entry['username'])) {
+						$names[] = htmlspecialchars($entry['username']);
+					}
+				}
+				return "Condiviso con " . implode(", ", $names);
+			}
+		}
+	?>
 	<div class="content-wrapper">
 		<div class="container mt-5">
             <!-- Section for Owned Wallets -->

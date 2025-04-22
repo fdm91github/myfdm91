@@ -9,8 +9,53 @@ if (!isset($_SESSION['username'])) {
 require_once '../config.php';
 
 $user_id = $_SESSION['id'];
+$wallet_data_id = $_GET['id'];
 
-// Usa i parametri di mese e anno selezionati se forniti tramite GET o POST
+// Recupero la riga wallet_data
+$sql = "SELECT id, description, amount, buying_date, wallet_id
+        FROM wallet_data
+        WHERE id = ? AND user_id = ?";
+$stmt = $link->prepare($sql);
+$stmt->bind_param("ii", $wallet_data_id, $user_id);
+$stmt->execute();
+$wallet_data = $stmt->get_result()->fetch_assoc();
+$stmt->close();
+
+// Recupero le parti
+$sql = "SELECT id, part_name, part_cost
+        FROM wallet_data_parts
+        WHERE wallet_data_id = ? AND user_id = ?";
+$stmt = $link->prepare($sql);
+$stmt->bind_param("ii", $wallet_data_id, $user_id);
+$stmt->execute();
+$parts = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+$stmt->close();
+
+// Recupero i portafogli dell’utente
+$sql = "SELECT id, description
+        FROM wallets
+        WHERE user_id = ? AND deleted_at IS NULL
+        ORDER BY id ASC";
+$stmt = $link->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$res = $stmt->get_result();
+$wallets = [];
+while ($r = $res->fetch_assoc()) {
+    $wallets[] = [
+      'id'   => $r['id'],
+      'name' => $r['description']
+    ];
+}
+$stmt->close();
+
+echo json_encode([
+  'wallet_data' => $wallet_data,
+  'parts'       => $parts,
+  'wallets'     => $wallets
+]);
+
+// Uso i parametri di mese e anno selezionati se forniti tramite GET o POST
 if (isset($_POST['month']) && isset($_POST['year'])) {
     $selectedMonth = $_POST['month'];
     $selectedYear = $_POST['year'];
@@ -18,7 +63,7 @@ if (isset($_POST['month']) && isset($_POST['year'])) {
     $selectedMonth = $_GET['month'];
     $selectedYear = $_GET['year'];
 } else {
-    // Altrimenti, usa mese e anno correnti
+    // Altrimenti, uso mese e anno correnti
     $selectedMonth = date('m');
     $selectedYear = date('Y');
 }
@@ -31,10 +76,10 @@ function formatDate($date) {
 $today = new DateTime();
 $selectedYearMonth = $selectedYear . '-' . $selectedMonth;
 
-// Ottieni il numero di giorni nel mese selezionato
+// Ottengo il numero di giorni nel mese selezionato
 $daysInSelectedMonth = cal_days_in_month(CAL_GREGORIAN, $selectedMonth, $selectedYear);
 
-// Se oggi è un giorno maggiore del numero di giorni nel mese selezionato, imposta il giorno all'ultimo giorno del mese selezionato
+// Se oggi è un giorno maggiore del numero di giorni nel mese selezionato, imposto il giorno all'ultimo giorno del mese selezionato
 if ($today->format('d') > $daysInSelectedMonth) {
     $today->setDate($selectedYear, $selectedMonth, $daysInSelectedMonth);
 }

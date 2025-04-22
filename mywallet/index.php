@@ -1,7 +1,6 @@
 <?php
 session_start();
 require_once '../config.php';
-include 'retrieveData.php';
 
 $months = [
 	'01' => 'Gennaio', '02' => 'Febbraio', '03' => 'Marzo',
@@ -22,6 +21,9 @@ $months = [
     <link href="../my.css" rel="stylesheet">
 </head>
 <body>
+	<?php
+		include 'retrieveData.php';
+	?>
 	<div class="content-wrapper">
 		<div class="container mt-5">
 			<div class="card mb-4">

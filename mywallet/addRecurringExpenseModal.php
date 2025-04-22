@@ -42,7 +42,7 @@
                             <input type="number" name="start_year" id="addRecurringExpenseStartYear" class="form-control" min="1900" max="2100" required>
                         </div>
                     </div>
-                    <div class="form-row">
+                    <div id="addRecurringExpenseEndDateFields" class="form-row">
                         <div class="form-group col-md-6">
                             <label for="addRecurringExpenseEndMonth">Mese di fine</label>
                             <select name="end_month" id="addRecurringExpenseEndMonth" class="form-control">
@@ -67,7 +67,7 @@
                         </div>
                     </div>
                     <div class="form-group form-check">
-                        <input type="checkbox" name="undetermined" id="addRecurringExpenseUndetermined" class="form-check-input" onclick="toggleRecurringEndDate('add')">
+                        <input type="checkbox" name="undetermined" id="addRecurringExpenseUndetermined" class="form-check-input">
                         <label class="form-check-label" for="addRecurringExpenseUndetermined">Indeterminato</label>
                     </div>
                     <div class="form-group">
@@ -86,30 +86,55 @@
 </div>
 
 <script>
-    function toggleRecurringEndDate(action) {
-        var endMonth = document.getElementById(action + 'RecurringExpenseEndMonth');
-        var endYear = document.getElementById(action + 'RecurringExpenseEndYear');
-        if (document.getElementById(action + 'RecurringExpenseUndetermined').checked) {
-            endMonth.disabled = true;
-            endYear.disabled = true;
-        } else {
-            endMonth.disabled = false;
-            endYear.disabled = false;
-        }
-    }
+	$(function() {
+		// Funzione che toggla wrapper + disable campi
+		function toggleEndDate() {
+		  var checked = $('#addRecurringExpenseUndetermined').is(':checked');
+		  $('#addRecurringExpenseEndDateFields')
+			.toggleClass('d-none', checked)
+			.find('select, input').prop('disabled', checked);
+		}
 
-    document.addEventListener('DOMContentLoaded', function() {
-        var today = new Date();
-        var currentMonth = today.getMonth() + 1; // Gennaio è 0
-        var currentYear = today.getFullYear();
+		// Imposta date di default
+		(function setDefaults(){
+		  var today = new Date();
+		  var m = today.getMonth() + 1, y = today.getFullYear();
+		  $('#addRecurringExpenseStartMonth').val(m);
+		  $('#addRecurringExpenseStartYear').val(y);
+		  $('#addRecurringExpenseEndMonth').val(m);
+		  $('#addRecurringExpenseEndYear').val(y);
+		})();
 
-        document.getElementById('addRecurringExpenseStartMonth').value = currentMonth;
-        document.getElementById('addRecurringExpenseStartYear').value = currentYear;
-        document.getElementById('addRecurringExpenseEndMonth').value = currentMonth;
-        document.getElementById('addRecurringExpenseEndYear').value = currentYear;
-    });
+		// All’apertura del modal: sincronizza subito lo stato
+		$('#addRecurringExpenseModal').on('shown.bs.modal', toggleEndDate);
 
-    $(document).ready(function() {
+		// Al cambio del checkbox
+		$('#addRecurringExpenseUndetermined').on('change', toggleEndDate);
+
+		// Inizializza anche al caricamento della pagina (utile se il checkbox fosse pre-spuntato)
+		toggleEndDate();
+	});
+
+	document.addEventListener('DOMContentLoaded', function() {
+		// Imposta date di default…
+		var today = new Date();
+		var currentMonth = today.getMonth() + 1;
+		var currentYear  = today.getFullYear();
+
+		document.getElementById('addRecurringExpenseStartMonth').value = currentMonth;
+		document.getElementById('addRecurringExpenseStartYear').value  = currentYear;
+		document.getElementById('addRecurringExpenseEndMonth').value   = currentMonth;
+		document.getElementById('addRecurringExpenseEndYear').value    = currentYear;
+
+		// Applica subito lo stato “undetermined” (se già spuntato)
+		toggleRecurringEndDate('add');
+	});
+
+	$(document).ready(function() {
+		$('#addRecurringExpenseUndetermined').on('change', function() {
+		  toggleRecurringEndDate('add');
+		});
+		
         $('#addRecurringExpenseForm').submit(function(e) {
             e.preventDefault();
 

@@ -1,42 +1,8 @@
 <?php
 session_start();
 require_once '../config.php';
-include 'retrieveData.php';
-
-$activeExpenses = [];
-$expiredExpenses = [];
-
-$currentMonth = date('n');
-$currentYear = date('Y');
-
-foreach ($recurringExpenses as $expense) {
-    if ($expense['undetermined'] == 1 || $expense['end_year'] > $currentYear || ($expense['end_year'] == $currentYear && $expense['end_month'] >= $currentMonth)) {
-        $activeExpenses[] = $expense;
-    } else {
-        $expiredExpenses[] = $expense;
-    }
-}
-
-function compare_expenses($a, $b, $sort_by, $order) {
-    if ($sort_by == 'amount' || $sort_by == 'monthly_debit' || $sort_by == 'billing_frequency' || $sort_by == 'current_installment') {
-        $result = $a[$sort_by] <=> $b[$sort_by];
-    } elseif ($sort_by == 'next_debit_date') {
-        $date_a = DateTime::createFromFormat('d/m/Y', $a[$sort_by]);
-        $date_b = DateTime::createFromFormat('d/m/Y', $b[$sort_by]);
-        $result = $date_a <=> $date_b;
-    } else {
-        $result = strcmp($a[$sort_by], $b[$sort_by]);
-    }
-    return $order === 'desc' ? -$result : $result;
-}
-
-$sort_by = $_GET['sort'] ?? 'next_debit_date';
-$order = $_GET['order'] ?? 'asc';
-
-usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
-    return compare_expenses($a, $b, $sort_by, $order);
-});
 ?>
+
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -47,6 +13,43 @@ usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
     <link href="../my.css" rel="stylesheet">
 </head>
 <body>
+	<?php
+		include 'retrieveData.php';
+		
+		$activeExpenses = [];
+		$expiredExpenses = [];
+
+		$currentMonth = date('n');
+		$currentYear = date('Y');
+
+		foreach ($recurringExpenses as $expense) {
+			if ($expense['undetermined'] == 1 || $expense['end_year'] > $currentYear || ($expense['end_year'] == $currentYear && $expense['end_month'] >= $currentMonth)) {
+				$activeExpenses[] = $expense;
+			} else {
+				$expiredExpenses[] = $expense;
+			}
+		}
+
+		function compare_expenses($a, $b, $sort_by, $order) {
+			if ($sort_by == 'amount' || $sort_by == 'monthly_debit' || $sort_by == 'billing_frequency' || $sort_by == 'current_installment') {
+				$result = $a[$sort_by] <=> $b[$sort_by];
+			} elseif ($sort_by == 'next_debit_date') {
+				$date_a = DateTime::createFromFormat('d/m/Y', $a[$sort_by]);
+				$date_b = DateTime::createFromFormat('d/m/Y', $b[$sort_by]);
+				$result = $date_a <=> $date_b;
+			} else {
+				$result = strcmp($a[$sort_by], $b[$sort_by]);
+			}
+			return $order === 'desc' ? -$result : $result;
+		}
+
+		$sort_by = $_GET['sort'] ?? 'next_debit_date';
+		$order = $_GET['order'] ?? 'asc';
+
+		usort($activeExpenses, function($a, $b) use ($sort_by, $order) {
+			return compare_expenses($a, $b, $sort_by, $order);
+		});
+	?>
 	<div class="content-wrapper">
 		<div class="container mt-5">
 			<!-- Filter Card -->

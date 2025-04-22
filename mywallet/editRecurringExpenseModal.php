@@ -42,7 +42,7 @@
                             <input type="number" name="start_year" id="editRecurringExpenseStartYear" class="form-control" min="1900" max="2100" required>
                         </div>
                     </div>
-                    <div class="form-row">
+                    <div id="editRecurringExpenseEndDateFields" class="form-row">
                         <div class="form-group col-md-6">
                             <label for="editRecurringExpenseEndMonth">Mese di fine</label>
                             <select name="end_month" id="editRecurringExpenseEndMonth" class="form-control">
@@ -67,7 +67,7 @@
                         </div>
                     </div>
                     <div class="form-group form-check">
-                        <input type="checkbox" name="undetermined" id="editRecurringExpenseUndetermined" class="form-check-input" onclick="toggleRecurringEndDate('edit')">
+                        <input type="checkbox" name="undetermined" id="editRecurringExpenseUndetermined" class="form-check-input">
                         <label class="form-check-label" for="editRecurringExpenseUndetermined">Indeterminato</label>
                     </div>
                     <div class="form-group">
@@ -86,17 +86,34 @@
 </div>
 
 <script>
-    function toggleRecurringEndDate(action) {
-        var endMonth = document.getElementById(action + 'RecurringExpenseEndMonth');
-        var endYear = document.getElementById(action + 'RecurringExpenseEndYear');
-        if (document.getElementById(action + 'RecurringExpenseUndetermined').checked) {
-            endMonth.disabled = true;
-            endYear.disabled = true;
-        } else {
-            endMonth.disabled = false;
-            endYear.disabled = false;
-        }
+  $(function() {
+    // Funzione che toggla wrapper + disable campi
+    function toggleEndDate() {
+      var checked = $('#editRecurringExpenseUndetermined').is(':checked');
+      $('#editRecurringExpenseEndDateFields')
+        .toggleClass('d-none', checked)
+        .find('select, input').prop('disabled', checked);
     }
+
+    // Imposta date di default
+    (function setDefaults(){
+      var today = new Date();
+      var m = today.getMonth() + 1, y = today.getFullYear();
+      $('#editRecurringExpenseStartMonth').val(m);
+      $('#editRecurringExpenseStartYear').val(y);
+      $('#editRecurringExpenseEndMonth').val(m);
+      $('#editRecurringExpenseEndYear').val(y);
+    })();
+
+    // All’apertura del modal: sincronizza subito lo stato
+    $('#editRecurringExpenseModal').on('shown.bs.modal', toggleEndDate);
+
+    // Al cambio del checkbox
+    $('#editRecurringExpenseUndetermined').on('change', toggleEndDate);
+
+    // Inizializza anche al caricamento della pagina (utile se il checkbox fosse pre-spuntato)
+    toggleEndDate();
+  });
 
     $(document).ready(function() {
 		$('#editRecurringExpenseModal').on('show.bs.modal', function (event) {

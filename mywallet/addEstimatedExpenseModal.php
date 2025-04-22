@@ -42,7 +42,7 @@
                             <input type="number" name="start_year" id="addEstimatedExpenseStartYear" class="form-control" min="1900" max="2100" required>
                         </div>
                     </div>
-                    <div class="form-row">
+                    <div id="addEstimatedExpenseEndDateFields" class="form-row">
                         <div class="form-group col-md-6">
                             <label for="addEstimatedExpenseEndMonth">Mese di fine</label>
                             <select name="end_month" id="addEstimatedExpenseEndMonth" class="form-control">
@@ -86,30 +86,55 @@
 </div>
 
 <script>
-    function toggleEstimatedEndDate(action) {
-        var endMonth = document.getElementById(action + 'EstimatedExpenseEndMonth');
-        var endYear = document.getElementById(action + 'EstimatedExpenseEndYear');
-        if (document.getElementById(action + 'EstimatedExpenseUndetermined').checked) {
-            endMonth.disabled = true;
-            endYear.disabled = true;
-        } else {
-            endMonth.disabled = false;
-            endYear.disabled = false;
-        }
-    }
+	$(function() {
+		// Funzione che toggla wrapper + disable campi
+		function toggleEndDate() {
+		  var checked = $('#addEstimatedExpenseUndetermined').is(':checked');
+		  $('#addEstimatedExpenseEndDateFields')
+			.toggleClass('d-none', checked)
+			.find('select, input').prop('disabled', checked);
+		}
 
-    document.addEventListener('DOMContentLoaded', function() {
-        var today = new Date();
-        var currentMonth = today.getMonth() + 1; // Gennaio è 0
-        var currentYear = today.getFullYear();
+		// Imposta date di default
+		(function setDefaults(){
+		  var today = new Date();
+		  var m = today.getMonth() + 1, y = today.getFullYear();
+		  $('#addEstimatedExpenseStartMonth').val(m);
+		  $('#addEstimatedExpenseStartYear').val(y);
+		  $('#addEstimatedExpenseEndMonth').val(m);
+		  $('#addEstimatedExpenseEndYear').val(y);
+		})();
 
-        document.getElementById('addEstimatedExpenseStartMonth').value = currentMonth;
-        document.getElementById('addEstimatedExpenseStartYear').value = currentYear;
-        document.getElementById('addEstimatedExpenseEndMonth').value = currentMonth;
-        document.getElementById('addEstimatedExpenseEndYear').value = currentYear;
-    });
+		// All’apertura del modal: sincronizza subito lo stato
+		$('#addEstimatedExpenseModal').on('shown.bs.modal', toggleEndDate);
 
-    $(document).ready(function() {
+		// Al cambio del checkbox
+		$('#addEstimatedExpenseUndetermined').on('change', toggleEndDate);
+
+		// Inizializza anche al caricamento della pagina (utile se il checkbox fosse pre-spuntato)
+		toggleEndDate();
+	});
+
+	document.addEventListener('DOMContentLoaded', function() {
+		// Imposta date di default…
+		var today = new Date();
+		var currentMonth = today.getMonth() + 1;
+		var currentYear  = today.getFullYear();
+
+		document.getElementById('addEstimatedExpenseStartMonth').value = currentMonth;
+		document.getElementById('addEstimatedExpenseStartYear').value  = currentYear;
+		document.getElementById('addEstimatedExpenseEndMonth').value   = currentMonth;
+		document.getElementById('addEstimatedExpenseEndYear').value    = currentYear;
+
+		// Applica subito lo stato “undetermined” (se già spuntato)
+		toggleEstimatedEndDate('add');
+	});
+
+	$(document).ready(function() {
+		$('#addEstimatedExpenseUndetermined').on('change', function() {
+		  toggleEstimatedEndDate('add');
+		});
+		
         $('#addEstimatedExpenseForm').submit(function(e) {
             e.preventDefault();
 
