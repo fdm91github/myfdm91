@@ -93,25 +93,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reimposta Password</title>
     <?php include 'script.php' ?>
-    <style>
-        .card {
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            min-width: 350px;
-			max-width: 500px;
-            margin: auto;
-        }
-        .login-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-        }
-    </style>
 </head>
 <body>
-    <div class="container login-container">
-        <div class="card">
+    <div class="container reset-container">
+        <div class="card reset-card">
             <div class="card-header text-center bg-primary text-white">
                 <h4>Reimposta la tua password</h4>
             </div>

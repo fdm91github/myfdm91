@@ -74,8 +74,8 @@ if (isset($_GET['token']) && isset($_GET['email'])) {
 	<?php include "script.php" ?>
 </head>
 <body>
-    <div class="container login-container">
-        <div class="card">
+    <div class="container reset-container">
+        <div class="card reset-card">
             <div class="card-header text-center">
                 <h4>Reimposta la tua password</h4>
             </div>
@@ -89,15 +89,15 @@ if (isset($_GET['token']) && isset($_GET['email'])) {
                 }
                 ?>
                 <form action="" method="post">
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="new_password">Nuova Password</label>
                         <input type="password" name="new_password" id="new_password" class="form-control" placeholder="Inserisci la nuova password" required>
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <label for="confirm_password">Conferma Password</label>
                         <input type="password" name="confirm_password" id="confirm_password" class="form-control" placeholder="Conferma la nuova password" required>
                     </div>
-                    <div class="form-group">
+                    <div class="mb-3">
                         <button type="submit" class="btn btn-primary btn-block">Reimposta la password</button>
                     </div>
                     <p class="text-center"><a href="login.php">Torna al login</a></p>

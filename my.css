@@ -21,9 +21,17 @@ body, html {
     padding: 15px;
 }
 
-.register-card {
-	max-width: 500px;
-	width: 100%;
+.reset-container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 15px;
+}
+
+.reset-card {
+    max-width: 500px;
+    width: 100%;
 }
 
 .register-form {
@@ -32,6 +40,11 @@ body, html {
     justify-content: center;
     align-items: center;
     padding: 15px;
+}
+
+.register-card {
+    max-width: 500px;
+    width: 100%;
 }
 
 p, .table th, .table td, .modal-body {
