@@ -3,7 +3,8 @@
     "description": "MyFDM91 Services",
     "type": "project",
     "require": {
-        "phpmailer/phpmailer": "^6.9"
+        "phpmailer/phpmailer": "^6.9",
+        "phpbu/phpbu": "^6.0"
     },
     "license": "GNU",
     "autoload": {

@@ -49,11 +49,43 @@ while ($r = $res->fetch_assoc()) {
 }
 $stmt->close();
 
-echo json_encode([
-  'wallet_data' => $wallet_data,
-  'parts'       => $parts,
-  'wallets'     => $wallets
-]);
+// Creo una funzione per recuperare i dati di ciascun portafogli utente
+function getWalletData(int $walletDataId, int $userId): array {
+    global $link;
+
+    $walletData = executeQuery(
+        $link,
+        "SELECT id, description, amount, buying_date, wallet_id
+         FROM wallet_data
+         WHERE id = ? AND user_id = ?",
+        ["ii", $walletDataId, $userId]
+    );
+
+    $parts = executeQuery(
+        $link,
+        "SELECT id, part_name, part_cost
+         FROM wallet_data_parts
+         WHERE wallet_data_id = ? AND user_id = ?",
+        ["ii", $walletDataId, $userId],
+        false
+    );
+
+	$wallets = executeQuery(
+        $link,
+        "SELECT id, description AS name
+         FROM wallets
+         WHERE user_id = ? AND deleted_at IS NULL
+         ORDER BY id ASC",
+        ["i", $userId],
+        false
+    );
+
+    return [
+        'wallet_data' => $walletData,
+        'parts'       => $parts,
+        'wallets'     => $wallets,
+    ];
+}
 
 // Uso i parametri di mese e anno selezionati se forniti tramite GET o POST
 if (isset($_POST['month']) && isset($_POST['year'])) {
