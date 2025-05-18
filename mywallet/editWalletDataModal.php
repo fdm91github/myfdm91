@@ -47,26 +47,22 @@
 
         let partsToDelete = [];
 
-        function loadWallets(selectedId) {
-            $.ajax({
-                url: 'fetchWallets.php',
-                type: 'GET',
-                success: function(response) {
-                    var $select = $('#editWalletDataWalletId').empty().append('<option value="">Seleziona portafoglio...</option>');
-                    response.wallets.forEach(function(w) {
-                        var sel = (w.id == selectedId) ? ' selected' : '';
-                        $select.append(`<option value="${w.id}"${sel}>${w.name}</option>`);
-                    });
-                }
-            });
-        }
+		function loadWallets(selectedId, wallets) {
+		  const $sel = $('#editWalletDataWalletId')
+						  .empty()
+						  .append('<option value="">Seleziona portafoglio...</option>');
 
-        $('#editWalletDataModal').on('show.bs.modal', function(event) {
+		  wallets.forEach(w => {
+			const isSelected = w.id == selectedId ? ' selected' : '';
+			$sel.append(`<option value="${w.id}"${isSelected}>${w.description}</option>`);
+		  });
+		}
+
+		$('#editWalletDataModal').on('show.bs.modal', function(event) {
 			partsToDelete = [];
 			const button = $(event.relatedTarget);
-			const id = button.data('id');
+			const id     = button.data('id');
 
-			// Chiamata unica per tutto
 			$.ajax({
 			  url: 'retrieveData.php',
 			  type: 'GET',
@@ -79,14 +75,8 @@
 				$('#editWalletDataAmount').val(resp.wallet_data.amount);
 				$('#editWalletDataBuyingDate').val(resp.wallet_data.buying_date);
 
-				// 2) Popolo il dropdown portafogli
-				const $sel = $('#editWalletDataWalletId')
-								.empty()
-								.append('<option value=\"\">Seleziona portafoglio...</option>');
-				resp.wallets.forEach(w => {
-				  const sel = (w.id == resp.wallet_data.wallet_id) ? ' selected' : '';
-				  $sel.append(`<option value=\"${w.id}\"${sel}>${w.name}</option>`);
-				});
+				// 2) invece di loadWallets(resp.wallet_data.wallet_id);
+				loadWallets(resp.wallet_data.wallet_id, resp.wallets);
 
 				// 3) Popolo le parti
 				$('#editPartsContainer').empty();
@@ -96,7 +86,6 @@
 			  }
 			});
 		});
-
 
         $('#editWalletDataModal').on('hidden.bs.modal', function () {
             $('#editWalletDataForm')[0].reset();

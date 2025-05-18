@@ -1,6 +1,11 @@
 <?php
 session_start();
-header('Content-Type: application/json');
+
+if (!isset($_SESSION['username'])) {
+    header("location: ../login.php");
+    exit;
+}
+
 require_once '../config.php';
 
 if (!isset($_SESSION['id'])) {
@@ -14,7 +19,7 @@ $sql = "SELECT id, description
         FROM wallets 
         WHERE user_id = ? 
         AND deleted_at IS NULL
-        ORDER BY id ASC";
+        ORDER BY description ASC";
 $stmt = $link->prepare($sql);
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
@@ -30,4 +35,4 @@ while ($row = $res->fetch_assoc()) {
 }
 
 echo json_encode(['wallets' => $wallets]);
-
+?>

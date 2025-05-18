@@ -153,9 +153,19 @@ require_once '../config.php';
 														<small>Spesa inserita da <?php echo htmlspecialchars($walletData['username']) ?></small>
 													<?php endif; ?>
 													<br/>
-													<button class="btn btn-info btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#details-<?php echo $walletData['id']; ?>" aria-expanded="false" aria-controls="details-<?php echo $walletData['id']; ?>">
-														<i class="bi bi-info-circle"></i>
-													</button>
+													<?php if (
+														isset($walletDataPartsById[$walletData['id']])
+														&& !empty($walletDataPartsById[$walletData['id']])
+													): ?>
+														<button class="btn btn-info btn-sm"
+																type="button"
+																data-bs-toggle="collapse"
+																data-bs-target="#details-<?php echo $walletData['id']; ?>"
+																aria-expanded="false"
+																aria-controls="details-<?php echo $walletData['id']; ?>">
+															<i class="bi bi-info-circle"></i>
+														</button>
+													<?php endif; ?>
 													<?php if($walletData['created_by'] == $_SESSION['id']): ?>
 														<button class="btn btn-warning btn-sm" data-bs-toggle="modal"
 															data-bs-target="#editWalletDataModal"
