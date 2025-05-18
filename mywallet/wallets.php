@@ -58,11 +58,11 @@ require_once '../config.php';
 						<div class="col-md-4">
 							<div class="card mb-3 position-relative">
 								<div class="card-body">
-									<div class="d-flex justify-content-between align-items-center">
 										<h5 class="card-title mb-0">
 											<i class="bi bi-<?php echo htmlspecialchars($wallet['icon']); ?>"></i>
 											<?php echo htmlspecialchars($wallet['description']); ?>
 										</h5>
+										<br/>
 										<div>
 											<button class="btn btn-warning btn-sm me-2"
 													data-bs-toggle="modal"
@@ -87,7 +87,6 @@ require_once '../config.php';
 												<i class="bi bi-trash"></i>
 											</button>
 										</div>
-									</div>
 									<small><?php echo displaySharedInfo($wallet['shared_with']); ?></small>
 								</div>
 								<!-- Icon indicating whether the wallet is flagged to show on the dashboard -->
