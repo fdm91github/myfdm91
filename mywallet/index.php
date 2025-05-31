@@ -66,11 +66,11 @@ $months = [
 							<p><b>Spese totali: <?php echo $totalExpenses; ?>€</b></p>
 						</div>
 						<div class="col-12 col-md-6">
-							<p><b>Stipendio rimanente: <?php echo $leftIncomes; ?>€</b></p>
 							<p><b>Totale nel salvadanaio: <?php echo ($totalPiggyBank > 0 ? $totalPiggyBank : '0'); ?>€</b></p>
 							<p>Aggiunti nel <b>Salvadanaio: <?php echo ($thisMonthPiggyBank > 0 ? $thisMonthPiggyBank : '0'); ?>€</b></p>
 							<p>Tot. su Salvadanaio <b>Spese Ricorrenti: <?php echo $recurringSavings; ?>€</b></p>
 							<p>Tot. su Salvadanaio <b>Spese Stimate: <?php echo $estimatedSavings; ?>€</b></p>
+							<p><b>Stipendio rimanente: <?php echo $leftIncomes; ?>€</b></p>
 						</div>
 					</div>
 				</div>
