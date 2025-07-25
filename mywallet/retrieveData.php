@@ -205,8 +205,8 @@ if (!empty($ownedWalletIds)) {
         "SELECT wd.id, wd.wallet_id, wd.description, wd.amount, wd.buying_date, wd.user_id AS created_by, u.username
          FROM wallet_data wd
 		 JOIN users u ON wd.user_id = u.id
-         WHERE wallet_id IN ($placeholders) 
-         ORDER BY buying_date DESC",
+         WHERE wallet_id IN ($placeholders)
+         ORDER BY id DESC",
         array_merge([$paramTypes], $ownedWalletIds),
         false
     );
