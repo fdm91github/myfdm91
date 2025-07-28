@@ -206,7 +206,7 @@ if (!empty($ownedWalletIds)) {
          FROM wallet_data wd
 		 JOIN users u ON wd.user_id = u.id
          WHERE wallet_id IN ($placeholders)
-         ORDER BY id DESC",
+         ORDER BY buying_date DESC, id DESC",
         array_merge([$paramTypes], $ownedWalletIds),
         false
     );
