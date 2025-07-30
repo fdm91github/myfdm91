@@ -525,8 +525,9 @@ foreach ($dashboardWallets as $wallet) {
         "SELECT SUM(amount) as total 
          FROM wallet_data
          WHERE wallet_id = ? 
-         AND DATE_FORMAT(buying_date, '%Y-%m') = ?",
-        ["is", $wallet['id'], $selectedYear . '-' . $selectedMonth]
+         AND DATE_FORMAT(buying_date, '%Y-%m') = ?
+         AND user_id = ?",
+        ["iss", $wallet['id'], $selectedYear . '-' . $selectedMonth, $user_id]
     );
     // Only add if there is a non-null total (default to 0 otherwise)
     $walletDashboardExpenses[$wallet['description']] = $walletExpenseRow['total'] ?: 0;
