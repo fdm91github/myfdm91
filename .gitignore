@@ -1,4 +1,4 @@
-config.php
+/html/config.php
 autoupdate.sh
-mygarage/uploads/
-/vendor/
+/html/mygarage/uploads/
+/html/vendor/
