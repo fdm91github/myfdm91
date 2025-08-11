@@ -7,7 +7,7 @@
             <p>&copy; <?php echo date('Y'); ?> MyFDM91. Tutti i diritti riservati
             <?php
                 // Percorso assoluto relativo alla root del progetto
-                $versionFile = $_SERVER['DOCUMENT_ROOT'] . "/VERSION";
+                $versionFile = $_SERVER['DOCUMENT_ROOT'] . "../VERSION";
                 $version = trim(@file_get_contents($versionFile));
 
                 if ($version) {
