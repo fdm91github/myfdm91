@@ -17,6 +17,7 @@
                 }
             ?>
             </p>
+            <p><a href="mailto:admin@fdm91.net">Contattaci</a>
         </div>
     </footer>
 </body>
