@@ -136,8 +136,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <div class="mb-3">
                         <button type="submit" class="btn btn-primary w-100">Accedi</button>
                     </div>
-                    <p class="text-center">Non hai ancora un account? Cosa aspetti, <a href="register.php">registrati</a>!</p>
-                    <p class="text-center"><a href="passwordReset.php">Ho dimenticato la password</a></p>
+                    <p class="text-center">Non hai ancora un account? Cosa aspetti, <a style="color:white;" href="register.php">registrati</a>!</p>
+                    <p class="text-center"><a style="color:white;" href="passwordReset.php">Ho dimenticato la password</a></p>
+                    <p class="text-center"><a style="color:white;" href="mailto:support@fdm91.net">Contatti</a></p>
                 </form>
             </div>
         </div>

@@ -16,7 +16,7 @@
                     echo ' - v' . $version . ' (<a style="color:white;" href="' . $githubUrl . '" target="_blank" rel="noopener">Note di rilascio</a>)';
                 }
             ?>
-	    - <a style="color:white;" href="mailto:admin@fdm91.net">Segnala un errore</a>
+	    - <a style="color:white;" href="mailto:dev@fdm91.net">Segnala un errore</a>
             </p>
         </div>
     </footer>
