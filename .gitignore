@@ -1,5 +1,6 @@
-/html/config.php
 autoupdate.sh
+/html/config.php
 /html/mygarage/uploads/
+/html/mywallet/.old/
 /html/vendor/
 /html/well-known/
