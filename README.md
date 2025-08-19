@@ -1,6 +1,6 @@
 - Download the repository to your server
 
-- Set the root folder in the virtualhost as the root folder of the repository
+- Point the DocumentRoot of the virtualhost to the html/ folder of the repository
 
 - Install phpmailer using composer require phpmailer/phpmailer
 
