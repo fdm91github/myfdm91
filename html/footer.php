@@ -8,7 +8,12 @@
             <?php
                 // Percorso assoluto relativo alla root del progetto
                 $versionFile = $_SERVER['DOCUMENT_ROOT'] . "../VERSION";
-                $version = trim(@file_get_contents($versionFile));
+		$version = trim(@file_get_contents($versionFile));
+                if ($version) {
+                    // Link alla release GitHub
+                    $githubUrl = "https://github.com/fdm91github/myfdm91/releases/" . $version;
+                    echo ' - v' . $version;
+		}
             ?>
 	    - <a style="color:white;" href="https://github.com/fdm91github/myfdm91/issues/new/choose">Segnala un errore</a>
             </p>
