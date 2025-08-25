@@ -4,7 +4,7 @@
 
     <footer class="footer bg-dark text-light text-center border-top border-dark py-2">
         <div class="container">
-            <p style="font-size: 14px;">&copy; <?php echo date('Y'); ?> MyFDM91. Tutti i diritti riservati.
+            <p style="font-size: 12px;">&copy; <?php echo date('Y'); ?> MyFDM91. Tutti i diritti riservati.
             <?php
                 // Percorso assoluto relativo alla root del progetto
                 $versionFile = $_SERVER['DOCUMENT_ROOT'] . "../VERSION";
