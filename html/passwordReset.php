@@ -3,8 +3,9 @@ ini_set('session.cookie_httponly', 1);
 ini_set('session.cookie_secure', 1);
 ini_set('session.use_strict_mode', 1);
 
-require_once 'config.php';
+require_once 'config.php';        // deve definire $link e $config
 require 'vendor/autoload.php';
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
@@ -14,74 +15,104 @@ $success_message = '';
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = trim($_POST['email']);
 
-    // Check if the email exists
-    $sql = "SELECT id, email FROM users WHERE email = ?";
-    if ($stmt = $link->prepare($sql)) {
-        $stmt->bind_param("s", $email);
-        if ($stmt->execute()) {
-            $stmt->store_result();
-            if ($stmt->num_rows == 1) {
-                // Generate a unique token
-                $token = bin2hex(random_bytes(50));
-                $stmt->bind_result($user_id, $user_email);
-                $stmt->fetch();
-                
-                // Set expiration time (1 hour from now)
-                $expires = date("U") + 3600;
+    // (opz.) Validazione email
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error_message = "Formato email non valido.";
+    } else {
+        // 1) Cerca l'utente
+        $sql = "SELECT id, email FROM users WHERE email = ? LIMIT 1";
+        if ($stmtUser = $link->prepare($sql)) {
+            $stmtUser->bind_param("s", $email);
+            if ($stmtUser->execute()) {
+                $stmtUser->store_result();
 
-                // Insert the token into the password_resets table
-                $sql = "INSERT INTO password_resets (user_id, email, token, expires) VALUES (?, ?, ?, ?)";
-                if ($stmt = $link->prepare($sql)) {
-                    $stmt->bind_param("issi", $user_id, $email, $token, $expires);
-                    $stmt->execute();
+                // Messaggio "generico" per non rivelare l'esistenza dell'account
+                $generic_ok = "Se l'email è registrata, riceverai le istruzioni per reimpostare la password.";
+
+                if ($stmtUser->num_rows == 1) {
+                    $stmtUser->bind_result($user_id, $user_email);
+                    $stmtUser->fetch();
+
+                    // (opz.) mantieni un solo token per utente
+                    if ($stmtDel = $link->prepare("DELETE FROM password_resets WHERE user_id = ?")) {
+                        $stmtDel->bind_param("i", $user_id);
+                        $stmtDel->execute();
+                        $stmtDel->close();
+                    }
+
+                    // 2) Crea token e scadenza
+                    $token   = bin2hex(random_bytes(32)); // 64 char hex
+                    $expires = time() + 3600;             // +1h (INT)
+
+                    // 3) Salva il token
+                    $sqlIns = "INSERT INTO password_resets (user_id, email, token, expires) VALUES (?, ?, ?, ?)";
+                    if ($stmtIns = $link->prepare($sqlIns)) {
+                        $stmtIns->bind_param("issi", $user_id, $email, $token, $expires);
+                        $stmtIns->execute();
+                        $stmtIns->close();
+                    } else {
+                        $error_message = "Errore interno: impossibile preparare l'inserimento token.";
+                        $stmtUser->close();
+                        $link->close();
+                        exit;
+                    }
+
+                    // 4) Costruisci link con URL-encode
+                    $reset_link = rtrim($config['host_base'], '/')
+                                . "/reset.php?token=" . rawurlencode($token)
+                                . "&email=" . rawurlencode($email);
+
+                    $subject = "Richiesta di reimpostazione della password";
+                    $message = "
+                        <p>Clicca sul seguente link per reimpostare la tua password:</p>
+                        <p><a href='" . htmlspecialchars($reset_link, ENT_QUOTES, 'UTF-8') . "'>Reimposta Password</a></p>
+                        <p>Se non hai richiesto questo reset, ignora questa mail.</p>
+                        <p>Non vedi il pulsante? Copia e incolla nel browser questo link:</p>
+                        <p><a href='" . htmlspecialchars($reset_link, ENT_QUOTES, 'UTF-8') . "'>" . htmlspecialchars($reset_link, ENT_QUOTES, 'UTF-8') . "</a></p>
+                    ";
+
+                    // 5) Invio email con PHPMailer (TLS su 587)
+                    $mail = new PHPMailer(true);
+                    try {
+                        $mail->isSMTP();
+                        $mail->Host       = $config['smtp']['host'];
+                        $mail->Port       = $config['smtp']['port'];
+                        $mail->SMTPAuth   = $config['smtp']['auth'];
+                        $mail->Username   = $config['smtp']['username'] ?? null;
+                        $mail->Password   = $config['smtp']['password'] ?? null;
+                        $mail->SMTPAutoTLS = $config['smtp']['autoTLS'] ?? true;
+                        // Forza STARTTLS su 587 (se usi 465 imposta ENCRYPTION_SMTPS)
+                        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+
+                        if (!empty($config['smtp']['options'])) {
+                            $mail->SMTPOptions = $config['smtp']['options'];
+                        }
+
+                        $mail->CharSet = 'UTF-8';
+                        $mail->setFrom($config['email']['from_address'], $config['email']['from_name']);
+                        $mail->addAddress($email);
+
+                        $mail->isHTML(true);
+                        $mail->Subject = $subject;
+                        $mail->Body    = $message;
+                        $mail->AltBody = "Apri questo link per reimpostare la password: " . $reset_link;
+
+                        $mail->send();
+                        // Messaggio "generico" per privacy
+                        $success_message = $generic_ok;
+                    } catch (Exception $e) {
+                        // Non rivelare troppo al client, logga server-side
+                        error_log("Errore PHPMailer: " . $mail->ErrorInfo);
+                        // Messaggio generico anche in caso d'errore per non rivelare info
+                        $success_message = $generic_ok;
+                    }
+                } else {
+                    // Anche se non esiste: messaggio generico
+                    $success_message = $generic_ok;
                 }
-
-                // Send a reset email using PHPMailer
-                $reset_link = $config['host_base'] . "/reset.php?token=$token&email=$email";
-                $subject = "Richiesta di reimpostazione della password";
-                $message = "
-							<p>Clicca sul seguente link per reimpostare la tua password:</p>
-							<a href='" . htmlspecialchars($reset_link) . "'>Reimposta Password</a>
-							<p>Se non hai richiesto questo reset, ignora semplicemente questa mail. Non preoccuparti, nessuno ha accesso al tuo account!</p>
-							<p>Non riesci a visualizzare correttamente il link? Copia e incolla in un browser il link di seguito:<p>
-							<a href='" . htmlspecialchars($reset_link) . "'>$reset_link</a>
-							";
-
-                // Create a PHPMailer instance
-                $mail = new PHPMailer(true);
-
-                try {
-                    // SMTP server configuration
-					$mail->isSMTP();
-					$mail->Host = $config['smtp']['host'];
-					$mail->Port = $config['smtp']['port'];
-					$mail->SMTPAuth = $config['smtp']['auth'];
-					$mail->SMTPAutoTLS = $config['smtp']['autoTLS'];
-					$mail->SMTPOptions = $config['smtp']['options'];
-
-					// Sender info
-					$mail->setFrom($config['email']['from_address'], $config['email']['from_name']);
-	
-					// Recipient
-					$mail->addAddress($email);  // User's email
-	
-					// Email content
-					$mail->isHTML(true);  // Enable HTML format
-					$mail->Subject = $subject;
-					$mail->Body = $message;
-	
-					// Send the email
-					$mail->send();
-					$success_message = "Le istruzioni per reimpostare la password sono state inviate alla tua email.";
-                } catch (Exception $e) {
-                    // Handle errors
-                    $error_message = "Errore nell'invio dell'email: " . htmlspecialchars($mail->ErrorInfo);
-                }
-            } else {
-                $error_message = "Non è stato trovato alcun account associato a questo indirizzo email.";
             }
+            $stmtUser->close();
         }
-        $stmt->close();
     }
     $link->close();
 }
@@ -130,3 +161,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 </body>
 </html>
+

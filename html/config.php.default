@@ -3,7 +3,7 @@
 define('DB_SERVER', 'hostname');
 define('DB_USERNAME', 'username');
 define('DB_PASSWORD', 'password');
-define('DB_NAME', 'database');
+define('DB_NAME', 'database_name');
 
 // Connection to the SQL database
 $link = new mysqli(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);
@@ -13,24 +13,29 @@ if($link === false){
 
 // Mailserver configuration settings
 $config = [
-	'smtp' => [
-		'host'    => 'hostname',
-		'port'    => port,
-		'auth'    => true/false,
-		'autoTLS' => true/false,
-		'options' => [
-			'ssl' => [
-				'verify_peer'       => true/false,
-				'verify_peer_name'  => true/false,
-				'allow_self_signed' => true/false,
+    'smtp' => [
+        // usa il FQDN pubblico del tuo SMTP (non IP privato)
+        'host'     => 'mail.example.net',
+        'port'     => 587,          // STARTTLS
+        'auth'     => true,         // richiede user/pass
+        'username' => getenv('SMTP_USERNAME') ?: 'myemail@example.net',
+        'password' => getenv('SMTP_PASSWORD') ?: 'password',
+        'secure'   => 'tls',        // 'tls' = STARTTLS (per 587), 'ssl' per 465
+        'autoTLS'  => true,         // abilita upgrade TLS automatico
+        'timeout'  => 30,           // opzionale
+        // Opzioni TLS: in cloud è bene verificare i certificati
+        'options'  => [
+            'ssl' => [
+                'verify_peer'       => true,
+                'verify_peer_name'  => true,
+                'allow_self_signed' => false,
             ],
         ],
     ],
-	'email' => [
-		'from_address' => 'email@mydomain.com',
-		'from_name'    => 'MyFDM91'
+    'email' => [
+        'from_address' => 'myemail@example.net',
+        'from_name'    => 'My Service Name',
     ],
-    'host_base' => 'https://my.domain.com'
+    'host_base' => 'https://mywebsite.example.net'
 ];
 
-?>
