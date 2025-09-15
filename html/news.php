@@ -24,13 +24,13 @@ if ($isAdminNews && $_SERVER['REQUEST_METHOD'] === 'POST') {
         $action = $_POST['action'] ?? '';
 
         if ($action === 'add') {
-            $titolo = trim($_POST['titolo'] ?? '');
-            $contenuto = trim($_POST['contenuto'] ?? '');
-            if ($titolo === '' || mb_strlen($titolo) > 150) $errors[] = "Titolo non valido.";
-            if ($contenuto === '') $errors[] = "Contenuto obbligatorio.";
+            $title = trim($_POST['title'] ?? '');
+            $body = trim($_POST['body'] ?? '');
+            if ($title === '' || mb_strlen($title) > 150) $errors[] = "Title non valido.";
+            if ($body === '') $errors[] = "Body obbligatorio.";
             if (!$errors) {
                 $stmt = $link->prepare("INSERT INTO notifications (title, body, created_by) VALUES (?, ?, ?)");
-                $stmt->bind_param("sss", $titolo, $contenuto, $_SESSION['username']);
+                $stmt->bind_param("sss", $title, $body, $_SESSION['username']);
                 $stmt->execute();
                 $stmt->close();
                 $success = "Novità aggiunta.";
@@ -39,14 +39,14 @@ if ($isAdminNews && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($action === 'edit') {
             $id = (int)($_POST['id'] ?? 0);
-            $titolo = trim($_POST['titolo'] ?? '');
-            $contenuto = trim($_POST['contenuto'] ?? '');
+            $title = trim($_POST['title'] ?? '');
+            $body = trim($_POST['body'] ?? '');
             if ($id <= 0) $errors[] = "ID non valido.";
-            if ($titolo === '' || mb_strlen($titolo) > 150) $errors[] = "Titolo non valido.";
-            if ($contenuto === '') $errors[] = "Contenuto obbligatorio.";
+            if ($title === '' || mb_strlen($title) > 150) $errors[] = "Title non valido.";
+            if ($body === '') $errors[] = "Body obbligatorio.";
             if (!$errors) {
                 $stmt = $link->prepare("UPDATE notifications SET title=?, body=? WHERE id=?");
-                $stmt->bind_param("ssi", $titolo, $contenuto, $id);
+                $stmt->bind_param("ssi", $title, $body, $id);
                 $stmt->execute();
                 $stmt->close();
                 $success = "Novità aggiornata.";
@@ -116,12 +116,12 @@ if ($res) while ($row = $res->fetch_assoc()) $novita[] = $row;
         <input type="hidden" name="csrf" value="<?= $_SESSION['csrf_news'] ?>">
         <input type="hidden" name="action" value="add">
         <div class="mb-3">
-          <label for="titolo" class="form-label">Titolo</label>
-          <input type="text" name="titolo" id="titolo" class="form-control" maxlength="150" required>
+          <label for="title" class="form-label">Title</label>
+          <input type="text" name="title" id="title" class="form-control" maxlength="150" required>
         </div>
         <div class="mb-3">
-          <label for="contenuto" class="form-label">Contenuto</label>
-          <textarea name="contenuto" id="contenuto" class="form-control" rows="4" required></textarea>
+          <label for="body" class="form-label">Body</label>
+          <textarea name="body" id="body" class="form-control" rows="4" required></textarea>
         </div>
         <button type="submit" class="btn btn-success">Salva</button>
       </form>
@@ -165,12 +165,12 @@ if ($res) while ($row = $res->fetch_assoc()) $novita[] = $row;
                     <input type="hidden" name="action" value="edit">
                     <input type="hidden" name="id" value="<?= $n['id'] ?>">
                     <div class="mb-2">
-                      <label class="form-label">Titolo</label>
-                      <input type="text" name="titolo" class="form-control" maxlength="150" value="<?= htmlspecialchars($n['titolo']) ?>" required>
+                      <label class="form-label">Title</label>
+                      <input type="text" name="title" class="form-control" maxlength="150" value="<?= htmlspecialchars($n['title']) ?>" required>
                     </div>
                     <div class="mb-2">
-                      <label class="form-label">Contenuto</label>
-                      <textarea name="contenuto" class="form-control" rows="4" required><?= htmlspecialchars($n['contenuto']) ?></textarea>
+                      <label class="form-label">Body</label>
+                      <textarea name="body" class="form-control" rows="4" required><?= htmlspecialchars($n['body']) ?></textarea>
                     </div>
                     <button type="submit" class="btn btn-sm btn-success">Aggiorna</button>
                   </form>
