@@ -90,7 +90,7 @@ $bellIcon = ($unread > 0) ? 'bi-bell-fill' : 'bi-bell';
 			  <span class="visually-hidden">nuove notifiche</span>
 			</span>
 		  </a>
-		  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="novitaDropdown" style="min-width:320px">
+		  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="novitaDropdown" style="min-width:400px">
 			<li class="d-flex justify-content-between align-items-center px-3 py-2">
 			  <strong>Ultime notifiche</strong>
 			  <?php if ($unread > 0): ?>
@@ -104,11 +104,11 @@ $bellIcon = ($unread > 0) ? 'bi-bell-fill' : 'bi-bell';
 			<?php else: ?>
 			  <?php foreach ($lastUnread as $n): ?>
 				<li class="px-2 py-1 d-flex justify-content-between align-items-start dropdown-notif" data-id="<?= (int)$n['id'] ?>">
+				  <button class="btn btn-link btn-sm text-decoration-none markOneReadBtn" title="Segna come letta"><i class="bi bi-envelope-open"></i></button>
 				  <a class="dropdown-item small flex-grow-1" href="../news.php#notif<?= (int)$n['id'] ?>">
 					<?= htmlspecialchars($n['title'], ENT_QUOTES, 'UTF-8') ?><br>
 					<small class="text-muted"><?= date('d/m/Y H:i', strtotime($n['created_at'])) ?></small>
 				  </a>
-				  <button class="btn btn-link btn-sm text-decoration-none markOneReadBtn" title="Segna come letta">Segna come letta</button>
 				</li>
 			  <?php endforeach; ?>
 			<?php endif; ?>
