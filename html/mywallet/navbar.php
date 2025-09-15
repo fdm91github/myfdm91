@@ -34,8 +34,45 @@
           <a class="nav-link" href="piggyBank.php"><i class="bi bi-piggy-bank-fill"></i> Salvadanaio</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="../logout.php"><i class="bi bi-door-closed-fill"></i> Esci</a>
-        </li>
+	  <a class="nav-link" href="../logout.php"><i class="bi bi-door-closed-fill"></i> Esci</a>
+	</li>
+	<?php
+	$isAdminNews = isset($_SESSION['username']) && $_SESSION['username'] === 'fdellamorte';
+
+	// Recupera ultime 3 novità
+	$novita = [];
+	$sql = "SELECT id, titolo, created_at FROM novita ORDER BY created_at DESC LIMIT 3";
+	if ($res = $link->query($sql)) {
+	    while ($row = $res->fetch_assoc()) {
+	        $novita[] = $row;
+	    }
+	}
+	?>
+	<li class="nav-item dropdown">
+	  <a class="nav-link dropdown-toggle position-relative" href="#" id="novitaDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+	    <i class="bi bi-bell"></i> Novità
+	  </a>
+	  <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="novitaDropdown" style="min-width:300px">
+	    <li><h6 class="dropdown-header">Ultime novità</h6></li>
+	    <?php if (empty($novita)): ?>
+	      <li><span class="dropdown-item text-muted">Nessuna novità</span></li>
+	    <?php else: ?>
+	      <?php foreach ($novita as $n): ?>
+	        <li>
+	          <a class="dropdown-item small" href="news.php#n<?= $n['id'] ?>">
+	            <?= htmlspecialchars($n['titolo'], ENT_QUOTES, 'UTF-8') ?><br>
+	            <small class="text-muted"><?= date('d/m/Y', strtotime($n['created_at'])) ?></small>
+	          </a>
+	        </li>
+	      <?php endforeach; ?>
+	    <?php endif; ?>
+	    <li><hr class="dropdown-divider"></li>
+	    <li><a class="dropdown-item text-center" href="news.php">Vedi tutte</a></li>
+	    <?php if ($isAdminNews): ?>
+	      <li><a class="dropdown-item text-center" href="news.php#add">➕ Aggiungi</a></li>
+	    <?php endif; ?>
+	  </ul>
+	</li>
       </ul>
     </div>
 
@@ -72,7 +109,16 @@
           </li>
           <li class="nav-item">
             <a class="nav-link" href="../logout.php"><i class="bi bi-door-closed-fill"></i> Esci</a>
-          </li>
+	  </li>
+	  <li class="nav-item">
+	    <a class="nav-link" href="news.php"><i class="bi bi-bell"></i> Novità</a>
+	  </li>
+	  <?php if ($isAdminNews): ?>
+	  <li class="nav-item">
+	    <a class="nav-link" href="news.php#add"><i class="bi bi-plus-circle"></i> Aggiungi novità</a>
+	  </li>
+	  <?php endif; ?>
+
         </ul>
       </div>
     </div>
