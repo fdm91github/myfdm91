@@ -1,10 +1,10 @@
 <?php
 session_start();
 if (!isset($_SESSION['username'])) {
-    header("location: ../login.php");
+    header("location: login.php");
     exit;
 }
-require_once '../config.php';
+require_once 'config.php';
 
 $isAdminNews = ($_SESSION['username'] ?? '') === 'fdellamorte';
 
@@ -29,7 +29,7 @@ if ($isAdminNews && $_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($titolo === '' || mb_strlen($titolo) > 150) $errors[] = "Titolo non valido.";
             if ($contenuto === '') $errors[] = "Contenuto obbligatorio.";
             if (!$errors) {
-                $stmt = $link->prepare("INSERT INTO novita (titolo, contenuto, created_by) VALUES (?, ?, ?)");
+                $stmt = $link->prepare("INSERT INTO notifications (title, body, created_by) VALUES (?, ?, ?)");
                 $stmt->bind_param("sss", $titolo, $contenuto, $_SESSION['username']);
                 $stmt->execute();
                 $stmt->close();
@@ -45,7 +45,7 @@ if ($isAdminNews && $_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($titolo === '' || mb_strlen($titolo) > 150) $errors[] = "Titolo non valido.";
             if ($contenuto === '') $errors[] = "Contenuto obbligatorio.";
             if (!$errors) {
-                $stmt = $link->prepare("UPDATE novita SET titolo=?, contenuto=? WHERE id=?");
+                $stmt = $link->prepare("UPDATE notifications SET title=?, body=? WHERE id=?");
                 $stmt->bind_param("ssi", $titolo, $contenuto, $id);
                 $stmt->execute();
                 $stmt->close();
@@ -57,7 +57,7 @@ if ($isAdminNews && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = (int)($_POST['id'] ?? 0);
             if ($id <= 0) $errors[] = "ID non valido.";
             if (!$errors) {
-                $stmt = $link->prepare("DELETE FROM novita WHERE id=?");
+                $stmt = $link->prepare("DELETE FROM notifications WHERE id=?");
                 $stmt->bind_param("i", $id);
                 $stmt->execute();
                 $stmt->close();
@@ -70,7 +70,7 @@ if ($isAdminNews && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // --- Fetch tutte le novità ---
 $novita = [];
-$res = $link->query("SELECT id, titolo, contenuto, created_at, created_by FROM novita ORDER BY created_at DESC");
+$res = $link->query("SELECT id, title, body, created_at, created_by FROM notifications ORDER BY created_at DESC");
 if ($res) while ($row = $res->fetch_assoc()) $novita[] = $row;
 ?>
 <!DOCTYPE html>
@@ -79,18 +79,27 @@ if ($res) while ($row = $res->fetch_assoc()) $novita[] = $row;
   <meta charset="UTF-8">
   <title>Novità</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <?php include '../script.php'; ?>
-  <link href="../my.css" rel="stylesheet">
+  <?php include 'script.php'; ?>
+  <link href="my.css" rel="stylesheet">
 </head>
 <body>
 <div class="content-wrapper container mt-5">
 
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h3 class="mb-0">Novità</h3>
+<div class="d-flex align-items-center mb-3">
+  <h3 class="mb-0">Novità</h3>
+
+  <div class="ms-auto d-flex align-items-center gap-2">
+    <button type="button" onclick="history.back()" class="btn btn-sm btn-outline-secondary">
+      ⬅ Indietro
+    </button>
     <?php if ($isAdminNews): ?>
-      <a href="#add" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Aggiungi</a>
+      <a href="#add" class="btn btn-sm btn-primary">
+        <i class="bi bi-plus-circle"></i> Aggiungi
+      </a>
     <?php endif; ?>
   </div>
+</div>
+
 
   <?php if ($success): ?>
     <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
@@ -101,7 +110,7 @@ if ($res) while ($row = $res->fetch_assoc()) $novita[] = $row;
 
   <?php if ($isAdminNews): ?>
   <div id="add" class="card mb-4">
-    <div class="card-header"><strong>Nuova novità</strong></div>
+    <div class="card-header"><strong>Aggiungi una novità</strong></div>
     <div class="card-body">
       <form method="POST" action="#add">
         <input type="hidden" name="csrf" value="<?= $_SESSION['csrf_news'] ?>">
@@ -121,21 +130,18 @@ if ($res) while ($row = $res->fetch_assoc()) $novita[] = $row;
   <?php endif; ?>
 
   <div class="card">
-    <div class="card-header"><strong>Elenco</strong></div>
+    <div class="card-header"><strong>Tutte le novità</strong></div>
     <div class="card-body">
       <?php if (empty($novita)): ?>
         <p>Nessuna novità.</p>
       <?php else: ?>
         <?php foreach ($novita as $n): ?>
           <div id="n<?= $n['id'] ?>" class="mb-5">
-            <button onclick="history.back()" class="btn btn-sm btn-outline-secondary mb-2">
-              ⬅ Indietro
-            </button>
-            <h5><?= htmlspecialchars($n['titolo']) ?></h5>
+            <h5><?= htmlspecialchars($n['title']) ?></h5>
             <div class="small mb-2" style="color:grey">
               Pubblicato il <?= date('d/m/Y H:i', strtotime($n['created_at'])) ?> da <?= htmlspecialchars($n['created_by']) ?>
             </div>
-            <div class="mb-2"><?= nl2br(htmlspecialchars($n['contenuto'])) ?></div>
+            <div class="mb-2"><?= nl2br(htmlspecialchars($n['body'])) ?></div>
 
             <?php if ($isAdminNews): ?>
               <!-- Pulsanti admin -->
@@ -179,8 +185,7 @@ if ($res) while ($row = $res->fetch_assoc()) $novita[] = $row;
     </div>
   </div>
 </div>
-<?php include 'navbar.php'; ?>
-<?php include '../footer.php'; ?>
+<?php include 'footer.php'; ?>
 </body>
 </html>
 
