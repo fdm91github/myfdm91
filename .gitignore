@@ -4,3 +4,5 @@ autoupdate.sh
 /html/mywallet/.old/
 /html/vendor/
 /html/well-known/
+/html/test_email.php
+
