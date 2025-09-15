@@ -33,6 +33,91 @@
         <li class="nav-item">
           <a class="nav-link" href="../logout.php"><i class="bi bi-door-closed-fill"></i> Esci</a>
         </li>
+		<?php
+		$userId = $_SESSION['id'] ?? null;
+		$unread = 0;
+		
+		if ($userId) {
+		  // non lette = tutte le notifications NON presenti nella tabella delle letture per quell'utente
+		  $sql = "
+			SELECT COUNT(*) AS unread
+			FROM notifications n
+			LEFT JOIN notification_reads r
+			  ON r.notification_id = n.id AND r.user_id = ?
+			WHERE r.notification_id IS NULL
+		  ";
+		  if ($stmt = $link->prepare($sql)) {
+			$stmt->bind_param("i", $userId);
+			$stmt->execute();
+			$stmt->bind_result($unread);
+			$stmt->fetch();
+			$stmt->close();
+		  }
+		}
+		
+		// Prendi le ultime 3 per mostrare il riepilogo
+		$last3 = [];
+		if ($userId) {
+		  $sql = "SELECT id, title, created_at FROM notifications ORDER BY created_at DESC LIMIT 3";
+		  if ($res = $link->query($sql)) {
+			while ($row = $res->fetch_assoc()) $last3[] = $row;
+		  }
+		}
+		
+		$bellIcon = ($unread > 0) ? 'bi-bell-fill' : 'bi-bell';
+		?>
+		<li class="nav-item dropdown">
+		  <a class="nav-link dropdown-toggle position-relative" href="#" id="novitaDropdown" role="button"
+			 data-bs-toggle="dropdown" aria-expanded="false">
+			<i id="bellIcon" class="bi <?= $bellIcon ?>"></i> Novità
+			<span id="bellBadge" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger <?= $unread > 0 ? '' : 'd-none' ?>">
+			  <?= (int)$unread ?>
+			  <span class="visually-hidden">nuove notifiche</span>
+			</span>
+		  </a>
+			<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="novitaDropdown" style="min-width:320px">
+				<li class="d-flex justify-content-between align-items-center px-3 py-2">
+					<strong>Ultime notifiche</strong>
+					<?php if ($unread > 0): ?>
+					<button class="btn btn-sm btn-outline-primary" id="markAllReadBtn">Segna tutte come lette</button>
+					<?php endif; ?>
+				</li>
+				<li><hr class="dropdown-divider"></li>
+				  <?php if (empty($last3)): ?>
+				<li><span class="dropdown-item text-muted">Nessuna notifica</span></li>
+					<?php else: ?>
+						<?php foreach ($last3 as $n): ?>
+							<li>
+								<a class="dropdown-item small" href="../news.php#notif<?= (int)$n['id'] ?>">
+									<?= htmlspecialchars($n['title'], ENT_QUOTES, 'UTF-8') ?><br>
+								<small class="text-muted"><?= date('d/m/Y H:i', strtotime($n['created_at'])) ?></small>
+								</a>
+							</li>
+						<?php endforeach; ?>
+					<?php endif; ?>
+					<li><hr class="dropdown-divider"></li>
+					<li><a class="dropdown-item text-center" href="../news.php">Vedi tutte</a></li>
+			</ul>
+		</li>
+		<script>
+		document.addEventListener('DOMContentLoaded', function () {
+		  // Segna tutte come lette
+		  document.getElementById('markAllReadBtn')?.addEventListener('click', function () {
+			fetch('../notifications_mark_all_read.php', { method: 'POST', headers: {'X-Requested-With': 'XMLHttpRequest'} })
+			  .then(r => r.ok ? Promise.resolve() : Promise.reject())
+			  .then(() => {
+				// UI: azzera badge + icona vuota
+				const badge = document.getElementById('bellBadge');
+				const icon  = document.getElementById('bellIcon');
+				if (badge) { badge.classList.add('d-none'); badge.textContent = ''; }
+				if (icon) { icon.classList.remove('bi-bell-fill'); icon.classList.add('bi-bell'); }
+				// Nascondi bottone
+				document.getElementById('markAllReadBtn')?.classList.add('d-none');
+			  })
+			  .catch(() => {});
+		  });
+		});
+		</script>
       </ul>
     </div>
 
