@@ -13,6 +13,43 @@ if (isset($_SESSION['username'])) {
 
 require_once 'config.php';
 
+function sendVerificationEmailJson(string $email): array {
+    // Costruisco l'URL assoluto allo stesso modo del browser
+    $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $host   = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $endpoint = $scheme . '://' . $host . '/mysettings/send_verification_email.php';
+
+    $ch = curl_init($endpoint);
+    $payload = json_encode(['email' => $email], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+    curl_setopt_array($ch, [
+        CURLOPT_POST           => true,
+        CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+        CURLOPT_POSTFIELDS     => $payload,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 10,
+    ]);
+
+    $res  = curl_exec($ch);
+    $cerr = curl_error($ch);
+    $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($res === false) {
+        error_log("[register] sendVerificationEmailJson cURL error: $cerr");
+        return [false, "Errore di rete nell'invio dell'email di verifica."];
+    }
+
+    $data = json_decode($res, true);
+    if ($code === 200 && is_array($data) && !empty($data['success'])) {
+        return [true, $data['message'] ?? 'Email di verifica inviata.'];
+    }
+
+    $msg = is_array($data) ? ($data['message'] ?? 'Errore sconosciuto') : "HTTP $code";
+    error_log("[register] sendVerificationEmailJson response error: $msg");
+    return [false, "Non è stato possibile inviare l'email di verifica."];
+}
+
 // Initialize messages
 $error_message = '';
 $success_message = '';
@@ -89,12 +126,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 $sql_insert = "INSERT INTO users (name, surname, email, username, password) VALUES (?, ?, ?, ?, ?)";
                                 if ($stmt_insert = $link->prepare($sql_insert)) {
                                     $stmt_insert->bind_param("sssss", $name, $surname, $email, $username, $hashed_password);
-                                    if ($stmt_insert->execute()) {
-                                        $success_message = "Registrazione completata con successo! Ora puoi accedere.";
-                                        header("Location: login.php");
-                                    } else {
-                                        $error_message = "Qualcosa è andato storto. Riprova più tardi.";
-                                    }
+									if ($stmt_insert->execute()) {
+										// Invia la mail di verifica con lo stesso POST JSON del fetch()
+										[$okMail, $mailMsg] = sendVerificationEmailJson($email);
+
+										// Messaggio non-bloccante (non impediamo la registrazione se l'email fallisce)
+										if ($okMail) {
+											$success_message = "Registrazione completata! Ti abbiamo inviato un’email per verificare l’indirizzo.";
+										} else {
+											$success_message = "Registrazione completata! Tuttavia non siamo riusciti a inviare l’email di verifica. Puoi riprovare da Impostazioni > Verifica email.";
+										}
+
+										// Redirect alla login con flag per mostrare un banner
+										header("Location: login.php?registered=1");
+										exit;
+									} else {
+										$error_message = "Qualcosa è andato storto. Riprova più tardi.";
+									}
                                     $stmt_insert->close();
                                 } else {
                                     $error_message = "Qualcosa è andato storto. Riprova più tardi.";

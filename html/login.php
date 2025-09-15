@@ -38,7 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'];
     $remember_me = isset($_POST['remember_me']);
 
-    $sql = "SELECT id, username, name, password FROM users WHERE username = ?";
+    $sql = "SELECT id, username, name, password FROM users WHERE username = ? AND enabled = 1";
 
     if ($stmt = $link->prepare($sql)) {
         $stmt->bind_param("s", $username);
@@ -84,11 +84,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         header("location: index.php");
                         exit;
                     } else {
-                        $error_message = "Hai inserito una password errata.";
+                        $error_message = "E01 - Non è possibile eseguire il login con queste credenziali."; // password errata
                     }
                 }
             } else {
-                $error_message = "Non ho trovato nessun utente che si chiami $username :(";
+                $error_message = "E02 - Non è possibile eseguire il login con queste credenziali."; // nessun utente trovato
             }
         } else {
             $error_message = "Qualcosa è andato storto. Riprova più tardi.";
