@@ -4,11 +4,113 @@ ini_set('session.cookie_secure', 1);
 ini_set('session.use_strict_mode', 1);
 session_start();
 
+require __DIR__ . '/vendor/autoload.php'; // PHPMailer
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
 require_once 'config.php';
 
 if (isset($_SESSION['username'])) {
     header("location: index.php");
     exit;
+}
+
+/**
+ * Invia email di notifica blocco account.
+ */
+function sendAccountLockedEmail(string $toEmail, string $username, array $config): bool {
+    if (empty($toEmail)) return false;
+
+    $resetUrl = rtrim($config['host_base'] ?? '', '/').'/passwordReset.php';
+
+    $subject = 'Account bloccato';
+    $body = "
+        <p>Ciao <strong>".htmlspecialchars($username, ENT_QUOTES, 'UTF-8')."</strong>,</p>
+        <p>Abbiamo rilevato troppi tentativi di accesso falliti al tuo account su <a href='https://my.fdm91.net'>MyFDM91</a>.</p>
+        <p>Per sicurezza l’account è stato <strong>temporaneamente bloccato</strong>.</p>
+        <p>Puoi sbloccarlo reimpostando la password da qui:<br>
+        <a href=\"".htmlspecialchars($resetUrl, ENT_QUOTES, 'UTF-8')."\">Password dimenticata</a></p>
+        <p>Se non sei stato tu, contattaci all'indirizzo <a href='mailto:support@fdm91.net'>support@fdm91.net</a>.</p>
+    ";
+
+    try {
+        $mail = new PHPMailer(true);
+        $mail->isSMTP();
+        $mail->Host       = $config['smtp']['host'];
+        $mail->Port       = $config['smtp']['port'];
+        $mail->SMTPAuth   = $config['smtp']['auth'];
+        $mail->SMTPAutoTLS= $config['smtp']['autoTLS'];
+        if (!empty($config['smtp']['options'])) {
+            $mail->SMTPOptions = $config['smtp']['options'];
+        }
+        if (!empty($config['smtp']['username'])) $mail->Username = $config['smtp']['username'];
+        if (!empty($config['smtp']['password'])) $mail->Password = $config['smtp']['password'];
+
+        $mail->setFrom($config['email']['from_address'], $config['email']['from_name']);
+        $mail->addAddress($toEmail);
+
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body    = $body;
+
+        return $mail->send();
+    } catch (Exception $e) {
+        error_log('[login] sendAccountLockedEmail error: '.$e->getMessage());
+        return false;
+    }
+}
+
+/**
+ * Incrementa badPasswordCount. Se arriva a 5: blocca, azzera contatore e invia email.
+ */
+function handleFailedLogin(mysqli $link, string $username, array $config): void {
+    // Prendo id, email, contatore, enabled
+    $sql = "SELECT id, email, badPasswordCount, enabled, username FROM users WHERE username = ?";
+    if (!$stmt = $link->prepare($sql)) return;
+    $stmt->bind_param("s", $username);
+    if (!$stmt->execute()) { $stmt->close(); return; }
+    $stmt->bind_result($id, $email, $bad, $enabled, $uname);
+    if (!$stmt->fetch()) { $stmt->close(); return; }
+    $stmt->close();
+
+    if ((int)$enabled === 0) {
+        // già bloccato: non fare nulla
+        return;
+    }
+
+    $newBad = (int)$bad + 1;
+
+    if ($newBad >= 5) {
+        // blocca e azzera contatore
+        $sql = "UPDATE users SET enabled = 0, badPasswordCount = 0 WHERE id = ?";
+        if ($stmt = $link->prepare($sql)) {
+            $stmt->bind_param("i", $id);
+            $stmt->execute();
+            $stmt->close();
+        }
+        // invia email di blocco
+        sendAccountLockedEmail($email ?? '', $uname ?? $username, $config);
+    } else {
+        // solo incrementa
+        $sql = "UPDATE users SET badPasswordCount = ? WHERE id = ?";
+        if ($stmt = $link->prepare($sql)) {
+            $stmt->bind_param("ii", $newBad, $id);
+            $stmt->execute();
+            $stmt->close();
+        }
+    }
+}
+
+/**
+ * Azzeramento contatore al login riuscito.
+ */
+function resetFailedCounter(mysqli $link, int $userId): void {
+    $sql = "UPDATE users SET badPasswordCount = 0 WHERE id = ?";
+    if ($stmt = $link->prepare($sql)) {
+        $stmt->bind_param("i", $userId);
+        $stmt->execute();
+        $stmt->close();
+    }
 }
 
 // Check if the remember me cookie exists
@@ -38,64 +140,78 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = $_POST['password'];
     $remember_me = isset($_POST['remember_me']);
 
-    $sql = "SELECT id, username, name, password FROM users WHERE username = ? AND enabled = 1";
+	$sql = "SELECT id, username, name, email, password, badPasswordCount, enabled
+			FROM users
+			WHERE username = ? AND enabled = 1";
 
-    if ($stmt = $link->prepare($sql)) {
-        $stmt->bind_param("s", $username);
+	if ($stmt = $link->prepare($sql)) {
+		$stmt->bind_param("s", $username);
 
-        if ($stmt->execute()) {
-            $stmt->store_result();
+		if ($stmt->execute()) {
+			$stmt->store_result();
 
-            if ($stmt->num_rows == 1) {
-                $stmt->bind_result($id, $username, $name, $hashed_password);
-                if ($stmt->fetch()) {
-                    if (password_verify($password, $hashed_password)) {
-                        session_start();
-                        $_SESSION['id'] = $id;
-                        $_SESSION['username'] = $username;
-                        $_SESSION['name'] = $name;
-                        
-                        if ($remember_me) {
-                            $selector = bin2hex(random_bytes(8));
-                            $authenticator = random_bytes(33);
+			if ($stmt->num_rows == 1) {
+				$stmt->bind_result($id, $dbUsername, $name, $email, $hashed_password, $badPasswordCount, $enabled);
+				if ($stmt->fetch()) {
+					if (password_verify($password, $hashed_password)) {
+						// LOGIN OK
+						// evita secondo session_start() -> è già stato chiamato
+						session_regenerate_id(true);
+						$_SESSION['id']       = $id;
+						$_SESSION['username'] = $dbUsername;
+						$_SESSION['name']     = $name;
 
-                            setcookie(
-                                'rememberme',
-                                $selector . ':' . base64_encode($authenticator),
-                                time() + 2592000,
-                                '/',
-                                'fdm91.net', // Change this to your domain
-                                true, // Secure, set to true if using HTTPS
-                                true  // HttpOnly
-                            );
+						// reset contatore
+						resetFailedCounter($link, $id);
 
-                            $stmt = $link->prepare("INSERT INTO auth_tokens (selector, token, user_id, username, expires) VALUES (?, ?, ?, ?, ?)");
-                            $stmt->bind_param(
-                                'ssiss',
-                                $selector,
-                                hash('sha256', $authenticator),
-                                $id,
-                                $username,
-                                date('Y-m-d H:i:s', time() + 2592000)
-                            );
-                            $stmt->execute();
-                        }
+						// remember me (invariato)...
+						if ($remember_me) {
+							$selector = bin2hex(random_bytes(8));
+							$authenticator = random_bytes(33);
 
-                        header("location: index.php");
-                        exit;
-                    } else {
-                        $error_message = "E01 - Non è possibile eseguire il login con queste credenziali."; // password errata
-                    }
-                }
-            } else {
-                $error_message = "E02 - Non è possibile eseguire il login con queste credenziali."; // nessun utente trovato
-            }
-        } else {
-            $error_message = "Qualcosa è andato storto. Riprova più tardi.";
-        }
-        $stmt->close();
-    }
-    $link->close();
+							setcookie(
+								'rememberme',
+								$selector . ':' . base64_encode($authenticator),
+								time() + 2592000,
+								'/',
+								'fdm91.net', // TODO: metti il tuo dominio
+								true, // secure
+								true  // httponly
+							);
+
+							if ($stmt2 = $link->prepare("INSERT INTO auth_tokens (selector, token, user_id, username, expires) VALUES (?, ?, ?, ?, ?)")) {
+								$stmt2->bind_param(
+									'ssiss',
+									$selector,
+									hash('sha256', $authenticator),
+									$id,
+									$dbUsername,
+									date('Y-m-d H:i:s', time() + 2592000)
+								);
+								$stmt2->execute();
+								$stmt2->close();
+							}
+						}
+
+						header("location: index.php");
+						exit;
+					} else {
+						// PASSWORD ERRATA
+						handleFailedLogin($link, $username, $config);
+						$error_message = "E01 - Non è possibile eseguire il login con queste credenziali.";
+					}
+				}
+			} else {
+				// UTENTE NON TROVATO o DISABILITATO
+				handleFailedLogin($link, $username, $config);
+				$error_message = "E02 - Non è possibile eseguire il login con queste credenziali.";
+			}
+		} else {
+			$error_message = "Qualcosa è andato storto. Riprova più tardi.";
+		}
+		$stmt->close();
+	}
+	$link->close();
 }
 ?>
 
